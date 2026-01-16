@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Configuration Firebase -->
+<script src="firebase-config.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SuperQuiz - Testez vos connaissances en culture générale avec nos quiz d'histoire, géographie, science et littérature">
+    <meta name="keywords" content="quiz, culture générale, histoire, géographie, science, littérature, test">
+    <title>SuperQuiz.com - Accueil</title>
+    <link rel="preload" href="CSS/style.css" as="style">
+    <link rel="stylesheet" href="CSS/style.css" type="text/css">
+    <link rel="preload" href="js/script.js" as="script">
+    <script src="js/script.js" defer></script>
+    <style>
+        .welcome-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .welcome-box h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.8em;
+        }
+        
+        .welcome-box p {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+        
+        .btn-cta {
+            display: inline-block;
+            padding: 12px 30px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .btn-cta:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html" aria-current="page">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="h1">
+            <h1>SUPERQUIZ</h1>
+        </div>
+
+        <div class="phrase-de-bienvenue">
+            <p>BIENVENUE DANS CE NOUVEAU SITE DE CULTURE GÉNÉRALE</p>
+        </div>
+
+        <div id="user-welcome"></div>
+
+        <div class="updates-info">
+            <h2>Mises à jour du site</h2>
+            <p>✨ <strong>Nouveau :</strong> Système de comptes utilisateurs ! Connectez-vous pour sauvegarder vos scores et suivre vos progrès.</p>
+            <p>Publication du site dans sa version Alpha avec 5 menus dont 5 sous-menus présents dans Quiz afin d'avoir une variété de matières où 
+            l'utilisateur peut trouver des questions en rapport avec le sous-menu choisi.</p>
+            <p class="update-divider">.............................</p>
+            <p class="update-divider">.............................</p>
+        </div>
+    </header>
+
+    <main>
+        <figure>
+            <img src="Images/bretagne.jpg" alt="Paysage de Bretagne avec ses côtes pittoresques" width="100" height="100" loading="lazy" />
+            <figcaption>La Bretagne est une région de l'ouest de la France connue pour ses côtes pittoresques et son riche
+                patrimoine culturel.</figcaption>
+        </figure>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script>
+        // Afficher un message de bienvenue personnalisé si connecté
+        function displayWelcome() {
+            const user = FirebaseAuth.getCurrentUser();
+            
+            if (user) {
+                const welcomeDiv = document.getElementById('user-welcome');
+                welcomeDiv.innerHTML = `
+                    <div class="welcome-box">
+                        <h2>👋 Bonjour ${user.name} !</h2>
+                        <p>Ravi de vous revoir. Prêt à tester vos connaissances ?</p>
+                        <a href="Quiz.html" class="btn-cta">Commencer un quiz</a>
+                        <a href="Scores.html" class="btn-cta">Voir mes scores</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Utilisateur non connecté
+            const welcomeDiv = document.getElementById('user-welcome');
+            welcomeDiv.innerHTML = `
+                <div class="welcome-box">
+                    <h2>🎯 Nouveau sur SuperQuiz ?</h2>
+                    <p>Créez un compte pour sauvegarder vos scores et suivre vos progrès !</p>
+                    <a href="Auth.html" class="btn-cta">S'inscrire gratuitement</a>
+                    <a href="Quiz.html" class="btn-cta">Essayer sans compte</a>
+                </div>
+            `;
+        }
+
+        // Gestion du menu d'authentification Firebase
+        FirebaseAuth.onAuthStateChanged(user => {
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+            
+            // Mettre à jour le message de bienvenue
+            displayWelcome();
+        });
+
+        // Fonction de déconnexion
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    alert('Déconnexion réussie !');
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

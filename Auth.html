@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Sécurité -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <title>SuperQuiz - Connexion</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        .auth-container{max-width:450px;margin:50px auto;background:#fff;padding:40px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,.2)}
+        .auth-header{text-align:center;margin-bottom:30px}
+        .auth-header h1{color:#2c3e50;margin-bottom:10px}
+        .auth-tabs{display:flex;margin-bottom:30px;border-bottom:2px solid #ecf0f1}
+        .auth-tab{flex:1;padding:15px;text-align:center;cursor:pointer;border-bottom:3px solid transparent;transition:all .3s;font-weight:600;color:#7f8c8d}
+        .auth-tab.active{color:#3498db;border-bottom-color:#3498db}
+        .auth-form{display:none}
+        .auth-form.active{display:block}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;color:#2c3e50;font-weight:500}
+        .form-group input{width:100%;padding:12px 15px;border:2px solid #ecf0f1;border-radius:8px;font-size:1em;transition:border-color .3s}
+        .form-group input:focus{outline:0;border-color:#3498db}
+        .btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:8px;font-size:1.1em;font-weight:600;cursor:pointer;transition:transform .3s}
+        .btn-submit:hover{transform:translateY(-2px)}
+        .btn-submit:disabled{opacity:0.6;cursor:not-allowed}
+        .message{padding:15px;border-radius:8px;margin-bottom:20px;display:none}
+        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+        .message.info{background:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}
+        .back-link{text-align:center;margin-top:20px}
+        .back-link a{color:#3498db;text-decoration:none}
+        .password-strength{font-size:.9em;margin-top:5px;color:#7f8c8d}
+        .password-strength.weak{color:#e74c3c}
+        .password-strength.medium{color:#f39c12}
+        .password-strength.strong{color:#2ecc71}
+        .forgot-password{text-align:right;margin-top:10px}
+        .forgot-password a{color:#3498db;text-decoration:none;font-size:0.9em}
+        .loading-spinner{border:3px solid #f3f3f3;border-top:3px solid #3498db;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:0 auto}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>🔐 Espace Personnel</h1>
+                <p>Connectez-vous pour sauvegarder vos scores</p>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Connexion</div>
+                <div class="auth-tab" onclick="switchTab('register')">Inscription</div>
+                <div class="auth-tab" onclick="switchTab('reset')">Mot de passe oublié</div>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required placeholder="votre@email.com" maxlength="254">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" maxlength="128">
+                </div>
+                <button type="submit" class="btn-submit" id="btn-login">Se connecter</button>
+                <div class="forgot-password">
+                    <a href="#" onclick="switchTab('reset'); return false;">Mot de passe oublié ?</a>
+                </div>
+            </form>
+
+            <!-- Formulaire d'inscription -->
+            <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-name">Nom</label>
+                    <input type="text" id="register-name" required placeholder="Votre nom" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required placeholder="votre@email.com" maxlength="254">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Mot de passe</label>
+                    <input type="password" id="register-password" required minlength="8" maxlength="128" placeholder="Min. 8 car., maj, min, chiffre" oninput="checkPasswordStrength()">
+                    <div id="password-strength" class="password-strength"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">Confirmer le mot de passe</label>
+                    <input type="password" id="register-confirm" required maxlength="128" placeholder="Répétez le mot de passe">
+                </div>
+                <button type="submit" class="btn-submit" id="btn-register">S'inscrire</button>
+            </form>
+
+            <!-- Formulaire de réinitialisation -->
+            <form id="reset-form" class="auth-form" onsubmit="handleResetPassword(event)">
+                <div class="form-group">
+                    <label for="reset-email">Email</label>
+                    <input type="email" id="reset-email" required placeholder="votre@email.com" maxlength="254">
+                </div>
+                <button type="submit" class="btn-submit" id="btn-reset">Réinitialiser mon mot de passe</button>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #7f8c8d;">
+                    📧 Vous recevrez un email avec un lien pour réinitialiser votre mot de passe.
+                </p>
+            </form>
+
+            <div class="back-link">
+                <a href="Accueil.html">← Retour à l'accueil</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        // Basculer entre les onglets
+        function switchTab(tabName) {
+            document.querySelectorAll('.auth-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
+            
+            const tabs = document.querySelectorAll('.auth-tab');
+            const forms = {
+                'login': 0,
+                'register': 1,
+                'reset': 2
+            };
+            
+            tabs[forms[tabName]].classList.add('active');
+            document.querySelectorAll('.auth-form')[forms[tabName]].classList.add('active');
+            
+            hideMessage();
+        }
+
+        // Afficher/cacher messages
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+        }
+
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+
+        // Vérifier force du mot de passe
+        function checkPasswordStrength() {
+            const pwd = document.getElementById('register-password').value;
+            const strength = document.getElementById('password-strength');
+            
+            if (!pwd) {
+                strength.textContent = '';
+                return;
+            }
+
+            let score = 0;
+            if (pwd.length >= 8) score++;
+            if (/[a-z]/.test(pwd)) score++;
+            if (/[A-Z]/.test(pwd)) score++;
+            if (/[0-9]/.test(pwd)) score++;
+            if (/[^a-zA-Z0-9]/.test(pwd)) score++;
+
+            if (score <= 2) {
+                strength.textContent = '⚠️ Faible';
+                strength.className = 'password-strength weak';
+            } else if (score === 3) {
+                strength.textContent = '✓ Moyen';
+                strength.className = 'password-strength medium';
+            } else {
+                strength.textContent = '✓✓ Fort';
+                strength.className = 'password-strength strong';
+            }
+        }
+
+        // Désactiver/activer bouton
+        function setButtonLoading(buttonId, loading) {
+            const btn = document.getElementById(buttonId);
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = '<div class="loading-spinner"></div>';
+            } else {
+                btn.disabled = false;
+                switch(buttonId) {
+                    case 'btn-login': btn.textContent = 'Se connecter'; break;
+                    case 'btn-register': btn.textContent = 'S\'inscrire'; break;
+                    case 'btn-reset': btn.textContent = 'Réinitialiser mon mot de passe'; break;
+                }
+            }
+        }
+
+        // Inscription
+        async function handleRegister(e) {
+            e.preventDefault();
+            setButtonLoading('btn-register', true);
+            
+            const name = document.getElementById('register-name').value.trim();
+            const email = document.getElementById('register-email').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+
+            try {
+                if (password !== confirm) {
+                    throw new Error('Les mots de passe ne correspondent pas');
+                }
+
+                const result = await FirebaseAuth.register(name, email, password);
+                
+                showMessage(result.message + ' Redirection...', 'success');
+                setTimeout(() => window.location.href = 'Accueil.html', 2000);
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+                setButtonLoading('btn-register', false);
+            }
+        }
+
+        // Connexion
+        async function handleLogin(e) {
+            e.preventDefault();
+            setButtonLoading('btn-login', true);
+            
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const result = await FirebaseAuth.login(email, password);
+                
+                if (!result.user.emailVerified) {
+                    showMessage('⚠️ Email non vérifié. Vérifiez votre boîte mail. <a href="#" onclick="resendVerification()">Renvoyer l\'email</a>', 'info');
+                    setButtonLoading('btn-login', false);
+                    return;
+                }
+                
+                showMessage('✅ Connexion réussie ! Redirection...', 'success');
+                setTimeout(() => window.location.href = 'Accueil.html', 1500);
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+                setButtonLoading('btn-login', false);
+            }
+        }
+
+        // Réinitialisation mot de passe
+        async function handleResetPassword(e) {
+            e.preventDefault();
+            setButtonLoading('btn-reset', true);
+            
+            const email = document.getElementById('reset-email').value.trim();
+
+            try {
+                const result = await FirebaseAuth.resetPassword(email);
+                showMessage(result.message, 'success');
+                setButtonLoading('btn-reset', false);
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+                setButtonLoading('btn-reset', false);
+            }
+        }
+
+        // Renvoyer email de vérification
+        async function resendVerification() {
+            try {
+                const result = await FirebaseAuth.resendVerificationEmail();
+                showMessage(result.message, 'success');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // Vérifier si déjà connecté
+        FirebaseAuth.onAuthStateChanged(user => {
+            if (user && user.emailVerified) {
+                showMessage('Vous êtes déjà connecté. Redirection...', 'success');
+                setTimeout(() => window.location.href = 'Accueil.html', 1500);
+            }
+        });
+    </script>
+</body>
+</html>

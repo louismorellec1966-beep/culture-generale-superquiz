@@ -1,0 +1,840 @@
+{
+    "histoire": {
+        "antiquite": {
+            "titre": "🏛️ Antiquité",
+            "questions": [
+                {
+                    "question": "Qui était le premier empereur romain ?",
+                    "reponses": [
+                        "Auguste",
+                        "Jules César",
+                        "Néron",
+                        "Tibère"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "En quelle année Jules César a-t-il été assassiné ?",
+                    "reponses": [
+                        "44 av. J.-C.",
+                        "55 av. J.-C.",
+                        "33 av. J.-C.",
+                        "27 av. J.-C."
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle était la capitale de l'Égypte ancienne ?",
+                    "reponses": [
+                        "Memphis",
+                        "Alexandrie",
+                        "Thèbes",
+                        "Le Caire"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui était le dieu principal dans la mythologie grecque ?",
+                    "reponses": [
+                        "Zeus",
+                        "Poséidon",
+                        "Hadès",
+                        "Apollon"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle bataille a marqué la fin de l'expansion perse en Grèce ?",
+                    "reponses": [
+                        "Salamine",
+                        "Marathon",
+                        "Thermopyles",
+                        "Platées"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "moyenage": {
+            "titre": "⚔️ Moyen Âge",
+            "questions": [
+                {
+                    "question": "En quelle année a eu lieu la bataille de Hastings ?",
+                    "reponses": [
+                        "1066",
+                        "1096",
+                        "1215",
+                        "1337"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a unifié les tribus mongoles au XIIIe siècle ?",
+                    "reponses": [
+                        "Gengis Khan",
+                        "Kubilaï Khan",
+                        "Tamerlan",
+                        "Attila"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "En quelle année a commencé la première croisade ?",
+                    "reponses": [
+                        "1096",
+                        "1066",
+                        "1215",
+                        "1187"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a signé la Magna Carta en 1215 ?",
+                    "reponses": [
+                        "Jean sans Terre",
+                        "Richard Cœur de Lion",
+                        "Philippe Auguste",
+                        "Louis IX"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "art": {
+            "titre": "🎨 Histoire de l'Art",
+            "questions": [
+                {
+                    "question": "Qui a peint la Joconde ?",
+                    "reponses": [
+                        "Léonard de Vinci",
+                        "Michel-Ange",
+                        "Raphaël",
+                        "Botticelli"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel courant artistique Pablo Picasso a-t-il co-fondé ?",
+                    "reponses": [
+                        "Cubisme",
+                        "Impressionnisme",
+                        "Surréalisme",
+                        "Fauvisme"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Où se trouve la chapelle Sixtine ?",
+                    "reponses": [
+                        "Vatican",
+                        "Florence",
+                        "Venise",
+                        "Milan"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a sculpté 'Le Penseur' ?",
+                    "reponses": [
+                        "Auguste Rodin",
+                        "Michel-Ange",
+                        "Donatello",
+                        "Bernini"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "guerres": {
+            "titre": "⚡ Guerres Mondiales",
+            "questions": [
+                {
+                    "question": "En quelle année a commencé la Première Guerre mondiale ?",
+                    "reponses": [
+                        "1914",
+                        "1915",
+                        "1916",
+                        "1917"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel traité a mis fin à la Première Guerre mondiale ?",
+                    "reponses": [
+                        "Traité de Versailles",
+                        "Traité de Paris",
+                        "Traité de Rome",
+                        "Traité de Westphalie"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel jour a eu lieu le débarquement de Normandie ?",
+                    "reponses": [
+                        "6 juin 1944",
+                        "8 mai 1945",
+                        "1er septembre 1939",
+                        "7 décembre 1941"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle bataille fut le tournant du front de l'Est ?",
+                    "reponses": [
+                        "Stalingrad",
+                        "Koursk",
+                        "Moscou",
+                        "Berlin"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "france": {
+            "titre": "🇫🇷 Histoire de France",
+            "questions": [
+                {
+                    "question": "En quelle année a eu lieu la bataille de Marignan ?",
+                    "reponses": [
+                        "1515",
+                        "1519",
+                        "1518",
+                        "1517"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui était le premier empereur de France ?",
+                    "reponses": [
+                        "Napoléon Bonaparte",
+                        "Louis XIV",
+                        "Charlemagne",
+                        "Jules César"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "En quelle année a commencé la Révolution française ?",
+                    "reponses": [
+                        "1789",
+                        "1799",
+                        "1804",
+                        "1776"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel roi était surnommé le 'Roi Soleil' ?",
+                    "reponses": [
+                        "Louis XIV",
+                        "Louis XV",
+                        "Louis XVI",
+                        "François Ier"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "contemporaine": {
+            "titre": "📱 Histoire Contemporaine",
+            "questions": [
+                {
+                    "question": "En quelle année le mur de Berlin est-il tombé ?",
+                    "reponses": [
+                        "1989",
+                        "1987",
+                        "1991",
+                        "1985"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui fut le premier président de la Ve République ?",
+                    "reponses": [
+                        "Charles de Gaulle",
+                        "Georges Pompidou",
+                        "François Mitterrand",
+                        "René Coty"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "En quelle année l'Union européenne a-t-elle été créée ?",
+                    "reponses": [
+                        "1993",
+                        "1957",
+                        "1989",
+                        "2000"
+                    ],
+                    "correct": 0
+                }
+            ]
+        }
+    },
+    "geographie": {
+        "capitales": {
+            "titre": "🏛️ Capitales du Monde",
+            "questions": [
+                {
+                    "question": "Quelle est la capitale de l'Australie ?",
+                    "reponses": [
+                        "Canberra",
+                        "Sydney",
+                        "Melbourne",
+                        "Brisbane"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle est la capitale du Canada ?",
+                    "reponses": [
+                        "Ottawa",
+                        "Toronto",
+                        "Montréal",
+                        "Vancouver"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle est la capitale de la Suisse ?",
+                    "reponses": [
+                        "Berne",
+                        "Zurich",
+                        "Genève",
+                        "Lausanne"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "france": {
+            "titre": "🇫🇷 Géographie de France",
+            "questions": [
+                {
+                    "question": "Combien de régions compte la France depuis 2016 ?",
+                    "reponses": [
+                        "13",
+                        "22",
+                        "18",
+                        "15"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel est le plus haut sommet de France ?",
+                    "reponses": [
+                        "Mont Blanc",
+                        "Mont Ventoux",
+                        "Pic du Midi",
+                        "Vignemale"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle ville est surnommée la 'ville rose' ?",
+                    "reponses": [
+                        "Toulouse",
+                        "Bordeaux",
+                        "Lyon",
+                        "Marseille"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "europe": {
+            "titre": "🇪🇺 Europe",
+            "questions": [
+                {
+                    "question": "Combien de pays compte l'Union européenne ?",
+                    "reponses": [
+                        "27",
+                        "28",
+                        "25",
+                        "30"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle ville est la 'Venise du Nord' ?",
+                    "reponses": [
+                        "Amsterdam",
+                        "Bruges",
+                        "Stockholm",
+                        "St-Pétersbourg"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "continents": {
+            "titre": "🌍 Continents & Océans",
+            "questions": [
+                {
+                    "question": "Quel est le plus grand océan du monde ?",
+                    "reponses": [
+                        "Pacifique",
+                        "Atlantique",
+                        "Indien",
+                        "Arctique"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel est le plus grand désert chaud ?",
+                    "reponses": [
+                        "Sahara",
+                        "Kalahari",
+                        "Gobi",
+                        "Atacama"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "nature": {
+            "titre": "🏔️ Géographie Physique",
+            "questions": [
+                {
+                    "question": "Quel est le plus haut sommet du monde ?",
+                    "reponses": [
+                        "Everest",
+                        "K2",
+                        "Kilimandjaro",
+                        "Mont Blanc"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel est le plus long fleuve du monde ?",
+                    "reponses": [
+                        "Nil",
+                        "Amazone",
+                        "Yangtsé",
+                        "Mississippi"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "culture": {
+            "titre": "🎭 Géographie Culturelle",
+            "questions": [
+                {
+                    "question": "Dans quel pays se trouve la tour de Pise ?",
+                    "reponses": [
+                        "Italie",
+                        "France",
+                        "Espagne",
+                        "Grèce"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Où se trouve le Taj Mahal ?",
+                    "reponses": [
+                        "Inde",
+                        "Chine",
+                        "Égypte",
+                        "Turquie"
+                    ],
+                    "correct": 0
+                }
+            ]
+        }
+    },
+    "science": {
+        "physique": {
+            "titre": "⚛️ Physique",
+            "questions": [
+                {
+                    "question": "Quelle est la vitesse de la lumière dans le vide ?",
+                    "reponses": [
+                        "300 000 km/s",
+                        "150 000 km/s",
+                        "500 000 km/s",
+                        "200 000 km/s"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a développé la théorie de la relativité ?",
+                    "reponses": [
+                        "Albert Einstein",
+                        "Isaac Newton",
+                        "Galileo Galilei",
+                        "Stephen Hawking"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle est l'unité de mesure de la force ?",
+                    "reponses": [
+                        "Newton",
+                        "Joule",
+                        "Watt",
+                        "Pascal"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "chimie": {
+            "titre": "🧪 Chimie",
+            "questions": [
+                {
+                    "question": "Quel est le symbole chimique de l'or ?",
+                    "reponses": [
+                        "Au",
+                        "Ag",
+                        "Fe",
+                        "Cu"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Combien d'atomes d'oxygène dans H2O ?",
+                    "reponses": [
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel gaz représente 78% de l'atmosphère ?",
+                    "reponses": [
+                        "Azote",
+                        "Oxygène",
+                        "CO2",
+                        "Argon"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "biologie": {
+            "titre": "🧬 Biologie",
+            "questions": [
+                {
+                    "question": "Quel est le support de l'information génétique ?",
+                    "reponses": [
+                        "ADN",
+                        "ARN",
+                        "Protéines",
+                        "Lipides"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Combien de chromosomes dans une cellule humaine ?",
+                    "reponses": [
+                        "46",
+                        "23",
+                        "48",
+                        "44"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quel organe produit l'insuline ?",
+                    "reponses": [
+                        "Pancréas",
+                        "Foie",
+                        "Estomac",
+                        "Intestin"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "astronomie": {
+            "titre": "🌌 Astronomie",
+            "questions": [
+                {
+                    "question": "Planète la plus proche du Soleil ?",
+                    "reponses": [
+                        "Mercure",
+                        "Vénus",
+                        "Mars",
+                        "Terre"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Combien de planètes dans le système solaire ?",
+                    "reponses": [
+                        "8",
+                        "9",
+                        "7",
+                        "10"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Quelle planète est la 'planète rouge' ?",
+                    "reponses": [
+                        "Mars",
+                        "Jupiter",
+                        "Vénus",
+                        "Saturne"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "mathematiques": {
+            "titre": "📐 Mathématiques",
+            "questions": [
+                {
+                    "question": "Valeur de π arrondie à deux décimales ?",
+                    "reponses": [
+                        "3.14",
+                        "3.16",
+                        "3.12",
+                        "3.18"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Somme des angles d'un triangle ?",
+                    "reponses": [
+                        "180°",
+                        "360°",
+                        "90°",
+                        "270°"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Père de la géométrie ?",
+                    "reponses": [
+                        "Euclide",
+                        "Pythagore",
+                        "Archimède",
+                        "Thalès"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "technologie": {
+            "titre": "💻 Technologie",
+            "questions": [
+                {
+                    "question": "Père de l'informatique moderne ?",
+                    "reponses": [
+                        "Alan Turing",
+                        "Bill Gates",
+                        "Steve Jobs",
+                        "Tim Berners-Lee"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Année d'invention du World Wide Web ?",
+                    "reponses": [
+                        "1989",
+                        "1995",
+                        "1985",
+                        "2000"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Que signifie CPU ?",
+                    "reponses": [
+                        "Central Processing Unit",
+                        "Computer Personal Unit",
+                        "Central Program",
+                        "Core Processing"
+                    ],
+                    "correct": 0
+                }
+            ]
+        }
+    },
+    "litterature": {
+        "classiques": {
+            "titre": "📚 Classiques Français",
+            "questions": [
+                {
+                    "question": "Qui a écrit 'Les Misérables' ?",
+                    "reponses": [
+                        "Victor Hugo",
+                        "Émile Zola",
+                        "Gustave Flaubert",
+                        "Honoré de Balzac"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Pièce de Molière mettant en scène un avare ?",
+                    "reponses": [
+                        "L'Avare",
+                        "Le Misanthrope",
+                        "Tartuffe",
+                        "Le Malade imaginaire"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Auteur de 'Madame Bovary' ?",
+                    "reponses": [
+                        "Gustave Flaubert",
+                        "Stendhal",
+                        "Guy de Maupassant",
+                        "Alexandre Dumas"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "poesie": {
+            "titre": "✍️ Poésie",
+            "questions": [
+                {
+                    "question": "Qui a écrit 'Les Fleurs du mal' ?",
+                    "reponses": [
+                        "Charles Baudelaire",
+                        "Arthur Rimbaud",
+                        "Paul Verlaine",
+                        "Stéphane Mallarmé"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a écrit 'Le Bateau ivre' ?",
+                    "reponses": [
+                        "Arthur Rimbaud",
+                        "Paul Verlaine",
+                        "Charles Baudelaire",
+                        "Victor Hugo"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a écrit 'Alcools' ?",
+                    "reponses": [
+                        "Guillaume Apollinaire",
+                        "Paul Éluard",
+                        "Jacques Prévert",
+                        "Louis Aragon"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "theatre": {
+            "titre": "🎭 Théâtre",
+            "questions": [
+                {
+                    "question": "Qui a écrit 'Phèdre' ?",
+                    "reponses": [
+                        "Jean Racine",
+                        "Pierre Corneille",
+                        "Molière",
+                        "Beaumarchais"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Pièce de Corneille : amour vs devoir ?",
+                    "reponses": [
+                        "Le Cid",
+                        "Horace",
+                        "Cinna",
+                        "Polyeucte"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a écrit 'La Cantatrice chauve' ?",
+                    "reponses": [
+                        "Eugène Ionesco",
+                        "Samuel Beckett",
+                        "Jean Anouilh",
+                        "Jean Cocteau"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "romans": {
+            "titre": "📖 Romans du XXe siècle",
+            "questions": [
+                {
+                    "question": "Qui a écrit 'L'Étranger' ?",
+                    "reponses": [
+                        "Albert Camus",
+                        "Jean-Paul Sartre",
+                        "André Gide",
+                        "André Malraux"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Roman de Sartre illustrant l'existentialisme ?",
+                    "reponses": [
+                        "La Nausée",
+                        "Les Mouches",
+                        "Huis clos",
+                        "L'Être et le Néant"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "mondiale": {
+            "titre": "🌍 Littérature Mondiale",
+            "questions": [
+                {
+                    "question": "Qui a écrit 'Roméo et Juliette' ?",
+                    "reponses": [
+                        "Shakespeare",
+                        "Molière",
+                        "Goethe",
+                        "Dante"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Auteur de 'Don Quichotte' ?",
+                    "reponses": [
+                        "Cervantès",
+                        "Shakespeare",
+                        "Dante",
+                        "Boccace"
+                    ],
+                    "correct": 0
+                }
+            ]
+        },
+        "contemporaine": {
+            "titre": "📱 Littérature Contemporaine",
+            "questions": [
+                {
+                    "question": "Prix Nobel de littérature 2014 ?",
+                    "reponses": [
+                        "Patrick Modiano",
+                        "Annie Ernaux",
+                        "J.M.G. Le Clézio",
+                        "Gao Xingjian"
+                    ],
+                    "correct": 0
+                },
+                {
+                    "question": "Qui a écrit 'L'Élégance du hérisson' ?",
+                    "reponses": [
+                        "Muriel Barbery",
+                        "Amélie Nothomb",
+                        "Anna Gavalda",
+                        "Katherine Pancol"
+                    ],
+                    "correct": 0
+                }
+            ]
+        }
+    }
+}

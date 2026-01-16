@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Correcteur UTF-8</title>
+</head>
+<body>
+    <h1>Correcteur d'encodage</h1>
+    <textarea id="input" style="width:100%;height:200px" placeholder="Collez votre texte mal encodé ici"></textarea>
+    <button onclick="corriger()">Corriger</button>
+    <textarea id="output" style="width:100%;height:200px" readonly></textarea>
+    
+    <script>
+        function corriger() {
+            const input = document.getElementById('input').value;
+            const corrections = {
+                'Ã©': 'é', 'Ã ': 'à', 'Ã¨': 'è', 'Ãª': 'ê', 'Ã´': 'ô',
+                'Ã§': 'ç', 'Ã‰': 'É', 'Ã€': 'À', 'Ã‚': 'Â', 'Ã®': 'î',
+                'Ã¹': 'ù', 'Ã»': 'û', 'Ã¯': 'ï', 'Å"': 'œ', 'Ã‡': 'Ç',
+                'Ãˆ': 'È', 'ÃŠ': 'Ê', 'Ã‹': 'Ë', 'ÃŒ': 'Ì', 'ÃŽ': 'Î',
+                'Ã': 'Ñ', 'Ã': 'Ò', 'Ã': 'Ó', 'Ã': 'Ô', 'Ã': 'Õ',
+                'Ã™': 'Ù', 'Ãš': 'Ú', 'Ã›': 'Û', 'Ã': 'Ý'
+            };
+            
+            let output = input;
+            for (let [wrong, right] of Object.entries(corrections)) {
+                output = output.replaceAll(wrong, right);
+            }
+            
+            document.getElementById('output').value = output;
+        }
+    </script>
+</body>
+</html>

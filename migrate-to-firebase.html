@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Migration vers Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>Migration des données vers Firebase</h1>
+    <button onclick="migrateData()">Démarrer la migration</button>
+    <div id="log"></div>
+
+    <script>
+        async function migrateData() {
+            const log = document.getElementById('log');
+            log.innerHTML = '<p>Démarrage de la migration...</p>';
+
+            try {
+                // Récupérer les anciennes données
+                const oldScoresStr = localStorage.getItem('quizScore');
+                
+                if (!oldScoresStr) {
+                    log.innerHTML += '<p>❌ Aucune donnée à migrer</p>';
+                    return;
+                }
+
+                // Vérifier authentification
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    alert('Veuillez vous connecter d\'abord');
+                    window.location.href = 'Auth.html';
+                    return;
+                }
+
+                const oldScores = JSON.parse(oldScoresStr);
+                log.innerHTML += `<p>✅ ${oldScores.length} scores trouvés</p>`;
+
+                // Migrer chaque score
+                for (const score of oldScores) {
+                    await FirebaseScores.save(score);
+                    log.innerHTML += `<p>✓ Score migré : ${score.titre}</p>`;
+                }
+
+                log.innerHTML += '<p>✅ Migration terminée avec succès !</p>';
+                log.innerHTML += '<p>Vous pouvez maintenant supprimer les anciennes données locales.</p>';
+
+                // Optionnel : Supprimer les anciennes données
+                if (confirm('Supprimer les anciennes données locales ?')) {
+                    localStorage.removeItem('quizScore');
+                    log.innerHTML += '<p>✅ Anciennes données supprimées</p>';
+                }
+
+            } catch (error) {
+                log.innerHTML += `<p>❌ Erreur : ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Sécurité -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <title>SuperQuiz - Connexion</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        .auth-container{max-width:450px;margin:50px auto;background:#fff;padding:40px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,.2)}
+        .auth-header{text-align:center;margin-bottom:30px}
+        .auth-header h1{color:#2c3e50;margin-bottom:10px}
+        .auth-tabs{display:flex;margin-bottom:30px;border-bottom:2px solid #ecf0f1}
+        .auth-tab{flex:1;padding:15px;text-align:center;cursor:pointer;border-bottom:3px solid transparent;transition:all .3s;font-weight:600;color:#7f8c8d}
+        .auth-tab.active{color:#3498db;border-bottom-color:#3498db}
+        .auth-form{display:none}
+        .auth-form.active{display:block}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;color:#2c3e50;font-weight:500}
+        .form-group input{width:100%;padding:12px 15px;border:2px solid #ecf0f1;border-radius:8px;font-size:1em;transition:border-color .3s}
+        .form-group input:focus{outline:0;border-color:#3498db}
+        .btn-submit{width:100%;padding:15px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:8px;font-size:1.1em;font-weight:600;cursor:pointer;transition:transform .3s}
+        .btn-submit:hover{transform:translateY(-2px)}
+        .message{padding:15px;border-radius:8px;margin-bottom:20px;display:none}
+        .message.success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+        .message.error{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+        .back-link{text-align:center;margin-top:20px}
+        .back-link a{color:#3498db;text-decoration:none}
+        .password-strength{font-size:.9em;margin-top:5px;color:#7f8c8d}
+        .password-strength.weak{color:#e74c3c}
+        .password-strength.medium{color:#f39c12}
+        .password-strength.strong{color:#2ecc71}
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="auth-container">
+            <div class="auth-header">
+                <h1>🔐 Espace Personnel</h1>
+                <p>Connectez-vous pour sauvegarder vos scores</p>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchTab('login')">Connexion</div>
+                <div class="auth-tab" onclick="switchTab('register')">Inscription</div>
+            </div>
+
+            <!-- Formulaire de connexion -->
+            <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required placeholder="votre@email.com" maxlength="254">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Mot de passe</label>
+                    <input type="password" id="login-password" required placeholder="••••••••" maxlength="128">
+                </div>
+                <button type="submit" class="btn-submit">Se connecter</button>
+            </form>
+
+            <!-- Formulaire d'inscription -->
+            <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="register-name">Nom</label>
+                    <input type="text" id="register-name" required placeholder="Votre nom" maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required placeholder="votre@email.com" maxlength="254">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Mot de passe</label>
+                    <input type="password" id="register-password" required minlength="8" maxlength="128" placeholder="Min. 8 car., maj, min, chiffre" oninput="checkPasswordStrength()">
+                    <div id="password-strength" class="password-strength"></div>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">Confirmer le mot de passe</label>
+                    <input type="password" id="register-confirm" required maxlength="128" placeholder="Répétez le mot de passe">
+                </div>
+                <button type="submit" class="btn-submit">S'inscrire</button>
+            </form>
+
+            <div class="back-link">
+                <a href="Accueil.html">← Retour à l'accueil</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/security.js"></script>
+    <script>
+        function switchTab(t){document.querySelectorAll('.auth-tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.auth-form').forEach(e=>e.classList.remove('active'));t==='login'?(document.querySelectorAll('.auth-tab')[0].classList.add('active'),document.getElementById('login-form').classList.add('active')):(document.querySelectorAll('.auth-tab')[1].classList.add('active'),document.getElementById('register-form').classList.add('active'));hideMessage()}
+        function showMessage(t,e){const s=document.getElementById('message');s.textContent=t;s.className=`message ${e}`;s.style.display='block'}
+        function hideMessage(){document.getElementById('message').style.display='none'}
+        function checkPasswordStrength(){const p=document.getElementById('register-password').value,s=document.getElementById('password-strength');if(!p){s.textContent='';return}let l=0;p.length>=8&&l++;/[a-z]/.test(p)&&l++;/[A-Z]/.test(p)&&l++;/[0-9]/.test(p)&&l++;/[^a-zA-Z0-9]/.test(p)&&l++;l<=2?(s.textContent='⚠️ Faible',s.className='password-strength weak'):l===3?(s.textContent='✓ Moyen',s.className='password-strength medium'):(s.textContent='✓✓ Fort',s.className='password-strength strong')}
+        async function handleRegister(e){e.preventDefault();const n=document.getElementById('register-name').value.trim(),m=document.getElementById('register-email').value.trim(),p=document.getElementById('register-password').value,c=document.getElementById('register-confirm').value;if(p!==c){showMessage('Les mots de passe ne correspondent pas','error');return}try{await Auth.register(n,m,p);showMessage('✅ Compte créé ! Vous pouvez vous connecter.','success');setTimeout(()=>{switchTab('login');document.getElementById('login-email').value=m},2e3)}catch(err){showMessage(err.message,'error')}}
+        async function handleLogin(e){e.preventDefault();const m=document.getElementById('login-email').value.trim(),p=document.getElementById('login-password').value;try{await Auth.login(m,p);showMessage('✅ Connexion réussie !','success');setTimeout(()=>window.location.href='Accueil.html',1500)}catch(err){showMessage(err.message,'error')}}
+        function checkSession(){const s=Auth.checkSession();s&&s.connected&&(showMessage('Vous êtes déjà connecté. Redirection...','success'),setTimeout(()=>window.location.href='Accueil.html',1500))}
+        document.addEventListener('DOMContentLoaded',checkSession);
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quiz de littérature - Choisissez votre thème : Classiques, Poésie, Romans, Théâtre">
+    <meta name="keywords" content="quiz littérature, romans, poésie, théâtre, auteurs">
+    <title>SuperQuiz.com - Littérature</title>
+    <link rel="preload" href="CSS/style.css" as="style">
+    <link rel="stylesheet" href="CSS/style.css" type="text/css">
+    <link rel="preload" href="js/script.js" as="script">
+    <script src="js/script.js" defer></script>
+</head>
+
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html" aria-current="page">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="h1">
+            <h1>SUPERQUIZ - LITTÉRATURE</h1>
+        </div>
+        <div class="phrase-de-bienvenue">
+            <p>Plongez dans l'univers des lettres</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="quiz-categories">
+            <h2>Catégories de Littérature</h2>
+            <div class="categories-grid">
+                <a href="mode-selection.html?matiere=litterature&categorie=classiques" class="category-card">
+                    <h3>📚 Classiques Français</h3>
+                    <p>Molière, Hugo, Balzac, Flaubert</p>
+                </a>
+                <a href="mode-selection.html?matiere=litterature&categorie=poesie" class="category-card">
+                    <h3>✍️ Poésie</h3>
+                    <p>Baudelaire, Rimbaud, Verlaine</p>
+                </a>
+                <a href="mode-selection.html?matiere=litterature&categorie=theatre" class="category-card">
+                    <h3>🎭 Théâtre</h3>
+                    <p>Racine, Corneille, Ionesco</p>
+                </a>
+                <a href="mode-selection.html?matiere=litterature&categorie=romans" class="category-card">
+                    <h3>📖 Romans du XXe siècle</h3>
+                    <p>Camus, Sartre, Duras</p>
+                </a>
+                <a href="mode-selection.html?matiere=litterature&categorie=mondiale" class="category-card">
+                    <h3>🌍 Littérature Mondiale</h3>
+                    <p>Shakespeare, Cervantès, Dostoïevski</p>
+                </a>
+                <a href="mode-selection.html?matiere=litterature&categorie=contemporaine" class="category-card">
+                    <h3>📱 Littérature Contemporaine</h3>
+                    <p>Auteurs modernes et prix littéraires</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+<script>
+        // Gestion du menu d'authentification Firebase
+        FirebaseAuth.onAuthStateChanged(user => {
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+        });
+
+        // Fonction de déconnexion
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    alert('Déconnexion réussie !');
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+</body>
+
+</html>

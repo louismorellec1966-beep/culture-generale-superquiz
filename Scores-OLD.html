@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Configuration Firebase -->
+<script src="firebase-config.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperQuiz - Mes Scores</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        .scores-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .user-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .user-info h3 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .scores-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+        }
+        
+        .score-row {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+            gap: 10px;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .mode-indicator {
+            font-size: 0.9em;
+            padding: 3px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+        
+        .mode-indicator.classic {
+            background: #3498db;
+            color: white;
+        }
+        
+        .mode-indicator.challenge {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .score-row:hover {
+            background: #f8f9fa;
+        }
+        
+        .quiz-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .score-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .score-value.good {
+            color: #2ecc71;
+        }
+        
+        .score-value.medium {
+            color: #f39c12;
+        }
+        
+        .score-value.poor {
+            color: #e74c3c;
+        }
+        
+        .score-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .no-scores {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+        
+        .no-scores h3 {
+            margin-bottom: 10px;
+        }
+        
+        .btn-action {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+        
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .filter-section select {
+            padding: 10px;
+            border: 2px solid #ecf0f1;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+
+        @media (max-width: 768px) {
+            .score-row {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+            
+            .table-header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html" aria-current="page">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+            <li id="auth-menu-item"></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div id="content-container"></div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        let currentUser = null;
+        let allScores = [];
+
+        // Vérifier la session
+        function checkAuth() {
+            const user = FirebaseAuth.getCurrentUser();
+            
+            if (!user) {
+                showNotConnected();
+                return false;
+            }
+
+            currentUser = user;
+            updateAuthMenu();
+            loadScores();
+            return true;
+        }
+
+        // Afficher message si non connecté
+        function showNotConnected() {
+            document.getElementById('content-container').innerHTML = `
+                <div class="scores-header">
+                    <h1>🔒 Accès Restreint</h1>
+                </div>
+                <div class="no-scores">
+                    <h3>Vous devez être connecté pour voir vos scores</h3>
+                    <p>Créez un compte pour sauvegarder et consulter vos performances !</p>
+                    <a href="Auth.html" class="btn-action">Se connecter / S'inscrire</a>
+                </div>
+            `;
+        }
+
+        // Mettre à jour le menu d'authentification
+        function updateAuthMenu() {
+            const authMenuItem = document.getElementById('auth-menu-item');
+            if (!authMenuItem) return;
+            
+            if (currentUser) {
+                authMenuItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" title="Déconnexion">
+                        👤 ${currentUser.name} (Déconnexion)
+                    </a>
+                `;
+            } else {
+                authMenuItem.innerHTML = '<a href="Auth.html">Connexion</a>';
+            }
+        }
+
+        // Déconnexion
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+
+        // Charger les scores depuis Firebase
+        async function loadScores() {
+            try {
+                allScores = await FirebaseScores.getAll();
+                displayScores();
+            } catch (error) {
+                console.error('Erreur chargement scores:', error);
+                allScores = [];
+                displayScores();
+            }
+        }
+
+        // Afficher les scores
+        function displayScores() {
+            const container = document.getElementById('content-container');
+
+            // Calculer les statistiques
+            const totalQuiz = allScores.length;
+            const totalPoints = allScores.reduce((sum, s) => sum + s.score, 0);
+            const totalPossible = allScores.reduce((sum, s) => sum + s.total, 0);
+            const avgPercent = totalPossible > 0 ? Math.round((totalPoints / totalPossible) * 100) : 0;
+            const bestScore = allScores.length > 0 ? Math.max(...allScores.map(s => (s.score / s.total) * 100)) : 0;
+
+            let html = `
+                <div class="scores-header">
+                    <h1>📊 Mes Performances</h1>
+                    <p>Bienvenue ${currentUser.name} !</p>
+                </div>
+
+                <div class="user-info">
+                    <h3>Statistiques Globales</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">${totalQuiz}</div>
+                            <div class="stat-label">Quiz complétés</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${totalPoints}/${totalPossible}</div>
+                            <div class="stat-label">Points totaux</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${avgPercent}%</div>
+                            <div class="stat-label">Moyenne générale</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">${Math.round(bestScore)}%</div>
+                            <div class="stat-label">Meilleur score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <label>Filtrer par matière : </label>
+                    <select id="filter-matiere" onchange="filterScores()">
+                        <option value="all">Toutes</option>
+                        <option value="histoire">Histoire</option>
+                        <option value="geographie">Géographie</option>
+                        <option value="science">Science</option>
+                        <option value="litterature">Littérature</option>
+                    </select>
+                </div>
+            `;
+
+            if (allScores.length === 0) {
+                html += `
+                    <div class="no-scores">
+                        <h3>Aucun score enregistré</h3>
+                        <p>Commencez un quiz pour voir vos résultats ici !</p>
+                        <a href="Quiz.html" class="btn-action">Faire un quiz</a>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="scores-table">
+                        <div class="table-header score-row">
+                            <div>Quiz</div>
+                            <div>Score</div>
+                            <div>Mode</div>
+                            <div>Pourcentage</div>
+                            <div>Date</div>
+                        </div>
+                        <div id="scores-list"></div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+            
+            if (allScores.length > 0) {
+                displayScoresList(allScores);
+            }
+        }
+
+        // Afficher la liste des scores
+        function displayScoresList(scores) {
+            const scoresList = document.getElementById('scores-list');
+            if (!scoresList) return;
+
+            // Trier par date (plus récent en premier)
+            const sortedScores = [...scores].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            scoresList.innerHTML = sortedScores.map(score => {
+                const percent = Math.round((score.score / score.total) * 100);
+                let scoreClass = 'poor';
+                if (percent >= 80) scoreClass = 'good';
+                else if (percent >= 50) scoreClass = 'medium';
+
+                const date = new Date(score.date);
+                const dateStr = date.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const modeDisplay = score.mode === 'challenge' 
+                    ? '<span class="mode-indicator challenge">🔥 Défi</span>' 
+                    : '<span class="mode-indicator classic">🎯 Classique</span>';
+
+                let scoreDisplay = `${score.score}/${score.total}`;
+                if (score.mode === 'challenge' && score.bonusPoints > 0) {
+                    scoreDisplay += ` <span style="color: #ffd700; font-size: 0.9em;">(+${score.bonusPoints})</span>`;
+                }
+
+                return `
+                    <div class="score-row">
+                        <div class="quiz-name">${score.titre || score.categorie}</div>
+                        <div class="score-value ${scoreClass}">${scoreDisplay}</div>
+                        <div>${modeDisplay}</div>
+                        <div class="score-value ${scoreClass}">${percent}%</div>
+                        <div class="score-date">${dateStr}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrer les scores
+        function filterScores() {
+            const filter = document.getElementById('filter-matiere').value;
+            
+            if (filter === 'all') {
+                displayScoresList(allScores);
+            } else {
+                const filtered = allScores.filter(s => s.matiere === filter);
+                displayScoresList(filtered);
+            }
+        }
+
+        // Initialisation avec Firebase
+        FirebaseAuth.onAuthStateChanged(user => {
+            if (user) {
+                checkAuth();
+            } else {
+                showNotConnected();
+            }
+            
+            // Mettre à jour le menu
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+        });
+    </script>
+</body>
+</html>

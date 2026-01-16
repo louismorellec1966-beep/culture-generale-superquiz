@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperQuiz - Quiz Dynamique</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+    
+    <style>
+        .quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .quiz-header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .breadcrumb {
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        .breadcrumb a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .score-display span {
+            font-size: 1.3em;
+            color: #ffd700;
+        }
+
+        .question-card {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-number {
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #2c3e50;
+        }
+
+        .answer-option {
+            display: block;
+            margin: 12px 0;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .answer-option:hover {
+            background: #f8f9fa;
+            border-color: #3498db;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #e3f2fd;
+            border-color: #3498db;
+        }
+
+        .btn-valider {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-valider:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .reponse-feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .reponse-feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .reponse-feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .error-message {
+            background: #e74c3c;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="breadcrumb" id="breadcrumb"></div>
+
+        <div class="quiz-header" id="quiz-header">
+            <h1 id="quiz-title">Chargement...</h1>
+        </div>
+
+        <div class="score-display" id="score-display">
+            <p>Score : <span id="current-score">0</span> / <span id="total-questions">0</span></p>
+        </div>
+
+        <div id="quiz-container"></div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <!-- LE SCRIPT EST ICI - PAS DE script.js EXTERNE -->
+    <script>
+        // Attendre que Firebase soit chargé
+        window.addEventListener('load', () => {
+            // Vérifier que Firebase est chargé
+            if (typeof firebase === 'undefined') {
+                console.error('Firebase non chargé');
+                setTimeout(() => window.location.reload(), 1000);
+                return;
+            }
+
+            // Attendre un peu que firebase-config.js s'exécute
+            setTimeout(initQuiz, 100);
+        });
+
+        // Récupérer les paramètres de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const matiere = urlParams.get('matiere');
+        const categorie = urlParams.get('categorie');
+        const mode = urlParams.get('mode') || 'classic';
+
+        let answeredQuestions = new Set();
+        let currentScore = 0;
+
+        // Données des quiz (version simplifiée pour test)
+        const quizData = {
+            "histoire": {
+                "antiquite": {
+                    "titre": "🏛️ Antiquité",
+                    "questions": [
+                        {
+                            "question": "Qui était le premier empereur romain ?",
+                            "reponses": ["Auguste", "Jules César", "Néron", "Tibère"],
+                            "correct": 0
+                        },
+                        {
+                            "question": "En quelle année Jules César a-t-il été assassiné ?",
+                            "reponses": ["44 av. J.-C.", "55 av. J.-C.", "33 av. J.-C.", "27 av. J.-C."],
+                            "correct": 0
+                        },
+                        {
+                            "question": "Quelle était la capitale de l'Égypte ancienne ?",
+                            "reponses": ["Memphis", "Alexandrie", "Thèbes", "Le Caire"],
+                            "correct": 0
+                        },
+                        {
+                            "question": "Qui était le dieu principal dans la mythologie grecque ?",
+                            "reponses": ["Zeus", "Poséidon", "Hadès", "Apollon"],
+                            "correct": 0
+                        },
+                        {
+                            "question": "Quelle bataille a marqué la fin de l'expansion perse en Grèce ?",
+                            "reponses": ["Salamine", "Marathon", "Thermopyles", "Platées"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            },
+            "geographie": {
+                "capitales": {
+                    "titre": "🏛️ Capitales",
+                    "questions": [
+                        {
+                            "question": "Quelle est la capitale de l'Australie ?",
+                            "reponses": ["Canberra", "Sydney", "Melbourne", "Brisbane"],
+                            "correct": 0
+                        }
+                    ]
+                }
+            }
+        };
+
+        function initQuiz() {
+            // Vérifier paramètres
+            if (!matiere || !categorie) {
+                document.getElementById('quiz-container').innerHTML =
+                    '<div class="error-message"><h2>Erreur</h2><p>Paramètres de quiz manquants. <a href="Quiz.html" style="color: white;">Retour aux quiz</a></p></div>';
+                return;
+            }
+
+            const quizContent = quizData[matiere]?.[categorie];
+
+            if (!quizContent) {
+                document.getElementById('quiz-container').innerHTML =
+                    '<div class="error-message"><h2>Quiz introuvable</h2><p><a href="Quiz.html" style="color: white;">Retour aux quiz</a></p></div>';
+                return;
+            }
+
+            // Mettre à jour le titre
+            document.getElementById('quiz-title').textContent = quizContent.titre;
+
+            // Fil d'Ariane
+            const matiereNom = matiere.charAt(0).toUpperCase() + matiere.slice(1);
+            document.getElementById('breadcrumb').innerHTML =
+                `<a href="Quiz.html">Quiz</a> > <a href="${matiereNom}.html">${matiereNom}</a> > ${quizContent.titre}`;
+
+            // Afficher les questions
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizContent.questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+
+                questionDiv.innerHTML = `
+                    <span class="question-number">Question ${index + 1}</span>
+                    <div class="question-text">${q.question}</div>
+                    ${q.reponses.map((rep, i) => `
+                        <div class="answer-option" onclick="selectAnswer(${index}, ${i})">
+                            <input type="radio" id="q${index}_r${i}" name="q${index}" value="${i}">
+                            <label for="q${index}_r${i}">${rep}</label>
+                        </div>
+                    `).join('')}
+                    <button class="btn-valider" onclick="validerQuestion(${index}, ${q.correct})">Valider</button>
+                    <div id="feedback${index}" class="reponse-feedback"></div>
+                `;
+                container.appendChild(questionDiv);
+            });
+
+            // Initialiser le total de questions
+            document.getElementById('total-questions').textContent = quizContent.questions.length;
+
+            // Menu auth
+            initAuthMenu();
+        }
+
+        function selectAnswer(qIndex, answerIndex) {
+            const radio = document.getElementById(`q${qIndex}_r${answerIndex}`);
+            if (radio && !radio.disabled) {
+                radio.checked = true;
+                document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
+                    r.closest('.answer-option').classList.remove('selected');
+                });
+                radio.closest('.answer-option').classList.add('selected');
+            }
+        }
+
+        function validerQuestion(qIndex, correctAnswer) {
+            const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
+            const feedback = document.getElementById(`feedback${qIndex}`);
+
+            if (!selected) {
+                feedback.className = 'reponse-feedback incorrect';
+                feedback.textContent = '⚠️ Veuillez sélectionner une réponse';
+                feedback.style.display = 'block';
+                return;
+            }
+
+            if (answeredQuestions.has(qIndex)) {
+                return; // Déjà répondu
+            }
+
+            const isCorrect = parseInt(selected.value) === correctAnswer;
+
+            if (isCorrect) {
+                currentScore++;
+                document.getElementById('current-score').textContent = currentScore;
+                feedback.className = 'reponse-feedback correct';
+                feedback.textContent = '✅ Bravo ! Bonne réponse !';
+            } else {
+                feedback.className = 'reponse-feedback incorrect';
+                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + document.querySelector(`input[name="q${qIndex}"][value="${correctAnswer}"]`).nextElementSibling.textContent;
+            }
+
+            feedback.style.display = 'block';
+            answeredQuestions.add(qIndex);
+
+            // Désactiver les radios
+            document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
+                r.disabled = true;
+                r.closest('.answer-option').style.opacity = '0.6';
+                r.closest('.answer-option').style.cursor = 'not-allowed';
+            });
+
+            // Vérifier si quiz terminé
+            const totalQuestions = parseInt(document.getElementById('total-questions').textContent);
+            if (answeredQuestions.size === totalQuestions) {
+                setTimeout(saveScore, 500);
+            }
+        }
+
+        async function saveScore() {
+            if (typeof FirebaseScores === 'undefined') {
+                if (confirm('Firebase non chargé. Voulez-vous recharger la page ?')) {
+                    window.location.reload();
+                }
+                return;
+            }
+
+            const user = FirebaseAuth?.getCurrentUser();
+
+            if (!user) {
+                if (confirm('Voulez-vous vous connecter pour sauvegarder votre score ?')) {
+                    window.location.href = 'Auth.html';
+                }
+                return;
+            }
+
+            const score = parseInt(document.getElementById('current-score').textContent);
+            const total = parseInt(document.getElementById('total-questions').textContent);
+            const quizTitle = document.getElementById('quiz-title').textContent;
+
+            const scoreData = {
+                matiere: matiere,
+                categorie: categorie,
+                titre: quizTitle,
+                score: score,
+                total: total,
+                mode: mode
+            };
+
+            try {
+                await FirebaseScores.save(scoreData);
+                alert(`✅ Score sauvegardé : ${score}/${total} (${Math.round((score / total) * 100)}%)\n\nConsultez vos scores dans la section "Scores" !`);
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                alert('❌ Erreur lors de la sauvegarde du score');
+            }
+        }
+
+        function initAuthMenu() {
+            if (typeof FirebaseAuth === 'undefined') {
+                setTimeout(initAuthMenu, 500);
+                return;
+            }
+
+            FirebaseAuth.onAuthStateChanged(user => {
+                const nav = document.querySelector('.menu');
+                if (!nav) return;
+
+                let authItem = document.getElementById('auth-menu-item');
+                if (!authItem) {
+                    authItem = document.createElement('li');
+                    authItem.id = 'auth-menu-item';
+                    nav.appendChild(authItem);
+                }
+
+                if (user) {
+                    authItem.innerHTML = `
+                        <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                            👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                        </a>
+                    `;
+                } else {
+                    authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+                }
+            });
+        }
+
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    alert('Déconnexion réussie !');
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+
+        // Menu hamburger
+        document.getElementById('toggle-menu')?.addEventListener('click', function() {
+            const nav = document.querySelector('nav');
+            nav.classList.toggle('menu-open');
+        });
+    </script>
+</body>
+</html>

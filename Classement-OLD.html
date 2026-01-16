@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Configuration Firebase -->
+<script src="firebase-config.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperQuiz - Classement Global</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        .classement-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .classement-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .classement-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 12px 30px;
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+        
+        .filter-tab:hover {
+            border-color: #3498db;
+            color: #3498db;
+        }
+        
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 900px;
+            margin: 40px auto;
+            align-items: flex-end;
+        }
+        
+        .podium-place {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .podium-place:hover {
+            transform: translateY(-10px);
+        }
+        
+        .podium-place.first {
+            order: 2;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #2c3e50;
+            padding: 40px 20px;
+        }
+        
+        .podium-place.second {
+            order: 1;
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+        }
+        
+        .podium-place.third {
+            order: 3;
+            background: linear-gradient(135deg, #cd7f32 0%, #e89b65 100%);
+            color: white;
+        }
+        
+        .medal {
+            font-size: 4em;
+            margin-bottom: 10px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .podium-rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .podium-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .podium-score {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .podium-details {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .classement-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+        
+        .table-header {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: grid;
+            grid-template-columns: 80px 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .classement-row {
+            padding: 15px;
+            border-bottom: 1px solid #ecf0f1;
+            display: grid;
+            grid-template-columns: 80px 2fr 1fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .classement-row:hover {
+            background: #f8f9fa;
+        }
+        
+        .classement-row.highlight {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+        }
+        
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            color: #3498db;
+        }
+        
+        .rank.top3 {
+            font-size: 2em;
+        }
+        
+        .player-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .player-score {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+        
+        .quiz-count {
+            color: #7f8c8d;
+        }
+        
+        .avg-score {
+            color: #f39c12;
+            font-weight: 600;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #7f8c8d;
+        }
+        
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .podium {
+                grid-template-columns: 1fr;
+            }
+            
+            .podium-place {
+                order: initial !important;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .classement-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Scores.html">Mes Scores</a></li>
+            <li><a href="Classement.html" aria-current="page">🏆 Classement</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="classement-header">
+            <h1>🏆 Classement Global</h1>
+            <p>Comparez vos performances avec les autres joueurs !</p>
+        </div>
+
+        <div class="stats-banner" id="stats-banner"></div>
+
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterClassement('global')">🌍 Global</div>
+            <div class="filter-tab" onclick="filterClassement('histoire')">📜 Histoire</div>
+            <div class="filter-tab" onclick="filterClassement('geographie')">🗺️ Géographie</div>
+            <div class="filter-tab" onclick="filterClassement('science')">🔬 Science</div>
+            <div class="filter-tab" onclick="filterClassement('litterature')">📚 Littérature</div>
+        </div>
+
+        <div id="podium-container"></div>
+        
+        <div class="classement-table">
+            <div class="table-header">
+                <div>Rang</div>
+                <div>Joueur</div>
+                <div>Score Total</div>
+                <div>Quiz Réalisés</div>
+                <div>Moyenne</div>
+            </div>
+            <div id="classement-list"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/security.js"></script>
+    <script>
+        let currentFilter = 'global';
+        let currentUser = null;
+
+        // Charger le classement
+        function loadClassement() {
+            // Récupérer l'utilisateur connecté
+            const session = Auth.checkSession();
+            if (session) {
+                currentUser = session.email;
+            }
+
+            // Récupérer tous les scores de tous les utilisateurs
+            const allUserScores = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('scores:')) {
+                    const email = key.replace('scores:', '');
+                    const scoresStr = localStorage.getItem(key);
+                    
+                    if (scoresStr) {
+                        try {
+                            const scores = JSON.parse(scoresStr);
+                            const userDataStr = localStorage.getItem(`user:${email}`);
+                            
+                            if (userDataStr) {
+                                const userData = JSON.parse(userDataStr);
+                                allUserScores.push({
+                                    email: email,
+                                    name: userData.name,
+                                    scores: scores
+                                });
+                            }
+                        } catch (e) {
+                            console.error('Erreur parsing scores:', e);
+                        }
+                    }
+                }
+            }
+
+            // Afficher les statistiques globales
+            displayStats(allUserScores);
+
+            // Afficher le classement
+            displayClassement(allUserScores, currentFilter);
+        }
+
+        // Afficher les statistiques
+        function displayStats(allUserScores) {
+            const totalPlayers = allUserScores.length;
+            const totalQuizzes = allUserScores.reduce((sum, user) => sum + user.scores.length, 0);
+            const totalPoints = allUserScores.reduce((sum, user) => {
+                return sum + user.scores.reduce((s, score) => s + score.score, 0);
+            }, 0);
+
+            const statsBanner = document.getElementById('stats-banner');
+            statsBanner.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-number">${totalPlayers}</div>
+                    <div class="stat-label">Joueurs actifs</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${totalQuizzes}</div>
+                    <div class="stat-label">Quiz réalisés</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${totalPoints}</div>
+                    <div class="stat-label">Points distribués</div>
+                </div>
+            `;
+        }
+
+        // Afficher le classement
+        function displayClassement(allUserScores, filter) {
+            // Calculer le score de chaque utilisateur
+            const rankings = allUserScores.map(user => {
+                let filteredScores = user.scores;
+                
+                if (filter !== 'global') {
+                    filteredScores = user.scores.filter(s => s.matiere === filter);
+                }
+
+                const totalScore = filteredScores.reduce((sum, s) => sum + s.score, 0);
+                const totalPossible = filteredScores.reduce((sum, s) => sum + s.total, 0);
+                const avgPercent = totalPossible > 0 ? Math.round((totalScore / totalPossible) * 100) : 0;
+
+                return {
+                    email: user.email,
+                    name: user.name,
+                    totalScore: totalScore,
+                    quizCount: filteredScores.length,
+                    avgPercent: avgPercent
+                };
+            })
+            .filter(r => r.quizCount > 0) // Seulement ceux qui ont joué
+            .sort((a, b) => {
+                // Trier par score total, puis par moyenne
+                if (b.totalScore !== a.totalScore) {
+                    return b.totalScore - a.totalScore;
+                }
+                return b.avgPercent - a.avgPercent;
+            });
+
+            // Afficher le podium (top 3)
+            displayPodium(rankings.slice(0, 3));
+
+            // Afficher le tableau complet
+            displayTable(rankings);
+        }
+
+        // Afficher le podium
+        function displayPodium(top3) {
+            const podiumContainer = document.getElementById('podium-container');
+            
+            if (top3.length === 0) {
+                podiumContainer.innerHTML = '<div class="no-data"><h3>Aucun score enregistré</h3><p>Soyez le premier à jouer !</p></div>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            const positions = ['first', 'second', 'third'];
+
+            podiumContainer.innerHTML = `
+                <div class="podium">
+                    ${top3.map((player, index) => `
+                        <div class="podium-place ${positions[index]}">
+                            <span class="medal">${medals[index]}</span>
+                            <div class="podium-rank">#${index + 1}</div>
+                            <div class="podium-name">${player.name}</div>
+                            <div class="podium-score">${player.totalScore}</div>
+                            <div class="podium-details">
+                                ${player.quizCount} quiz • ${player.avgPercent}% de moyenne
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // Afficher le tableau
+        function displayTable(rankings) {
+            const classementList = document.getElementById('classement-list');
+            
+            if (rankings.length === 0) {
+                classementList.innerHTML = '<div class="no-data"><p>Aucun score pour ce filtre</p></div>';
+                return;
+            }
+
+            classementList.innerHTML = rankings.map((player, index) => {
+                const rank = index + 1;
+                const isCurrentUser = currentUser && player.email === currentUser;
+                const rowClass = isCurrentUser ? 'classement-row highlight' : 'classement-row';
+                const rankClass = rank <= 3 ? 'rank top3' : 'rank';
+
+                return `
+                    <div class="${rowClass}">
+                        <div class="${rankClass}">
+                            ${rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : '#' + rank}
+                        </div>
+                        <div class="player-name">
+                            ${player.name} ${isCurrentUser ? '(Vous)' : ''}
+                        </div>
+                        <div class="player-score">${player.totalScore} pts</div>
+                        <div class="quiz-count">${player.quizCount}</div>
+                        <div class="avg-score">${player.avgPercent}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filtrer le classement
+        function filterClassement(filter) {
+            currentFilter = filter;
+            
+            // Mettre à jour les tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Recharger le classement
+            loadClassement();
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadClassement();
+            
+            // Mettre à jour le menu d'auth
+            const authMenuItem = document.getElementById('auth-menu-item');
+            if (!authMenuItem) {
+                const nav = document.querySelector('.menu');
+                const authItem = document.createElement('li');
+                authItem.id = 'auth-menu-item';
+                
+                const session = Auth.checkSession();
+                if (session) {
+                    authItem.innerHTML = `<a href="#" onclick="handleLogout(event)" style="color: #2ecc71;">👤 ${session.name}</a>`;
+                } else {
+                    authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+                }
+                
+                nav.appendChild(authItem);
+            }
+        });
+    </script>
+</body>
+</html>

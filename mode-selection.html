@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<!-- Configuration Firebase -->
+<script src="firebase-config.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperQuiz - Choix du mode</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        .mode-container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .mode-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .mode-header h1 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .quiz-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .quiz-info h2 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+        
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .mode-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            transition: height 0.3s ease;
+        }
+        
+        .mode-card.classic::before {
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+        }
+        
+        .mode-card.challenge::before {
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+        
+        .mode-card:hover::before {
+            height: 100%;
+            opacity: 0.1;
+        }
+        
+        .mode-icon {
+            font-size: 4em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-title {
+            font-size: 2em;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .mode-description {
+            color: #7f8c8d;
+            text-align: center;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .mode-features {
+            list-style: none;
+            padding: 0;
+            margin: 25px 0;
+        }
+        
+        .mode-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            align-items: center;
+            font-size: 1.05em;
+        }
+        
+        .mode-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .mode-features li::before {
+            content: '✓';
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background: #2ecc71;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .mode-features.challenge li::before {
+            background: #e74c3c;
+        }
+        
+        .btn-select {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            color: white;
+        }
+        
+        .btn-select.classic {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+        }
+        
+        .btn-select.challenge {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+        }
+        
+        .btn-select:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-link a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .modes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="mode-container">
+            <div class="mode-header">
+                <h1>⚡ Choisis ton mode de jeu</h1>
+                <p>Comment veux-tu jouer aujourd'hui ?</p>
+            </div>
+
+            <div class="quiz-info" id="quiz-info">
+                <h2>Chargement...</h2>
+            </div>
+
+            <div class="modes-grid">
+                <!-- Mode Classique -->
+                <div class="mode-card classic">
+                    <div class="mode-icon">🎯</div>
+                    <div class="mode-title">Mode Classique</div>
+                    <div class="mode-description">
+                        Prends ton temps et réponds tranquillement. Parfait pour apprendre !
+                    </div>
+                    <ul class="mode-features">
+                        <li>Pas de limite de temps</li>
+                        <li>Aucune pression</li>
+                        <li>Idéal pour réviser</li>
+                        <li>Score simple (bonnes réponses)</li>
+                    </ul>
+                    <button class="btn-select classic" onclick="selectMode('classic')">
+                        Jouer en mode Classique
+                    </button>
+                </div>
+
+                <!-- Mode Défi -->
+                <div class="mode-card challenge">
+                    <div class="mode-icon">🔥</div>
+                    <div class="mode-title">Mode Défi</div>
+                    <div class="mode-description">
+                        Teste ta rapidité ! Mais attention : prends le temps de bien lire (min. 12s) !
+                    </div>
+                    <ul class="mode-features challenge">
+                        <li>Chronomètre global visible ⏱️</li>
+                        <li>Points bonus de rapidité</li>
+                        <li>12-15s = +50 pts 🏆</li>
+                        <li>16-20s = +30 pts 🥇</li>
+                        <li>21-25s = +20 pts 🥈</li>
+                        <li>26-30s = +10 pts 🥉</li>
+                        <li>< 12s ou > 30s = 0 bonus</li>
+                    </ul>
+                    <button class="btn-select challenge" onclick="selectMode('challenge')">
+                        Relever le Défi ! 🔥
+                    </button>
+                </div>
+            </div>
+
+            <div class="back-link">
+                <a href="#" id="back-link">← Retour</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Récupérer les paramètres de l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const matiere = urlParams.get('matiere');
+        const categorie = urlParams.get('categorie');
+
+        // Noms des catégories pour l'affichage
+        const categoriesNoms = {
+            'histoire': {
+                'antiquite': '🏛️ Antiquité',
+                'moyenage': '⚔️ Moyen Âge',
+                'art': '🎨 Histoire de l\'Art',
+                'guerres': '⚡ Guerres Mondiales',
+                'france': '🇫🇷 Histoire de France',
+                'contemporaine': '📱 Histoire Contemporaine'
+            },
+            'geographie': {
+                'capitales': '🏛️ Capitales du Monde',
+                'france': '🇫🇷 Géographie de France',
+                'europe': '🇪🇺 Europe',
+                'continents': '🌍 Continents & Océans',
+                'nature': '🏔️ Géographie Physique',
+                'culture': '🎭 Géographie Culturelle'
+            },
+            'science': {
+                'physique': '⚛️ Physique',
+                'chimie': '🧪 Chimie',
+                'biologie': '🧬 Biologie',
+                'astronomie': '🌌 Astronomie',
+                'mathematiques': '📐 Mathématiques',
+                'technologie': '💻 Technologie'
+            },
+            'litterature': {
+                'classiques': '📚 Classiques Français',
+                'poesie': '✍️ Poésie',
+                'theatre': '🎭 Théâtre',
+                'romans': '📖 Romans du XXe siècle',
+                'mondiale': '🌍 Littérature Mondiale',
+                'contemporaine': '📱 Littérature Contemporaine'
+            }
+        };
+
+        // Afficher les informations du quiz
+        function displayQuizInfo() {
+            const quizInfoDiv = document.getElementById('quiz-info');
+            const backLink = document.getElementById('back-link');
+            
+            if (matiere && categorie) {
+                const categorieName = categoriesNoms[matiere]?.[categorie] || categorie;
+                const matiereName = matiere.charAt(0).toUpperCase() + matiere.slice(1);
+                
+                quizInfoDiv.innerHTML = `
+                    <h2>Quiz : ${categorieName}</h2>
+                    <p>Matière : ${matiereName}</p>
+                `;
+                
+                backLink.href = `${matiereName}.html`;
+            } else {
+                quizInfoDiv.innerHTML = '<h2>⚠️ Quiz non spécifié</h2>';
+                backLink.href = 'Quiz.html';
+            }
+        }
+
+        // Sélectionner un mode
+        function selectMode(mode) {
+            if (!matiere || !categorie) {
+                alert('Erreur : paramètres de quiz manquants');
+                return;
+            }
+
+            // Rediriger vers le quiz avec le mode sélectionné
+            window.location.href = `quiz-dynamique.html?matiere=${matiere}&categorie=${categorie}&mode=${mode}`;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            displayQuizInfo();
+            
+            // Gestion du menu d'authentification
+            const nav = document.querySelector('.menu');
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+            
+            const sessionStr = localStorage.getItem('session:current');
+            if (sessionStr) {
+                const session = JSON.parse(sessionStr);
+                if (session.connected) {
+                    authItem.innerHTML = `<a href="#" onclick="logout(event)" style="color: #2ecc71;">👤 ${session.name}</a>`;
+                    nav.appendChild(authItem);
+                    return;
+                }
+            }
+            
+            authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            nav.appendChild(authItem);
+        });
+
+        function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                localStorage.removeItem('session:current');
+                window.location.href = 'Accueil.html';
+            }
+        }
+    </script>
+</body>
+</html>

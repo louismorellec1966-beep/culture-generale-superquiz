@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité - SuperQuiz</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <style>
+        .privacy-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            line-height: 1.8;
+        }
+        
+        .privacy-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .privacy-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .privacy-section {
+            margin: 30px 0;
+        }
+        
+        .privacy-section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .privacy-section h3 {
+            color: #34495e;
+            margin-top: 20px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background: #3498db;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-box h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        
+        .rights-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .rights-list li {
+            margin: 10px 0;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Scores.html">Mes Scores</a></li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="privacy-header">
+            <h1>🔒 Politique de Confidentialité</h1>
+            <p>Conforme au RGPD (Règlement Général sur la Protection des Données)</p>
+            <p>Dernière mise à jour : 15 janvier 2025</p>
+        </div>
+
+        <div class="privacy-container">
+            <div class="info-box">
+                <h3>💡 En bref</h3>
+                <p>SuperQuiz respecte votre vie privée. Vos données sont stockées localement sur votre navigateur et ne sont jamais transmises à des tiers. Vous gardez le contrôle total de vos informations.</p>
+            </div>
+
+            <section class="privacy-section">
+                <h2>1. Responsable du traitement des données</h2>
+                <p><strong>Nom :</strong> [VOTRE NOM/ENTREPRISE]</p>
+                <p><strong>Email :</strong> louismorellec1966@gmail.com</p>
+                <p><strong>Adresse :</strong> [VOTRE ADRESSE]</p>
+                
+                <p style="margin-top: 20px;">Pour toute question concernant cette politique ou vos données personnelles, vous pouvez nous contacter à l'adresse ci-dessus.</p>
+            </section>
+
+            <section class="privacy-section">
+                <h2>2. Données collectées</h2>
+                
+                <h3>2.1 Données que nous collectons</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Donnée</th>
+                            <th>Finalité</th>
+                            <th>Base légale</th>
+                            <th>Durée de conservation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Nom d'utilisateur</td>
+                            <td>Identification dans le classement</td>
+                            <td>Consentement</td>
+                            <td>Jusqu'à suppression du compte</td>
+                        </tr>
+                        <tr>
+                            <td>Adresse email</td>
+                            <td>Authentification, contact</td>
+                            <td>Consentement</td>
+                            <td>Jusqu'à suppression du compte</td>
+                        </tr>
+                        <tr>
+                            <td>Mot de passe (hashé)</td>
+                            <td>Sécurisation du compte</td>
+                            <td>Consentement</td>
+                            <td>Jusqu'à suppression du compte</td>
+                        </tr>
+                        <tr>
+                            <td>Scores des quiz</td>
+                            <td>Suivi de progression, classement</td>
+                            <td>Consentement</td>
+                            <td>Jusqu'à suppression du compte</td>
+                        </tr>
+                        <tr>
+                            <td>Date et heure des actions</td>
+                            <td>Horodatage des scores</td>
+                            <td>Intérêt légitime</td>
+                            <td>Jusqu'à suppression du compte</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2.2 Données que nous NE collectons PAS</h3>
+                <ul>
+                    <li>❌ Adresse IP</li>
+                    <li>❌ Données de localisation GPS</li>
+                    <li>❌ Informations bancaires</li>
+                    <li>❌ Données de navigation (cookies tiers)</li>
+                    <li>❌ Historique de navigation</li>
+                </ul>
+            </section>
+
+            <section class="privacy-section">
+                <h2>3. Comment nous utilisons vos données</h2>
+                
+                <h3>3.1 Utilisation</h3>
+                <p>Vos données sont utilisées exclusivement pour :</p>
+                <ul>
+                    <li>✅ Créer et gérer votre compte utilisateur</li>
+                    <li>✅ Sauvegarder vos scores et votre progression</li>
+                    <li>✅ Afficher votre classement par rapport aux autres joueurs</li>
+                    <li>✅ Vous permettre de vous connecter de manière sécurisée</li>
+                    <li>✅ Vous contacter en cas de besoin (support, informations importantes)</li>
+                </ul>
+
+                <h3>3.2 Stockage</h3>
+                <div class="info-box">
+                    <h3>🔐 Stockage local sécurisé</h3>
+                    <p><strong>Important :</strong> Vos données sont stockées <em>uniquement</em> dans le stockage local de votre navigateur (localStorage).</p>
+                    <p>Cela signifie que :</p>
+                    <ul>
+                        <li>✅ Vos données restent sur votre appareil</li>
+                        <li>✅ Elles ne sont jamais transmises à un serveur distant</li>
+                        <li>✅ Vous gardez le contrôle total</li>
+                        <li>⚠️ Si vous videz le cache du navigateur, vos données seront supprimées</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="privacy-section">
+                <h2>4. Partage des données</h2>
+                
+                <h3>4.1 Données publiques</h3>
+                <p>Les informations suivantes sont <strong>visibles publiquement</strong> dans le classement :</p>
+                <ul>
+                    <li>Votre nom d'utilisateur</li>
+                    <li>Vos scores totaux</li>
+                    <li>Votre nombre de quiz réalisés</li>
+                    <li>Votre moyenne de réussite</li>
+                </ul>
+
+                <h3>4.2 Données privées</h3>
+                <p>Les informations suivantes restent <strong>strictement confidentielles</strong> :</p>
+                <ul>
+                    <li>🔒 Votre adresse email</li>
+                    <li>🔒 Votre mot de passe (hashé)</li>
+                    <li>🔒 Vos scores détaillés par quiz</li>
+                </ul>
+
+                <h3>4.3 Partage avec des tiers</h3>
+                <p><strong>Nous ne vendons, ne louons et ne partageons JAMAIS vos données personnelles avec des tiers.</strong></p>
+                
+                <p>Exception : En cas d'obligation légale (requête judiciaire), nous pourrions être contraints de communiquer certaines informations aux autorités compétentes.</p>
+            </section>
+
+            <section class="privacy-section">
+                <h2>5. Sécurité des données</h2>
+                
+                <h3>5.1 Mesures de sécurité</h3>
+                <p>Nous mettons en œuvre les mesures suivantes pour protéger vos données :</p>
+                <ul>
+                    <li>🔐 <strong>Hashage des mots de passe :</strong> SHA-256 avec salt unique</li>
+                    <li>🔐 <strong>Sanitization :</strong> Protection contre les injections XSS</li>
+                    <li>🔐 <strong>Rate limiting :</strong> Protection contre les attaques par force brute</li>
+                    <li>🔐 <strong>Sessions sécurisées :</strong> Tokens de session avec expiration</li>
+                    <li>🔐 <strong>HTTPS :</strong> Chiffrement des communications (en production)</li>
+                </ul>
+
+                <h3>5.2 Limitations</h3>
+                <div class="warning-box">
+                    <p><strong>⚠️ Important :</strong> Le stockage localStorage présente des limitations de sécurité :</p>
+                    <ul>
+                        <li>Les données peuvent être accessibles via la console du navigateur</li>
+                        <li>Il n'y a pas de synchronisation entre appareils</li>
+                        <li>Les données sont perdues si le cache est vidé</li>
+                    </ul>
+                    <p><strong>Recommandation :</strong> N'utilisez pas le même mot de passe que vos comptes importants.</p>
+                </div>
+            </section>
+
+            <section class="privacy-section">
+                <h2>6. Vos droits (RGPD)</h2>
+                
+                <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                
+                <div class="rights-list">
+                    <h3>📋 Droit d'accès (Article 15)</h3>
+                    <p>Vous pouvez demander une copie de toutes les données que nous détenons sur vous.</p>
+                    <p><strong>Comment l'exercer :</strong> Contactez-nous par email à louismorellec1966@gmail.com</p>
+                </div>
+
+                <div class="rights-list">
+                    <h3>✏️ Droit de rectification (Article 16)</h3>
+                    <p>Vous pouvez modifier vos informations personnelles à tout moment.</p>
+                    <p><strong>Comment l'exercer :</strong> Connectez-vous à votre compte et modifiez vos informations (fonctionnalité à venir)</p>
+                </div>
+
+                <div class="rights-list">
+                    <h3>🗑️ Droit à l'effacement (Article 17)</h3>
+                    <p>Vous pouvez demander la suppression complète de vos données.</p>
+                    <p><strong>Comment l'exercer :</strong></p>
+                    <ol>
+                        <li>Ouvrez la console de votre navigateur (F12)</li>
+                        <li>Tapez : <code>localStorage.clear()</code></li>
+                        <li>Ou contactez-nous pour une suppression manuelle</li>
+                    </ol>
+                </div>
+
+                <div class="rights-list">
+                    <h3>⛔ Droit d'opposition (Article 21)</h3>
+                    <p>Vous pouvez vous opposer au traitement de vos données.</p>
+                    <p><strong>Comment l'exercer :</strong> Contactez-nous par email</p>
+                </div>
+
+                <div class="rights-list">
+                    <h3>📦 Droit à la portabilité (Article 20)</h3>
+                    <p>Vous pouvez récupérer vos données dans un format structuré.</p>
+                    <p><strong>Comment l'exercer :</strong> Contactez-nous pour recevoir vos données en JSON</p>
+                </div>
+
+                <div class="rights-list">
+                    <h3>🚫 Droit de limitation (Article 18)</h3>
+                    <p>Vous pouvez demander la limitation du traitement de vos données.</p>
+                    <p><strong>Comment l'exercer :</strong> Contactez-nous par email</p>
+                </div>
+
+                <p style="margin-top: 30px;"><strong>⏱️ Délai de réponse :</strong> Nous nous engageons à répondre à vos demandes dans un délai maximum de 1 mois.</p>
+            </section>
+
+            <section class="privacy-section">
+                <h2>7. Cookies et technologies similaires</h2>
+                
+                <h3>7.1 LocalStorage</h3>
+                <p>Ce site utilise le stockage local du navigateur (localStorage) pour :</p>
+                <ul>
+                    <li>Maintenir votre session de connexion</li>
+                    <li>Sauvegarder vos scores et progression</li>
+                    <li>Mémoriser vos préférences</li>
+                </ul>
+
+                <h3>7.2 Absence de cookies tiers</h3>
+                <p>✅ Nous n'utilisons <strong>AUCUN</strong> cookie tiers de traçage ou de publicité.</p>
+                <p>✅ Aucune donnée n'est partagée avec Google Analytics, Facebook, ou tout autre service tiers.</p>
+
+                <h3>7.3 Gestion</h3>
+                <p>Vous pouvez à tout moment effacer les données stockées localement en :</p>
+                <ul>
+                    <li>Vidant le cache de votre navigateur</li>
+                    <li>Utilisant le mode navigation privée</li>
+                    <li>Tapant <code>localStorage.clear()</code> dans la console (F12)</li>
+                </ul>
+            </section>
+
+            <section class="privacy-section">
+                <h2>8. Données des mineurs</h2>
+                
+                <p>SuperQuiz est accessible à tous les âges. Cependant :</p>
+                
+                <div class="warning-box">
+                    <p><strong>⚠️ Si vous avez moins de 15 ans :</strong></p>
+                    <p>Vous devez obtenir l'autorisation de vos parents ou tuteurs légaux avant de créer un compte et de fournir vos données personnelles.</p>
+                </div>
+
+                <p>Les parents peuvent à tout moment demander :</p>
+                <ul>
+                    <li>L'accès aux données de leur enfant</li>
+                    <li>La modification de ces données</li>
+                    <li>La suppression du compte de leur enfant</li>
+                </ul>
+            </section>
+
+            <section class="privacy-section">
+                <h2>9. Transferts internationaux</h2>
+                
+                <p>Vos données sont stockées localement sur votre appareil et ne font l'objet d'aucun transfert international.</p>
+                
+                <p>En cas d'évolution future vers un hébergement cloud, nous nous engageons à :</p>
+                <ul>
+                    <li>Choisir des hébergeurs situés dans l'Union Européenne</li>
+                    <li>Ou garantir un niveau de protection adéquat (clauses contractuelles types)</li>
+                    <li>Vous en informer préalablement</li>
+                </ul>
+            </section>
+
+            <section class="privacy-section">
+                <h2>10. Modification de la politique</h2>
+                
+                <p>Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment.</p>
+                
+                <p><strong>En cas de modification substantielle :</strong></p>
+                <ul>
+                    <li>📧 Vous serez informé par email (si vous avez un compte)</li>
+                    <li>📢 Une notification sera affichée sur le site</li>
+                    <li>📅 La nouvelle version entrera en vigueur 30 jours après publication</li>
+                </ul>
+
+                <p>Nous vous encourageons à consulter régulièrement cette page pour rester informé.</p>
+            </section>
+
+            <section class="privacy-section">
+                <h2>11. Réclamations</h2>
+                
+                <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez :</p>
+                
+                <h3>11.1 Nous contacter</h3>
+                <p>Email : louismorellec1966@gmail.com</p>
+                
+                <h3>11.2 Contacter la CNIL</h3>
+                <p>Si notre réponse ne vous satisfait pas, vous avez le droit de déposer une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) :</p>
+                
+                <div class="info-box">
+                    <p><strong>CNIL</strong></p>
+                    <p>3 Place de Fontenoy</p>
+                    <p>TSA 80715</p>
+                    <p>75334 PARIS CEDEX 07</p>
+                    <p>Tél : 01 53 73 22 22</p>
+                    <p>Site web : <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a></p>
+                </div>
+            </section>
+
+            <section class="privacy-section">
+                <h2>12. Contact</h2>
+                
+                <p>Pour toute question concernant cette politique de confidentialité ou vos données personnelles :</p>
+                
+                <div class="info-box">
+                    <p><strong>📧 Email :</strong> louismorellec1966@gmail.com</p>
+                    <p><strong>📞 Téléphone :</strong> +33 6 41 32 10 58</p>
+                    <p><strong>📬 Courrier :</strong> [VOTRE ADRESSE]</p>
+                    <p><strong>💬 Formulaire :</strong> <a href="Contact.html">Page de contact</a></p>
+                </div>
+                
+                <p><strong>Délai de réponse :</strong> Nous nous engageons à vous répondre dans un délai maximum de 1 mois.</p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+        <p style="margin-top: 10px;">
+            <a href="Mentions-Legales.html" style="color: white;">Mentions Légales</a> | 
+            <a href="Politique-Confidentialite.html" style="color: white;">Politique de Confidentialité</a>
+        </p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/security.js"></script>
+</body>
+</html>

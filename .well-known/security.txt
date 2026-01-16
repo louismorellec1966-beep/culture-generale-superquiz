@@ -1,0 +1,14 @@
+<!-- ========== security.txt ========== -->
+<!-- Créez le dossier .well-known et placez ce fichier dedans -->
+<!-- Chemin: /.well-known/security.txt -->
+
+Contact: mailto:louismorellec1966@gmail.com
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: fr, en
+Canonical: https://votresite.com/.well-known/security.txt
+
+# Politique de divulgation
+Policy: https://votresite.com/security-policy.html
+
+# Remerciements
+Acknowledgments: https://votresite.com/thanks.html

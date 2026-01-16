@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quiz de sciences - Choisissez votre domaine : Physique, Biologie, Chimie, Astronomie">
+    <meta name="keywords" content="quiz science, physique, biologie, chimie, astronomie">
+    <title>SuperQuiz.com - Sciences</title>
+    <link rel="preload" href="CSS/style.css" as="style">
+    <link rel="stylesheet" href="CSS/style.css" type="text/css">
+    <link rel="preload" href="js/script.js" as="script">
+    <script src="js/script.js" defer></script>
+</head>
+
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html" aria-current="page">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="h1">
+            <h1>SUPERQUIZ - SCIENCES</h1>
+        </div>
+        <div class="phrase-de-bienvenue">
+            <p>Découvrez les merveilles de la science</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="quiz-categories">
+            <h2>Catégories de Sciences</h2>
+            <div class="categories-grid">
+                <a href="mode-selection.html?matiere=science&categorie=physique" class="category-card">
+                    <h3>⚛️ Physique</h3>
+                    <p>Mécanique, électricité, relativité</p>
+                </a>
+                <a href="mode-selection.html?matiere=science&categorie=chimie" class="category-card">
+                    <h3>🧪 Chimie</h3>
+                    <p>Atomes, molécules, réactions</p>
+                </a>
+                <a href="mode-selection.html?matiere=science&categorie=biologie" class="category-card">
+                    <h3>🧬 Biologie</h3>
+                    <p>Cellules, génétique, évolution</p>
+                </a>
+                <a href="mode-selection.html?matiere=science&categorie=astronomie" class="category-card">
+                    <h3>🌌 Astronomie</h3>
+                    <p>Planètes, étoiles, galaxies</p>
+                </a>
+                <a href="mode-selection.html?matiere=science&categorie=mathematiques" class="category-card">
+                    <h3>📐 Mathématiques</h3>
+                    <p>Géométrie, algèbre, calcul</p>
+                </a>
+                <a href="mode-selection.html?matiere=science&categorie=technologie" class="category-card">
+                    <h3>💻 Technologie</h3>
+                    <p>Informatique, inventions, innovation</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+<script>
+        // Gestion du menu d'authentification Firebase
+        FirebaseAuth.onAuthStateChanged(user => {
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+        });
+
+        // Fonction de déconnexion
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    alert('Déconnexion réussie !');
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+</body>
+
+</html>

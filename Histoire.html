@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Quiz d'histoire - Choisissez votre période : Antiquité, Moyen Âge, Histoire de l'Art, Guerres Mondiales">
+    <meta name="keywords" content="quiz histoire, france, culture générale, antiquité, moyen âge">
+    <title>SuperQuiz.com - Histoire</title>
+    <link rel="preload" href="CSS/style.css" as="style">
+    <link rel="stylesheet" href="CSS/style.css" type="text/css">
+    <link rel="preload" href="js/script.js" as="script">
+    <script src="js/script.js" defer></script>
+</head>
+
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html" aria-current="page">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+            <li><a href="Experimentation.html">Expérience</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="h1">
+            <h1>SUPERQUIZ - HISTOIRE</h1>
+        </div>
+        <div class="phrase-de-bienvenue">
+            <p>Choisissez votre période historique favorite</p>
+        </div>
+    </header>
+
+    <main>
+        <div class="quiz-categories">
+            <h2>Catégories d'Histoire</h2>
+            <div class="categories-grid">
+                <a href="mode-selection.html?matiere=histoire&categorie=antiquite" class="category-card">
+                    <h3>🏛️ Antiquité</h3>
+                    <p>Rome, Grèce, Égypte ancienne</p>
+                </a>
+                <a href="mode-selection.html?matiere=histoire&categorie=moyenage" class="category-card">
+                    <h3>⚔️ Moyen Âge</h3>
+                    <p>Chevaliers, châteaux, croisades</p>
+                </a>
+                <a href="mode-selection.html?matiere=histoire&categorie=art" class="category-card">
+                    <h3>🎨 Histoire de l'Art</h3>
+                    <p>Peinture, sculpture, architecture</p>
+                </a>
+                <a href="mode-selection.html?matiere=histoire&categorie=guerres" class="category-card">
+                    <h3>⚡ Guerres Mondiales</h3>
+                    <p>XXe siècle, conflits majeurs</p>
+                </a>
+                <a href="mode-selection.html?matiere=histoire&categorie=france" class="category-card">
+                    <h3>🇫🇷 Histoire de France</h3>
+                    <p>Révolution, Empire, République</p>
+                </a>
+                <a href="mode-selection.html?matiere=histoire&categorie=contemporaine" class="category-card">
+                    <h3>📱 Histoire Contemporaine</h3>
+                    <p>Depuis 1945 à nos jours</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+<script>
+        // Gestion du menu d'authentification Firebase
+        FirebaseAuth.onAuthStateChanged(user => {
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
+                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+        });
+
+        // Fonction de déconnexion
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    alert('Déconnexion réussie !');
+                    window.location.href = 'Accueil.html';
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+</body>
+
+</html>

@@ -82,115 +82,134 @@ const XPSystem = {
 
 // ========== BADGES ==========
 const BADGES = {
-    'premier_quiz': {
-        id: 'premier_quiz',
-        nom: 'Première Victoire',
-        description: 'Compléter son premier quiz',
-        icone: '🎯',
+    "premier_quiz": {
+        nom: "Premier Pas",
+        description: "Compléter son premier quiz",
+        icone: "🎯",
         condition: (stats) => stats.totalQuiz >= 1
     },
-    'dix_quiz': {
-        id: 'dix_quiz',
-        nom: 'Explorateur',
-        description: 'Compléter 10 quiz',
-        icone: '🧭',
+    "dix_quiz": {
+        nom: "Habitué",
+        description: "Compléter 10 quiz",
+        icone: "📚",
         condition: (stats) => stats.totalQuiz >= 10
     },
-    'cinquante_quiz': {
-        id: 'cinquante_quiz',
-        nom: 'Expert',
-        description: 'Compléter 50 quiz',
-        icone: '🏆',
-        condition: (stats) => stats.totalQuiz >= 50
-    },
-    'cent_quiz': {
-        id: 'cent_quiz',
-        nom: 'Maître Quiz',
-        description: 'Compléter 100 quiz',
-        icone: '👑',
-        condition: (stats) => stats.totalQuiz >= 100
-    },
-    'parfait': {
-        id: 'parfait',
-        nom: 'Perfectionniste',
-        description: 'Obtenir un score parfait',
-        icone: '⭐',
+    "parfait": {
+        nom: "Perfectionniste",
+        description: "Obtenir un score parfait",
+        icone: "⭐",
         condition: (stats) => stats.quizParfaits >= 1
     },
-    'dix_parfaits': {
-        id: 'dix_parfaits',
-        nom: 'Sans Faute',
-        description: 'Obtenir 10 scores parfaits',
-        icone: '🌟',
-        condition: (stats) => stats.quizParfaits >= 10
+    "cinq_parfaits": {
+        nom: "Excellence",
+        description: "Obtenir 5 scores parfaits",
+        icone: "🌟",
+        condition: (stats) => stats.quizParfaits >= 5
     },
-    'streak_7': {
-        id: 'streak_7',
-        nom: 'Semaine Parfaite',
-        description: 'Jouer 7 jours de suite',
-        icone: '🔥',
+    "streak_7": {
+        nom: "Semaine de feu",
+        description: "Jouer 7 jours d'affilée",
+        icone: "🔥",
         condition: (stats) => stats.recordStreak >= 7
     },
-    'streak_30': {
-        id: 'streak_30',
-        nom: 'Mois de Feu',
-        description: 'Jouer 30 jours de suite',
-        icone: '💫',
-        condition: (stats) => stats.recordStreak >= 30
+    "streak_30": {
+        nom: "Mois de feu",
+        description: "Jouer 30 jours d'affilée",
+        icone: "🏆",
+        condition: (stats) => stats.streakActuelle >= 30
     },
-    'niveau_5': {
-        id: 'niveau_5',
-        nom: 'Apprenti',
-        description: 'Atteindre le niveau 5',
-        icone: '📚',
+    "rapide": {
+        nom: "Éclair",
+        description: "Finir un quiz en moins de 30 secondes",
+        icone: "⚡",
+        condition: (stats) => stats.tempsRecordQuiz && stats.tempsRecordQuiz <= 30
+    },
+    "veteran": {
+        nom: "Vétéran",
+        description: "Compléter 50 quiz",
+        icone: "🎖️",
+        condition: (stats) => stats.totalQuiz >= 50
+    },
+    "expert": {
+        nom: "Expert",
+        description: "Compléter 100 quiz",
+        icone: "👑",
+        condition: (stats) => stats.totalQuiz >= 100
+    },
+    "debutant": {
+        nom: "Débutant",
+        description: "Atteindre le niveau 5",
+        icone: "🌱",
         condition: (stats) => stats.niveau >= 5
     },
-    'niveau_10': {
-        id: 'niveau_10',
-        nom: 'Érudit',
-        description: 'Atteindre le niveau 10',
-        icone: '🎓',
-        condition: (stats) => stats.niveau >= 10
+    "intermediaire": {
+        nom: "Intermédiaire",
+        description: "Atteindre le niveau 15",
+        icone: "🌿",
+        condition: (stats) => stats.niveau >= 15
     },
-    'polyvalent': {
-        id: 'polyvalent',
-        nom: 'Polyvalent',
-        description: 'Jouer dans toutes les matières',
-        icone: '🎨',
+    "avance": {
+        nom: "Avancé",
+        description: "Atteindre le niveau 30",
+        icone: "🌳",
+        condition: (stats) => stats.niveau >= 30
+    },
+    "maitre": {
+        nom: "Maître",
+        description: "Atteindre le niveau 50",
+        icone: "🏅",
+        condition: (stats) => stats.niveau >= 50
+    },
+    "polyvalent": {
+        nom: "Polyvalent",
+        description: "Jouer dans les 4 matières",
+        icone: "🎭",
         condition: (stats) => {
-            const matieres = Object.keys(stats.matieres || {});
-            return matieres.length >= 4;
+            const matieres = stats.matieres || {};
+            return Object.keys(matieres).length >= 4;
         }
     },
-    'rapide': {
-        id: 'rapide',
-        nom: 'Éclair',
-        description: 'Finir un quiz en moins de 30 secondes',
-        icone: '⚡',
-        condition: (stats) => stats.tempsRecordQuiz && stats.tempsRecordQuiz < 30
+    "noctambule": {
+        nom: "Noctambule",
+        description: "Jouer après minuit",
+        icone: "🦉",
+        condition: (stats) => stats.aJoueApresMinuit
     },
-    'noctambule': {
-        id: 'noctambule',
-        nom: 'Noctambule',
-        description: 'Jouer après minuit',
-        icone: '🌙',
-        condition: (stats) => stats.aJoueApresMinuit === true
-    },
-    'matinal': {
-        id: 'matinal',
-        nom: 'Lève-tôt',
-        description: 'Jouer avant 7h du matin',
-        icone: '🌅',
-        condition: (stats) => stats.aJoueAvant7h === true
-    },
-    'marathonien': {
-        id: 'marathonien',
-        nom: 'Marathonien',
-        description: 'Répondre à 100 questions en une journée',
-        icone: '🏃',
-        condition: (stats) => stats.questionsAujourdHui >= 100
+    "matinal": {
+        nom: "Matinal",
+        description: "Jouer avant 7h du matin",
+        icone: "🌅",
+        condition: (stats) => stats.aJoueAvant7h
     }
 };
+
+// ========== AVATARS PRÉDÉFINIS ==========
+const AVATARS_PREDEFINIES = [
+    { id: 'default', url: null, emoji: '👤', nom: 'Par défaut' },
+    { id: 'scholar', url: null, emoji: '🎓', nom: 'Érudit' },
+    { id: 'scientist', url: null, emoji: '🧑‍🔬', nom: 'Scientifique' },
+    { id: 'artist', url: null, emoji: '🎨', nom: 'Artiste' },
+    { id: 'explorer', url: null, emoji: '🧭', nom: 'Explorateur' },
+    { id: 'wizard', url: null, emoji: '🧙', nom: 'Magicien' },
+    { id: 'robot', url: null, emoji: '🤖', nom: 'Robot' },
+    { id: 'alien', url: null, emoji: '👽', nom: 'Alien' },
+    { id: 'ninja', url: null, emoji: '🥷', nom: 'Ninja' },
+    { id: 'astronaut', url: null, emoji: '👨‍🚀', nom: 'Astronaute' },
+    { id: 'detective', url: null, emoji: '🕵️', nom: 'Détective' },
+    { id: 'chef', url: null, emoji: '👨‍🍳', nom: 'Chef' },
+    { id: 'superhero', url: null, emoji: '🦸', nom: 'Super-héros' },
+    { id: 'pirate', url: null, emoji: '🏴‍☠️', nom: 'Pirate' },
+    { id: 'king', url: null, emoji: '👑', nom: 'Roi' },
+    { id: 'queen', url: null, emoji: '👸', nom: 'Reine' },
+    { id: 'dragon', url: null, emoji: '🐉', nom: 'Dragon' },
+    { id: 'unicorn', url: null, emoji: '🦄', nom: 'Licorne' },
+    { id: 'phoenix', url: null, emoji: '🔥', nom: 'Phénix' },
+    { id: 'owl', url: null, emoji: '🦉', nom: 'Hibou' },
+    { id: 'cat', url: null, emoji: '🐱', nom: 'Chat' },
+    { id: 'dog', url: null, emoji: '🐶', nom: 'Chien' },
+    { id: 'fox', url: null, emoji: '🦊', nom: 'Renard' },
+    { id: 'panda', url: null, emoji: '🐼', nom: 'Panda' }
+];
 
 // ========== GESTION DES PROFILS FIREBASE ==========
 const ProfileSystem = {
@@ -244,22 +263,26 @@ const ProfileSystem = {
     // Créer ou récupérer le profil d'un utilisateur
     getProfile: async (userId) => {
         try {
+            console.log('📥 Récupération profil:', userId);
             const doc = await db.collection('profiles').doc(userId).get();
             
             if (doc.exists) {
+                console.log('✅ Profil trouvé');
                 return { ...ProfileSystem.defaultProfile, ...doc.data(), id: doc.id };
             }
             
+            console.log('⚠️ Profil non trouvé');
             return null;
         } catch (error) {
-            console.error('Erreur récupération profil:', error);
-            return null;
+            console.error('❌ Erreur récupération profil:', error);
+            throw error;
         }
     },
 
     // Créer un nouveau profil
     createProfile: async (userId, userData) => {
         try {
+            console.log('📝 Création profil pour:', userId);
             const profile = {
                 ...ProfileSystem.defaultProfile,
                 pseudo: userData.name || userData.email.split('@')[0],
@@ -269,9 +292,10 @@ const ProfileSystem = {
             };
             
             await db.collection('profiles').doc(userId).set(profile);
+            console.log('✅ Profil créé');
             return { success: true, profile };
         } catch (error) {
-            console.error('Erreur création profil:', error);
+            console.error('❌ Erreur création profil:', error);
             throw error;
         }
     },
@@ -469,8 +493,10 @@ const ProfileSystem = {
     // CORRIGÉ: Récupérer le classement avec les profils (sans index composite)
     getLeaderboardWithProfiles: async (limit = 20) => {
         try {
+            console.log('📊 Récupération classement...');
             // Récupérer TOUS les profils (sans where + orderBy combinés)
             const snapshot = await db.collection('profiles').get();
+            console.log('📥 Profils récupérés:', snapshot.docs.length);
 
             // Filtrer et trier côté client
             const profiles = snapshot.docs
@@ -490,9 +516,10 @@ const ProfileSystem = {
                     ...p
                 }));
 
+            console.log('✅ Classement prêt:', profiles.length, 'profils');
             return profiles;
         } catch (error) {
-            console.error('Erreur récupération classement:', error);
+            console.error('❌ Erreur récupération classement:', error);
             return [];
         }
     },
@@ -587,5 +614,6 @@ const ProfileSystem = {
 window.XPSystem = XPSystem;
 window.ProfileSystem = ProfileSystem;
 window.BADGES = BADGES;
+window.AVATARS_PREDEFINIES = AVATARS_PREDEFINIES;
 
-console.log('✅ Profile System chargé');
+console.log('✅ Profile System chargé avec', AVATARS_PREDEFINIES.length, 'avatars');

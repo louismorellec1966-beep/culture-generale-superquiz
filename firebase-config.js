@@ -1,5 +1,6 @@
 // ========== CONFIGURATION FIREBASE ==========
 // Configuration Firebase pour SuperQuiz avec système de profils enrichis
+// VERSION CORRIGÉE - Sans index composites (tri côté client)
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAEGKVsQYmKnzkMu8vclmxrf01sHmvZXA",
@@ -17,6 +18,8 @@ firebase.initializeApp(firebaseConfig);
 // Références globales
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+console.log('🔥 Firebase initialisé');
 
 // ========== SYSTÈME D'AUTHENTIFICATION ==========
 const FirebaseAuth = {
@@ -177,15 +180,23 @@ const FirebaseScores = {
         }
     },
 
-    // CORRIGÉ: Récupération sans index composite
+    // CORRIGÉ: Récupération sans index composite (tri côté client)
     getAll: async () => {
         const user = auth.currentUser;
-        if (!user) return [];
+        if (!user) {
+            console.log('⚠️ Utilisateur non connecté');
+            return [];
+        }
+        
         try {
-            // Requête simple sans orderBy pour éviter le besoin d'index
+            console.log('📥 Récupération scores pour:', user.uid);
+            
+            // Requête simple SANS orderBy pour éviter le besoin d'index
             const snapshot = await db.collection('scores')
                 .where('userId', '==', user.uid)
                 .get();
+            
+            console.log('📊 Scores trouvés:', snapshot.docs.length);
             
             const scores = snapshot.docs.map(doc => {
                 const data = doc.data();
@@ -196,18 +207,22 @@ const FirebaseScores = {
                 };
             });
             
-            // Tri côté client (évite le besoin d'index)
+            // Tri côté client (évite le besoin d'index composite)
             scores.sort((a, b) => new Date(b.date) - new Date(a.date));
             
+            console.log('✅ Scores triés et prêts');
             return scores;
         } catch (error) {
-            console.error('Erreur récupération scores:', error);
+            console.error('❌ Erreur récupération scores:', error);
             return [];
         }
     },
 
+    // CORRIGÉ: Classement sans index composite
     getLeaderboard: async (matiere = null) => {
         try {
+            console.log('📊 Récupération classement par scores...');
+            
             // Récupérer tous les scores (sans filtre pour éviter les index)
             const snapshot = await db.collection('scores').get();
             const userScores = {};
@@ -264,9 +279,11 @@ const FirebaseScores = {
 
             // Tri côté client
             leaderboard.sort((a, b) => b.totalScore - a.totalScore);
+            
+            console.log('✅ Classement prêt:', leaderboard.length, 'joueurs');
             return leaderboard;
         } catch (error) {
-            console.error('Erreur récupération classement:', error);
+            console.error('❌ Erreur récupération classement:', error);
             return [];
         }
     },
@@ -274,8 +291,12 @@ const FirebaseScores = {
     // CORRIGÉ: Classement par XP sans index composite
     getXPLeaderboard: async (limit = 20) => {
         try {
+            console.log('📊 Récupération classement XP...');
+            
             // Récupérer TOUS les profils (sans where/orderBy combinés)
             const snapshot = await db.collection('profiles').get();
+            
+            console.log('📥 Profils récupérés:', snapshot.docs.length);
 
             // Filtrer et trier côté client
             const profiles = snapshot.docs
@@ -305,9 +326,10 @@ const FirebaseScores = {
                     rank: index + 1
                 }));
 
+            console.log('✅ Classement XP prêt:', profiles.length, 'profils');
             return profiles;
         } catch (error) {
-            console.error('Erreur récupération classement XP:', error);
+            console.error('❌ Erreur récupération classement XP:', error);
             return [];
         }
     }
@@ -320,4 +342,4 @@ window.db = db;
 window.auth = auth;
 window.firebase = firebase;
 
-console.log('✅ Firebase initialisé avec succès');
+console.log('✅ Firebase Config chargé avec succès');

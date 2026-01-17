@@ -2,14 +2,13 @@
 <html lang="fr">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperQuiz - Quiz Dynamique</title>
@@ -20,6 +19,7 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
+    <script defer src="js/profile-system.js"></script>
     
     <style>
         .quiz-header {
@@ -31,10 +31,7 @@
             border-radius: 10px;
         }
 
-        .quiz-header h1 {
-            margin: 0;
-            font-size: 2em;
-        }
+        .quiz-header h1 { margin: 0; font-size: 2em; }
 
         .breadcrumb {
             margin: 20px 0;
@@ -58,10 +55,7 @@
             font-weight: bold;
         }
 
-        .score-display span {
-            font-size: 1.3em;
-            color: #ffd700;
-        }
+        .score-display span { font-size: 1.3em; color: #ffd700; }
 
         .question-card {
             background: white;
@@ -156,6 +150,189 @@
             text-align: center;
             margin: 20px 0;
         }
+
+        /* Résultats avec XP */
+        .results-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .results-modal.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .results-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .results-header {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .results-score {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 15px 0;
+        }
+
+        .results-percentage {
+            font-size: 1.5em;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .xp-gain {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .xp-gain-title {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .xp-gain-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .level-up {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .new-badges {
+            margin: 20px 0;
+        }
+
+        .new-badge-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #d4edda;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .new-badge-item .badge-icon { font-size: 1.5em; }
+        .new-badge-item .badge-name { font-weight: bold; color: #155724; }
+
+        .results-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn-result {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: transform 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-result:hover { transform: translateY(-2px); }
+
+        .btn-result.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-result.secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        /* Timer mode défi */
+        .global-timer {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .global-timer.active { display: block; }
+
+        .timer-value { font-size: 1.8em; }
+
+        /* Mode badge */
+        .mode-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .mode-badge.classic {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+        }
+
+        .mode-badge.challenge {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            color: white;
+        }
     </style>
 </head>
 
@@ -180,6 +357,7 @@
             </li>
             <li><a href="Scores.html">Scores</a></li>
             <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Profil.html">👤 Profil</a></li>
             <li><a href="Contact.html">Contact</a></li>
         </ul>
     </nav>
@@ -196,28 +374,46 @@
         </div>
 
         <div id="quiz-container"></div>
+
+        <div id="global-timer" class="global-timer">
+            <div>⏱️ Temps</div>
+            <div class="timer-value" id="timer-value">0:00</div>
+        </div>
     </main>
+
+    <!-- Modal Résultats -->
+    <div id="results-modal" class="results-modal">
+        <div class="results-content">
+            <div class="results-header" id="results-emoji">🎉</div>
+            <div class="results-score" id="results-score">0/0</div>
+            <div class="results-percentage" id="results-percentage">0%</div>
+            
+            <div class="xp-gain" id="xp-section">
+                <div class="xp-gain-title">XP Gagnés</div>
+                <div class="xp-gain-value" id="xp-gained">+0 XP</div>
+            </div>
+
+            <div class="level-up" id="level-up-section" style="display: none;">
+                🎊 Niveau supérieur ! Niveau <span id="new-level">2</span>
+            </div>
+
+            <div class="new-badges" id="new-badges-section"></div>
+
+            <div class="results-actions">
+                <a href="Quiz.html" class="btn-result secondary">← Autre Quiz</a>
+                <button class="btn-result primary" onclick="location.reload()">🔄 Rejouer</button>
+                <a href="Profil.html" class="btn-result secondary">👤 Mon Profil</a>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
 
-    <!-- LE SCRIPT EST ICI - PAS DE script.js EXTERNE -->
+    <script src="js/script.js"></script>
     <script>
-        // Attendre que Firebase soit chargé
-        window.addEventListener('load', () => {
-            // Vérifier que Firebase est chargé
-            if (typeof firebase === 'undefined') {
-                console.error('Firebase non chargé');
-                setTimeout(() => window.location.reload(), 1000);
-                return;
-            }
-
-            // Attendre un peu que firebase-config.js s'exécute
-            setTimeout(initQuiz, 100);
-        });
-
-        // Récupérer les paramètres de l'URL
+        // Paramètres URL
         const urlParams = new URLSearchParams(window.location.search);
         const matiere = urlParams.get('matiere');
         const categorie = urlParams.get('categorie');
@@ -225,57 +421,68 @@
 
         let answeredQuestions = new Set();
         let currentScore = 0;
+        let quizStartTime = null;
+        let timerInterval = null;
 
-        // Données des quiz (version simplifiée pour test)
+        // Données des quiz
         const quizData = {
             "histoire": {
                 "antiquite": {
                     "titre": "🏛️ Antiquité",
                     "questions": [
-                        {
-                            "question": "Qui était le premier empereur romain ?",
-                            "reponses": ["Auguste", "Jules César", "Néron", "Tibère"],
-                            "correct": 0
-                        },
-                        {
-                            "question": "En quelle année Jules César a-t-il été assassiné ?",
-                            "reponses": ["44 av. J.-C.", "55 av. J.-C.", "33 av. J.-C.", "27 av. J.-C."],
-                            "correct": 0
-                        },
-                        {
-                            "question": "Quelle était la capitale de l'Égypte ancienne ?",
-                            "reponses": ["Memphis", "Alexandrie", "Thèbes", "Le Caire"],
-                            "correct": 0
-                        },
-                        {
-                            "question": "Qui était le dieu principal dans la mythologie grecque ?",
-                            "reponses": ["Zeus", "Poséidon", "Hadès", "Apollon"],
-                            "correct": 0
-                        },
-                        {
-                            "question": "Quelle bataille a marqué la fin de l'expansion perse en Grèce ?",
-                            "reponses": ["Salamine", "Marathon", "Thermopyles", "Platées"],
-                            "correct": 0
-                        }
+                        { "question": "Qui était le premier empereur romain ?", "reponses": ["Auguste", "Jules César", "Néron", "Tibère"], "correct": 0 },
+                        { "question": "En quelle année Jules César a-t-il été assassiné ?", "reponses": ["44 av. J.-C.", "55 av. J.-C.", "33 av. J.-C.", "27 av. J.-C."], "correct": 0 },
+                        { "question": "Quelle était la capitale de l'Égypte ancienne ?", "reponses": ["Memphis", "Alexandrie", "Thèbes", "Le Caire"], "correct": 0 },
+                        { "question": "Qui était le dieu principal dans la mythologie grecque ?", "reponses": ["Zeus", "Poséidon", "Hadès", "Apollon"], "correct": 0 },
+                        { "question": "Quelle bataille a marqué la fin de l'expansion perse en Grèce ?", "reponses": ["Salamine", "Marathon", "Thermopyles", "Platées"], "correct": 0 }
                     ]
-                }
+                },
+                "moyenage": { "titre": "⚔️ Moyen Âge", "questions": [
+                    { "question": "En quelle année a eu lieu la bataille de Hastings ?", "reponses": ["1066", "1096", "1215", "1337"], "correct": 0 },
+                    { "question": "Qui a unifié les tribus mongoles ?", "reponses": ["Gengis Khan", "Kubilaï Khan", "Tamerlan", "Attila"], "correct": 0 }
+                ]},
+                "art": { "titre": "🎨 Histoire de l'Art", "questions": [{ "question": "Qui a peint la Joconde ?", "reponses": ["Léonard de Vinci", "Michel-Ange", "Raphaël", "Botticelli"], "correct": 0 }]},
+                "guerres": { "titre": "⚡ Guerres Mondiales", "questions": [{ "question": "En quelle année a commencé la Première Guerre mondiale ?", "reponses": ["1914", "1915", "1916", "1917"], "correct": 0 }]},
+                "france": { "titre": "🇫🇷 Histoire de France", "questions": [{ "question": "En quelle année a eu lieu Marignan ?", "reponses": ["1515", "1519", "1518", "1517"], "correct": 0 }]},
+                "contemporaine": { "titre": "📱 Histoire Contemporaine", "questions": [{ "question": "Année de la chute du mur de Berlin ?", "reponses": ["1989", "1987", "1991", "1985"], "correct": 0 }]}
             },
             "geographie": {
-                "capitales": {
-                    "titre": "🏛️ Capitales",
-                    "questions": [
-                        {
-                            "question": "Quelle est la capitale de l'Australie ?",
-                            "reponses": ["Canberra", "Sydney", "Melbourne", "Brisbane"],
-                            "correct": 0
-                        }
-                    ]
-                }
+                "capitales": { "titre": "🏛️ Capitales", "questions": [{ "question": "Quelle est la capitale de l'Australie ?", "reponses": ["Canberra", "Sydney", "Melbourne", "Brisbane"], "correct": 0 }]},
+                "france": { "titre": "🇫🇷 France", "questions": [{ "question": "Combien de régions en France ?", "reponses": ["13", "22", "18", "15"], "correct": 0 }]},
+                "europe": { "titre": "🇪🇺 Europe", "questions": [{ "question": "Pays dans l'UE ?", "reponses": ["27", "28", "25", "30"], "correct": 0 }]},
+                "continents": { "titre": "🌍 Continents", "questions": [{ "question": "Plus grand océan ?", "reponses": ["Pacifique", "Atlantique", "Indien", "Arctique"], "correct": 0 }]},
+                "nature": { "titre": "🏔️ Physique", "questions": [{ "question": "Plus haut sommet ?", "reponses": ["Everest", "K2", "Kilimandjaro", "Mont Blanc"], "correct": 0 }]},
+                "culture": { "titre": "🎭 Culture", "questions": [{ "question": "Où est la tour de Pise ?", "reponses": ["Italie", "France", "Espagne", "Grèce"], "correct": 0 }]}
+            },
+            "science": {
+                "physique": { "titre": "⚛️ Physique", "questions": [{ "question": "Vitesse de la lumière ?", "reponses": ["300 000 km/s", "150 000", "500 000", "200 000"], "correct": 0 }]},
+                "chimie": { "titre": "🧪 Chimie", "questions": [{ "question": "Symbole de l'or ?", "reponses": ["Au", "Ag", "Fe", "Cu"], "correct": 0 }]},
+                "biologie": { "titre": "🧬 Biologie", "questions": [{ "question": "Support génétique ?", "reponses": ["ADN", "ARN", "Protéines", "Lipides"], "correct": 0 }]},
+                "astronomie": { "titre": "🌌 Astronomie", "questions": [{ "question": "Planète proche du Soleil ?", "reponses": ["Mercure", "Vénus", "Mars", "Terre"], "correct": 0 }]},
+                "mathematiques": { "titre": "📐 Maths", "questions": [{ "question": "Valeur de π ?", "reponses": ["3.14", "3.16", "3.12", "3.18"], "correct": 0 }]},
+                "technologie": { "titre": "💻 Technologie", "questions": [{ "question": "Père de l'informatique ?", "reponses": ["Alan Turing", "Bill Gates", "Steve Jobs", "Tim"], "correct": 0 }]}
+            },
+            "litterature": {
+                "classiques": { "titre": "📚 Classiques", "questions": [{ "question": "Auteur des Misérables ?", "reponses": ["Victor Hugo", "Zola", "Flaubert", "Balzac"], "correct": 0 }]},
+                "poesie": { "titre": "✍️ Poésie", "questions": [{ "question": "Auteur des Fleurs du mal ?", "reponses": ["Baudelaire", "Rimbaud", "Verlaine", "Mallarmé"], "correct": 0 }]},
+                "theatre": { "titre": "🎭 Théâtre", "questions": [{ "question": "Auteur de Phèdre ?", "reponses": ["Racine", "Corneille", "Molière", "Beaumarchais"], "correct": 0 }]},
+                "romans": { "titre": "📖 Romans XXe", "questions": [{ "question": "Auteur de L'Étranger ?", "reponses": ["Camus", "Sartre", "Gide", "Malraux"], "correct": 0 }]},
+                "mondiale": { "titre": "🌍 Mondiale", "questions": [{ "question": "Auteur de Roméo et Juliette ?", "reponses": ["Shakespeare", "Molière", "Goethe", "Dante"], "correct": 0 }]},
+                "contemporaine": { "titre": "📱 Contemporaine", "questions": [{ "question": "Nobel 2014 ?", "reponses": ["Modiano", "Ernaux", "Le Clézio", "Gao"], "correct": 0 }]}
             }
         };
 
+        // Initialisation
+        window.addEventListener('load', () => {
+            setTimeout(initQuiz, 100);
+        });
+
         function initQuiz() {
-            // Vérifier paramètres
+            if (typeof firebase === 'undefined') {
+                setTimeout(initQuiz, 200);
+                return;
+            }
+
             if (!matiere || !categorie) {
                 document.getElementById('quiz-container').innerHTML =
                     '<div class="error-message"><h2>Erreur</h2><p>Paramètres de quiz manquants. <a href="Quiz.html" style="color: white;">Retour aux quiz</a></p></div>';
@@ -283,29 +490,30 @@
             }
 
             const quizContent = quizData[matiere]?.[categorie];
-
             if (!quizContent) {
                 document.getElementById('quiz-container').innerHTML =
                     '<div class="error-message"><h2>Quiz introuvable</h2><p><a href="Quiz.html" style="color: white;">Retour aux quiz</a></p></div>';
                 return;
             }
 
-            // Mettre à jour le titre
-            document.getElementById('quiz-title').textContent = quizContent.titre;
+            // Titre avec badge de mode
+            const modeBadge = mode === 'challenge'
+                ? '<span class="mode-badge challenge">🔥 DÉFI</span>'
+                : '<span class="mode-badge classic">🎯 CLASSIQUE</span>';
+            document.getElementById('quiz-title').innerHTML = quizContent.titre + modeBadge;
 
-            // Fil d'Ariane
+            // Breadcrumb
             const matiereNom = matiere.charAt(0).toUpperCase() + matiere.slice(1);
             document.getElementById('breadcrumb').innerHTML =
                 `<a href="Quiz.html">Quiz</a> > <a href="${matiereNom}.html">${matiereNom}</a> > ${quizContent.titre}`;
 
-            // Afficher les questions
+            // Questions
             const container = document.getElementById('quiz-container');
             container.innerHTML = '';
 
             quizContent.questions.forEach((q, index) => {
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question-card';
-
                 questionDiv.innerHTML = `
                     <span class="question-number">Question ${index + 1}</span>
                     <div class="question-text">${q.question}</div>
@@ -321,11 +529,37 @@
                 container.appendChild(questionDiv);
             });
 
-            // Initialiser le total de questions
             document.getElementById('total-questions').textContent = quizContent.questions.length;
+
+            // Démarrer le timer en mode défi
+            if (mode === 'challenge') {
+                startTimer();
+            }
+
+            // Timer de début
+            quizStartTime = Date.now();
 
             // Menu auth
             initAuthMenu();
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('global-timer');
+            timerElement.classList.add('active');
+
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - quizStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer-value').textContent =
+                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 100);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
         }
 
         function selectAnswer(qIndex, answerIndex) {
@@ -350,9 +584,7 @@
                 return;
             }
 
-            if (answeredQuestions.has(qIndex)) {
-                return; // Déjà répondu
-            }
+            if (answeredQuestions.has(qIndex)) return;
 
             const isCorrect = parseInt(selected.value) === correctAnswer;
 
@@ -363,46 +595,46 @@
                 feedback.textContent = '✅ Bravo ! Bonne réponse !';
             } else {
                 feedback.className = 'reponse-feedback incorrect';
-                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + document.querySelector(`input[name="q${qIndex}"][value="${correctAnswer}"]`).nextElementSibling.textContent;
+                const correctText = document.querySelector(`input[name="q${qIndex}"][value="${correctAnswer}"]`)
+                    .nextElementSibling.textContent;
+                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctText;
             }
 
             feedback.style.display = 'block';
             answeredQuestions.add(qIndex);
 
-            // Désactiver les radios
+            // Désactiver les options
             document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
                 r.disabled = true;
                 r.closest('.answer-option').style.opacity = '0.6';
                 r.closest('.answer-option').style.cursor = 'not-allowed';
             });
 
-            // Vérifier si quiz terminé
+            // Quiz terminé ?
             const totalQuestions = parseInt(document.getElementById('total-questions').textContent);
             if (answeredQuestions.size === totalQuestions) {
+                stopTimer();
                 setTimeout(saveScore, 500);
             }
         }
 
         async function saveScore() {
-            if (typeof FirebaseScores === 'undefined') {
-                if (confirm('Firebase non chargé. Voulez-vous recharger la page ?')) {
-                    window.location.reload();
-                }
-                return;
-            }
-
-            const user = FirebaseAuth?.getCurrentUser();
-
-            if (!user) {
-                if (confirm('Voulez-vous vous connecter pour sauvegarder votre score ?')) {
-                    window.location.href = 'Auth.html';
-                }
-                return;
-            }
-
-            const score = parseInt(document.getElementById('current-score').textContent);
+            const score = currentScore;
             const total = parseInt(document.getElementById('total-questions').textContent);
-            const quizTitle = document.getElementById('quiz-title').textContent;
+            const quizTitle = document.getElementById('quiz-title').textContent.split('<')[0].trim();
+            const tempsEnSecondes = Math.floor((Date.now() - quizStartTime) / 1000);
+
+            // Vérifier connexion
+            if (typeof FirebaseAuth === 'undefined') {
+                showResults(score, total, null);
+                return;
+            }
+
+            const user = FirebaseAuth.getCurrentUser();
+            if (!user) {
+                showResults(score, total, null);
+                return;
+            }
 
             const scoreData = {
                 matiere: matiere,
@@ -410,16 +642,66 @@
                 titre: quizTitle,
                 score: score,
                 total: total,
-                mode: mode
+                mode: mode,
+                tempsEnSecondes: tempsEnSecondes
             };
 
             try {
-                await FirebaseScores.save(scoreData);
-                alert(`✅ Score sauvegardé : ${score}/${total} (${Math.round((score / total) * 100)}%)\n\nConsultez vos scores dans la section "Scores" !`);
+                const result = await FirebaseScores.save(scoreData);
+                showResults(score, total, result.profileUpdate);
             } catch (error) {
                 console.error('Erreur sauvegarde:', error);
-                alert('❌ Erreur lors de la sauvegarde du score');
+                showResults(score, total, null);
             }
+        }
+
+        function showResults(score, total, profileUpdate) {
+            const percentage = Math.round((score / total) * 100);
+            
+            // Emoji selon le score
+            let emoji = '😔';
+            if (percentage >= 90) emoji = '🏆';
+            else if (percentage >= 70) emoji = '🎉';
+            else if (percentage >= 50) emoji = '👍';
+            else if (percentage >= 30) emoji = '🤔';
+
+            document.getElementById('results-emoji').textContent = emoji;
+            document.getElementById('results-score').textContent = `${score}/${total}`;
+            document.getElementById('results-percentage').textContent = `${percentage}%`;
+
+            // XP et badges
+            if (profileUpdate) {
+                document.getElementById('xp-gained').textContent = `+${profileUpdate.xpGagne} XP`;
+                
+                // Level up ?
+                if (profileUpdate.levelUp) {
+                    document.getElementById('new-level').textContent = profileUpdate.newNiveau;
+                    document.getElementById('level-up-section').style.display = 'block';
+                }
+
+                // Nouveaux badges ?
+                if (profileUpdate.nouveauxBadges && profileUpdate.nouveauxBadges.length > 0) {
+                    const badgesHTML = profileUpdate.nouveauxBadges.map(badge => `
+                        <div class="new-badge-item">
+                            <span class="badge-icon">${badge.icone}</span>
+                            <span class="badge-name">${badge.nom}</span>
+                        </div>
+                    `).join('');
+                    document.getElementById('new-badges-section').innerHTML = `
+                        <h3>🏅 Nouveaux badges !</h3>
+                        ${badgesHTML}
+                    `;
+                }
+            } else {
+                // Non connecté
+                document.getElementById('xp-section').innerHTML = `
+                    <div class="xp-gain-title">💡 Conseil</div>
+                    <div style="font-size: 1em;">Connectez-vous pour gagner de l'XP et des badges !</div>
+                    <a href="Auth.html" style="display: inline-block; margin-top: 10px; padding: 10px 20px; background: #2c3e50; color: white; text-decoration: none; border-radius: 5px;">Se connecter</a>
+                `;
+            }
+
+            document.getElementById('results-modal').classList.add('active');
         }
 
         function initAuthMenu() {
@@ -456,7 +738,6 @@
             if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
                 try {
                     await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
                     window.location.href = 'Accueil.html';
                 } catch (error) {
                     alert('Erreur lors de la déconnexion');
@@ -466,8 +747,7 @@
 
         // Menu hamburger
         document.getElementById('toggle-menu')?.addEventListener('click', function() {
-            const nav = document.querySelector('nav');
-            nav.classList.toggle('menu-open');
+            document.querySelector('nav').classList.toggle('menu-open');
         });
     </script>
 </body>

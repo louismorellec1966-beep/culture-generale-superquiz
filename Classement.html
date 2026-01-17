@@ -2,14 +2,13 @@
 <html lang="fr">
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperQuiz - Classement</title>
@@ -18,36 +17,225 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
+    <script defer src="js/profile-system.js"></script>
     <style>
-        .classement-header{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%);color:white;padding:40px;text-align:center;border-radius:10px;margin-bottom:30px}
-        .classement-header h1{margin:0;font-size:2.5em}
-        .filter-tabs{display:flex;justify-content:center;gap:10px;margin:30px 0;flex-wrap:wrap}
-        .filter-tab{padding:12px 30px;background:white;border:2px solid #ecf0f1;border-radius:25px;cursor:pointer;transition:all .3s;font-weight:600;color:#7f8c8d}
-        .filter-tab:hover{border-color:#3498db;color:#3498db}
-        .filter-tab.active{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-color:transparent}
-        .podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:900px;margin:40px auto;align-items:flex-end}
-        .podium-place{background:white;border-radius:15px;padding:30px 20px;text-align:center;box-shadow:0 5px 20px rgba(0,0,0,.1);transition:transform .3s}
-        .podium-place:hover{transform:translateY(-10px)}
-        .podium-place.first{order:2;background:linear-gradient(135deg,#ffd700 0%,#ffed4e 100%);color:#2c3e50;padding:40px 20px}
-        .podium-place.second{order:1;background:linear-gradient(135deg,#c0c0c0 0%,#e8e8e8 100%)}
-        .podium-place.third{order:3;background:linear-gradient(135deg,#cd7f32 0%,#e89b65 100%);color:white}
-        .medal{font-size:4em;margin-bottom:10px;display:block;animation:bounce 2s infinite}
-        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-        .podium-name{font-size:1.3em;font-weight:bold;margin:10px 0}
-        .podium-score{font-size:2em;font-weight:bold;margin:10px 0}
-        .classement-table{background:white;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.1);margin-top:40px}
-        .table-header{background:#3498db;color:white;padding:15px;font-weight:bold;display:grid;grid-template-columns:80px 2fr 1fr 1fr 1fr;gap:15px}
-        .classement-row{padding:15px;border-bottom:1px solid #ecf0f1;display:grid;grid-template-columns:80px 2fr 1fr 1fr 1fr;gap:15px;align-items:center;transition:background .3s}
-        .classement-row:hover{background:#f8f9fa}
-        .classement-row.highlight{background:#e3f2fd;border-left:4px solid #3498db}
-        .rank{font-size:1.5em;font-weight:bold;text-align:center;color:#3498db}
-        .rank.top3{font-size:2em}
-        .player-name{font-weight:600;color:#2c3e50}
-        .player-score{font-size:1.3em;font-weight:bold;color:#2ecc71}
-        .no-data{text-align:center;padding:50px;color:#7f8c8d}
-        .stat-box{background:white;padding:20px;border-radius:10px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-        .stat-number{font-size:2.5em;font-weight:bold;color:#3498db}
-        .stats-banner{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:30px 0}
+        .classement-header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .classement-header h1 { margin: 0; font-size: 2.5em; }
+        .classement-header p { margin: 10px 0 0 0; opacity: 0.9; }
+
+        .filter-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .filter-tab {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #ecf0f1;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #7f8c8d;
+        }
+        .filter-tab:hover { border-color: #3498db; color: #3498db; }
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Podium amélioré */
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            max-width: 900px;
+            margin: 40px auto;
+            align-items: flex-end;
+        }
+        .podium-place {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        .podium-place:hover { transform: translateY(-10px); }
+        .podium-place.first {
+            order: 2;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            padding: 40px 20px;
+            z-index: 2;
+        }
+        .podium-place.second {
+            order: 1;
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+        }
+        .podium-place.third {
+            order: 3;
+            background: linear-gradient(135deg, #cd7f32 0%, #e89b65 100%);
+            color: white;
+        }
+
+        .podium-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .podium-place.first .podium-avatar { width: 100px; height: 100px; font-size: 50px; }
+
+        .medal {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5em;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+
+        .podium-name { font-size: 1.2em; font-weight: bold; margin: 10px 0; }
+        .podium-level {
+            display: inline-block;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        .podium-xp { font-size: 1.8em; font-weight: bold; margin: 10px 0; }
+        .podium-details { font-size: 0.9em; opacity: 0.8; }
+
+        /* Table classement */
+        .classement-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-top: 40px;
+        }
+        .table-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 20px;
+            font-weight: bold;
+            display: grid;
+            grid-template-columns: 60px 60px 2fr 100px 100px 80px;
+            gap: 15px;
+            align-items: center;
+        }
+        .classement-row {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            display: grid;
+            grid-template-columns: 60px 60px 2fr 100px 100px 80px;
+            gap: 15px;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        .classement-row:hover { background: #f8f9fa; transform: translateX(5px); }
+        .classement-row.highlight {
+            background: linear-gradient(90deg, #e3f2fd, #fff);
+            border-left: 4px solid #3498db;
+        }
+
+        .rank {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: center;
+            color: #7f8c8d;
+        }
+        .rank.top3 { font-size: 1.8em; }
+
+        .row-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .player-info { display: flex; flex-direction: column; gap: 3px; }
+        .player-name { font-weight: 600; color: #2c3e50; }
+        .player-level {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #3498db;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .player-xp { font-size: 1.1em; font-weight: bold; color: #f39c12; }
+        .quiz-count { color: #7f8c8d; }
+        .success-rate { font-weight: 600; }
+        .success-rate.good { color: #2ecc71; }
+        .success-rate.medium { color: #f39c12; }
+        .success-rate.poor { color: #e74c3c; }
+
+        /* Stats banner */
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s;
+        }
+        .stat-box:hover { transform: translateY(-5px); }
+        .stat-number { font-size: 2.2em; font-weight: bold; color: #3498db; }
+        .stat-label { color: #7f8c8d; margin-top: 5px; }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+        .no-data h3 { margin-bottom: 10px; color: #2c3e50; }
+
+        @media (max-width: 768px) {
+            .podium { grid-template-columns: 1fr; }
+            .podium-place { order: initial !important; }
+            .table-header { display: none; }
+            .classement-row {
+                grid-template-columns: 50px 50px 1fr;
+                gap: 10px;
+            }
+            .classement-row > *:nth-child(n+4) { display: none; }
+        }
     </style>
 </head>
 <body>
@@ -69,121 +257,226 @@
                 </ul>
             </li>
             <li><a href="Scores.html">Scores</a></li>
+            <li><a href="Profil.html">👤 Profil</a></li>
             <li><a href="Classement.html" aria-current="page">🏆 Classement</a></li>
+            <li><a href="Profil.html">👤 Profil</a></li>
             <li><a href="Contact.html">Contact</a></li>
         </ul>
     </nav>
+
     <main>
         <div class="classement-header">
             <h1>🏆 Classement Global</h1>
-            <p>Comparez vos performances !</p>
+            <p>Comparez vos performances avec les autres joueurs !</p>
         </div>
+
         <div class="stats-banner" id="stats-banner">
-            <div class="stat-box"><div class="stat-number">⏳</div><div class="stat-label">Chargement...</div></div>
+            <div class="stat-box">
+                <div class="stat-number">⏳</div>
+                <div class="stat-label">Chargement...</div>
+            </div>
         </div>
+
         <div class="filter-tabs">
-            <div class="filter-tab active" onclick="filterClassement('global')">🌍 Global</div>
+            <div class="filter-tab active" onclick="filterClassement('xp')">⭐ Par XP</div>
+            <div class="filter-tab" onclick="filterClassement('global')">🎯 Par Score</div>
             <div class="filter-tab" onclick="filterClassement('histoire')">📜 Histoire</div>
             <div class="filter-tab" onclick="filterClassement('geographie')">🗺️ Géo</div>
             <div class="filter-tab" onclick="filterClassement('science')">🔬 Science</div>
             <div class="filter-tab" onclick="filterClassement('litterature')">📚 Littérature</div>
         </div>
+
         <div id="podium-container"></div>
+
         <div class="classement-table">
             <div class="table-header">
-                <div>Rang</div><div>Joueur</div><div>Score</div><div>Quiz</div><div>Moy</div>
+                <div>Rang</div>
+                <div></div>
+                <div>Joueur</div>
+                <div>XP</div>
+                <div>Quiz</div>
+                <div>Taux</div>
             </div>
-            <div id="classement-list"><div class="no-data"><p>⏳ Chargement...</p></div></div>
+            <div id="classement-list">
+                <div class="no-data"><p>⏳ Chargement...</p></div>
+            </div>
         </div>
     </main>
+
     <footer><p>Copyright © 2024 SuperQuiz</p></footer>
+
     <script src="js/script.js"></script>
     <script>
-let currentFilter='global',currentUser=null,allLeaderboard=[];
-async function loadClassement(){
-    try{
-        console.log('🔍 Chargement classement...');
-        allLeaderboard=await FirebaseScores.getLeaderboard(currentFilter==='global'?null:currentFilter);
-        console.log('✅ Classement:', allLeaderboard.length);
-        displayStats();displayPodium(allLeaderboard.slice(0,3));displayTable(allLeaderboard);
-    }catch(e){
-        console.error('❌ Erreur:',e);
-        document.getElementById('classement-list').innerHTML='<div class="no-data"><h3>Erreur</h3><p>'+e.message+'</p></div>';
-    }
-}
-function displayStats(){
-    const total=allLeaderboard.length;
-    const quiz=allLeaderboard.reduce((s,u)=>s+(u.quizCount||0),0);
-    const pts=allLeaderboard.reduce((s,u)=>s+(u.totalScore||0),0);
-    document.getElementById('stats-banner').innerHTML=`
-        <div class="stat-box"><div class="stat-number">${total}</div><div class="stat-label">Joueurs</div></div>
-        <div class="stat-box"><div class="stat-number">${quiz}</div><div class="stat-label">Quiz</div></div>
-        <div class="stat-box"><div class="stat-number">${pts}</div><div class="stat-label">Points</div></div>
-    `;
-}
-function displayPodium(top3){
-    const c=document.getElementById('podium-container');
-    if(top3.length===0){c.innerHTML='<div class="no-data"><p>Aucun score</p></div>';return}
-    const medals=['🥇','🥈','🥉'],pos=['first','second','third'];
-    c.innerHTML=`<div class="podium">${top3.map((p,i)=>`
-        <div class="podium-place ${pos[i]}">
-            <span class="medal">${medals[i]}</span>
-            <div class="podium-name">${p.name||'Joueur'}</div>
-            <div class="podium-score">${p.totalScore||0}</div>
-            <div>${p.quizCount||0} quiz</div>
-        </div>
-    `).join('')}</div>`;
-}
-function displayTable(rankings){
-    const list=document.getElementById('classement-list');
-    if(rankings.length===0){list.innerHTML='<div class="no-data"><p>Aucun score</p></div>';return}
-    list.innerHTML=rankings.map((p,i)=>{
-        const rank=i+1;
-        const isCurrent=currentUser&&p.uid===currentUser.uid;
-        const avg=p.quizCount>0?Math.round((p.totalScore/p.quizCount)*10):0;
-        return`<div class="${isCurrent?'classement-row highlight':'classement-row'}">
-            <div class="${rank<=3?'rank top3':'rank'}">${rank<=3?['🥇','🥈','🥉'][rank-1]:'#'+rank}</div>
-            <div class="player-name">${p.name||'Joueur'}${isCurrent?' (Vous)':''}</div>
-            <div class="player-score">${p.totalScore||0}</div>
-            <div class="quiz-count">${p.quizCount||0}</div>
-            <div class="avg-score">${avg}</div>
-        </div>`;
-    }).join('');
-}
-async function filterClassement(filter){
-    currentFilter=filter;
-    document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
-    event.target.classList.add('active');
-    await loadClassement();
-}
-async function logout(e){
-    e.preventDefault();
-    if(confirm('Déconnexion ?')){
-        try{await FirebaseAuth.logout();window.location.href='Accueil.html'}
-        catch(e){alert('Erreur déconnexion')}
-    }
-}
-window.addEventListener('load',()=>{
-    if(typeof FirebaseAuth==='undefined'){
-        setTimeout(()=>location.reload(),2000);return;
-    }
-    FirebaseAuth.onAuthStateChanged(user=>{
-        if(user)currentUser=user;
-        loadClassement();
-        const nav=document.querySelector('.menu');
-        if(!nav)return;
-        const exist=document.getElementById('auth-menu-item');
-        if(exist)exist.remove();
-        const auth=document.createElement('li');
-        auth.id='auth-menu-item';
-        if(user){
-            auth.innerHTML=`<a href="#" onclick="logout(event)" style="color:#2ecc71">👤 ${user.name}</a>`;
-        }else{
-            auth.innerHTML='<a href="Auth.html" style="color:#e74c3c">🔐 Connexion</a>';
+        let currentFilter = 'xp';
+        let currentUser = null;
+        let allLeaderboard = [];
+
+        async function loadClassement() {
+            try {
+                if (currentFilter === 'xp') {
+                    allLeaderboard = await FirebaseScores.getXPLeaderboard(50);
+                } else {
+                    const matiere = currentFilter === 'global' ? null : currentFilter;
+                    allLeaderboard = await FirebaseScores.getLeaderboard(matiere);
+                }
+                
+                displayStats();
+                displayPodium(allLeaderboard.slice(0, 3));
+                displayTable(allLeaderboard);
+            } catch (e) {
+                console.error('❌ Erreur:', e);
+                document.getElementById('classement-list').innerHTML = 
+                    '<div class="no-data"><h3>Erreur</h3><p>' + e.message + '</p></div>';
+            }
         }
-        nav.appendChild(auth);
-    });
-});
+
+        function displayStats() {
+            const total = allLeaderboard.length;
+            const totalQuiz = allLeaderboard.reduce((s, u) => s + (u.quizCount || u.totalQuiz || 0), 0);
+            const totalXP = allLeaderboard.reduce((s, u) => s + (u.experiencePoints || u.totalScore || 0), 0);
+            
+            document.getElementById('stats-banner').innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-number">${total}</div>
+                    <div class="stat-label">Joueurs</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${totalQuiz}</div>
+                    <div class="stat-label">Quiz joués</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">${formatNumber(totalXP)}</div>
+                    <div class="stat-label">${currentFilter === 'xp' ? 'XP Total' : 'Points Total'}</div>
+                </div>
+            `;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function displayPodium(top3) {
+            const container = document.getElementById('podium-container');
+            if (top3.length === 0) {
+                container.innerHTML = '<div class="no-data"><p>Aucun score enregistré</p></div>';
+                return;
+            }
+
+            const medals = ['🥇', '🥈', '🥉'];
+            const positions = ['first', 'second', 'third'];
+
+            container.innerHTML = `<div class="podium">${top3.map((p, i) => {
+                const isXP = currentFilter === 'xp';
+                const mainValue = isXP ? (p.experiencePoints || 0) : (p.totalScore || 0);
+                const avatar = p.avatar || '👤';
+                const niveau = p.niveau || 1;
+                const quizCount = p.quizCount || p.totalQuiz || 0;
+                
+                return `
+                    <div class="podium-place ${positions[i]}">
+                        <span class="medal">${medals[i]}</span>
+                        <div class="podium-avatar">${avatar}</div>
+                        <div class="podium-name">${p.pseudo || p.name || 'Joueur'}</div>
+                        <div class="podium-level">Niveau ${niveau}</div>
+                        <div class="podium-xp">${formatNumber(mainValue)} ${isXP ? 'XP' : 'pts'}</div>
+                        <div class="podium-details">${quizCount} quiz</div>
+                    </div>
+                `;
+            }).join('')}</div>`;
+        }
+
+        function displayTable(rankings) {
+            const list = document.getElementById('classement-list');
+            if (rankings.length === 0) {
+                list.innerHTML = '<div class="no-data"><p>Aucun score pour ce filtre</p></div>';
+                return;
+            }
+
+            const isXP = currentFilter === 'xp';
+
+            list.innerHTML = rankings.map((p, i) => {
+                const rank = p.rank || (i + 1);
+                const isCurrent = currentUser && (p.uid === currentUser.uid);
+                const mainValue = isXP ? (p.experiencePoints || 0) : (p.totalScore || 0);
+                const avatar = p.avatar || '👤';
+                const niveau = p.niveau || 1;
+                const quizCount = p.quizCount || p.totalQuiz || 0;
+                const tauxReussite = p.tauxReussite || (p.average ? Math.round(p.average) : 0);
+                const tauxClass = tauxReussite >= 80 ? 'good' : tauxReussite >= 50 ? 'medium' : 'poor';
+
+                return `
+                    <div class="${isCurrent ? 'classement-row highlight' : 'classement-row'}">
+                        <div class="${rank <= 3 ? 'rank top3' : 'rank'}">
+                            ${rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : '#' + rank}
+                        </div>
+                        <div class="row-avatar">${avatar}</div>
+                        <div class="player-info">
+                            <span class="player-name">${p.pseudo || p.name || 'Joueur'}${isCurrent ? ' (Vous)' : ''}</span>
+                            <span class="player-level">Niveau ${niveau}</span>
+                        </div>
+                        <div class="player-xp">${formatNumber(mainValue)}</div>
+                        <div class="quiz-count">${quizCount}</div>
+                        <div class="success-rate ${tauxClass}">${tauxReussite}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function filterClassement(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Mettre à jour le header de la table
+            const header = document.querySelector('.table-header');
+            if (filter === 'xp') {
+                header.innerHTML = '<div>Rang</div><div></div><div>Joueur</div><div>XP</div><div>Quiz</div><div>Taux</div>';
+            } else {
+                header.innerHTML = '<div>Rang</div><div></div><div>Joueur</div><div>Score</div><div>Quiz</div><div>Moy</div>';
+            }
+            
+            await loadClassement();
+        }
+
+        async function logout(e) {
+            e.preventDefault();
+            if (confirm('Déconnexion ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    window.location.href = 'Accueil.html';
+                } catch (e) {
+                    alert('Erreur déconnexion');
+                }
+            }
+        }
+
+        window.addEventListener('load', () => {
+            if (typeof FirebaseAuth === 'undefined') {
+                setTimeout(() => location.reload(), 2000);
+                return;
+            }
+
+            FirebaseAuth.onAuthStateChanged(user => {
+                if (user) currentUser = user;
+                loadClassement();
+
+                // Menu auth
+                const nav = document.querySelector('.menu');
+                if (!nav) return;
+                const exist = document.getElementById('auth-menu-item');
+                if (exist) exist.remove();
+                const auth = document.createElement('li');
+                auth.id = 'auth-menu-item';
+                if (user) {
+                    auth.innerHTML = `<a href="#" onclick="logout(event)" style="color:#2ecc71">👤 ${user.name}</a>`;
+                } else {
+                    auth.innerHTML = '<a href="Auth.html" style="color:#e74c3c">🔐 Connexion</a>';
+                }
+                nav.appendChild(auth);
+            });
+        });
     </script>
 </body>
 </html>

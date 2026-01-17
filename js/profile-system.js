@@ -29,19 +29,26 @@ const XPSystem = {
         return 1;
     },
 
+    // XP requis pour atteindre un niveau donné
+    xpPourNiveau: (niveau) => {
+        if (niveau <= 1) return 0;
+        if (niveau <= XPSystem.xpParNiveau.length) {
+            return XPSystem.xpParNiveau[niveau - 1];
+        }
+        // Pour les niveaux au-delà de 15
+        return XPSystem.xpParNiveau[XPSystem.xpParNiveau.length - 1] + (niveau - 15) * 4000;
+    },
+
     // XP nécessaire pour le prochain niveau
     xpPourProchainNiveau: (niveau) => {
-        if (niveau >= XPSystem.xpParNiveau.length) {
-            return XPSystem.xpParNiveau[XPSystem.xpParNiveau.length - 1] + (niveau - 14) * 4000;
-        }
-        return XPSystem.xpParNiveau[niveau];
+        return XPSystem.xpPourNiveau(niveau + 1);
     },
 
     // Progression en pourcentage vers le prochain niveau
     progressionNiveau: (xp) => {
         const niveau = XPSystem.niveauDepuisXP(xp);
-        const xpNiveauActuel = XPSystem.xpParNiveau[niveau - 1] || 0;
-        const xpNiveauSuivant = XPSystem.xpPourProchainNiveau(niveau);
+        const xpNiveauActuel = XPSystem.xpPourNiveau(niveau);
+        const xpNiveauSuivant = XPSystem.xpPourNiveau(niveau + 1);
         const progression = (xp - xpNiveauActuel) / (xpNiveauSuivant - xpNiveauActuel);
         return Math.min(Math.max(progression * 100, 0), 100);
     },
@@ -285,7 +292,7 @@ const ProfileSystem = {
             console.log('📝 Création profil pour:', userId);
             const profile = {
                 ...ProfileSystem.defaultProfile,
-                pseudo: userData.name || userData.email.split('@')[0],
+                pseudo: userData.name || userData.email?.split('@')[0] || 'Joueur',
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -616,4 +623,4 @@ window.ProfileSystem = ProfileSystem;
 window.BADGES = BADGES;
 window.AVATARS_PREDEFINIES = AVATARS_PREDEFINIES;
 
-console.log('✅ Profile System chargé avec', AVATARS_PREDEFINIES.length, 'avatars');
+console.log('✅ Profile System chargé');

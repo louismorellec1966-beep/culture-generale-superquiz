@@ -56,7 +56,6 @@ const FirebaseAuth = {
                         streakActuelle: 0,
                         dernierJeuDate: null,
                         quizParfaits: 0,
-                        questionsAujourdHui: 0,
                         matieres: {}
                     },
                     preferences: {
@@ -66,15 +65,14 @@ const FirebaseAuth = {
                         langue: 'fr',
                         afficherProfil: true
                     },
-                    social: { amis: [], suivis: [], followers: [] },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
 
-            return { success: true, message: '✅ Compte créé ! Vérifiez votre email.' };
+            return { success: true, user };
         } catch (error) {
+            console.error('Erreur inscription:', error);
             throw new Error(FirebaseAuth.getErrorMessage(error.code));
         }
     },
@@ -82,98 +80,44 @@ const FirebaseAuth = {
     login: async (email, password) => {
         try {
             const userCredential = await auth.signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
             
             // Mettre à jour lastLogin dans le profil
-            if (userCredential.user) {
-                try {
-                    await db.collection('profiles').doc(userCredential.user.uid).update({
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } catch (e) {
-                    // Profil peut ne pas exister pour les anciens utilisateurs
-                    console.log('Mise à jour lastLogin échouée, profil peut-être inexistant');
-                }
+            try {
+                await db.collection('profiles').doc(user.uid).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (e) {
+                console.log('Profil non trouvé, création...');
             }
-
-            return {
-                success: true,
-                user: {
-                    uid: userCredential.user.uid,
-                    email: userCredential.user.email,
-                    emailVerified: userCredential.user.emailVerified
-                }
-            };
+            
+            return { success: true, user };
         } catch (error) {
+            console.error('Erreur connexion:', error);
             throw new Error(FirebaseAuth.getErrorMessage(error.code));
         }
     },
 
     logout: async () => {
-        await auth.signOut();
-    },
-
-    resetPassword: async (email) => {
         try {
-            await auth.sendPasswordResetEmail(email);
-            return { success: true, message: '✅ Email de réinitialisation envoyé !' };
+            await auth.signOut();
+            return { success: true };
         } catch (error) {
-            throw new Error(FirebaseAuth.getErrorMessage(error.code));
+            console.error('Erreur déconnexion:', error);
+            throw error;
         }
     },
 
-    resendVerificationEmail: async () => {
-        try {
-            const user = auth.currentUser;
-            if (!user) throw new Error('Aucun utilisateur connecté');
-            await user.sendEmailVerification();
-            return { success: true, message: '✅ Email de vérification renvoyé !' };
-        } catch (error) {
-            throw new Error(FirebaseAuth.getErrorMessage(error.code));
-        }
-    },
-
-    getCurrentUser: () => {
-        const user = auth.currentUser;
-        if (!user) return null;
-        return {
-            uid: user.uid,
-            email: user.email,
-            name: user.displayName || user.email.split('@')[0],
-            emailVerified: user.emailVerified
-        };
-    },
+    getCurrentUser: () => auth.currentUser,
 
     onAuthStateChanged: (callback) => {
-        return auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                try {
-                    const doc = await db.collection('users').doc(user.uid).get();
-                    const userData = doc.data();
-                    callback({
-                        uid: user.uid,
-                        email: user.email,
-                        name: userData?.name || user.email.split('@')[0],
-                        emailVerified: user.emailVerified
-                    });
-                } catch (error) {
-                    console.error('Erreur récupération profil:', error);
-                    callback({
-                        uid: user.uid,
-                        email: user.email,
-                        name: user.email.split('@')[0],
-                        emailVerified: user.emailVerified
-                    });
-                }
-            } else {
-                callback(null);
-            }
-        });
+        return auth.onAuthStateChanged(callback);
     },
 
     getErrorMessage: (code) => {
         const messages = {
-            'auth/email-already-in-use': 'Cette adresse email est déjà utilisée',
-            'auth/invalid-email': 'Adresse email invalide',
+            'auth/email-already-in-use': 'Cet email est déjà utilisé',
+            'auth/invalid-email': 'Email invalide',
             'auth/weak-password': 'Mot de passe trop faible (min. 6 caractères)',
             'auth/user-not-found': 'Email ou mot de passe incorrect',
             'auth/wrong-password': 'Email ou mot de passe incorrect',
@@ -233,22 +177,29 @@ const FirebaseScores = {
         }
     },
 
+    // CORRIGÉ: Récupération sans index composite
     getAll: async () => {
         const user = auth.currentUser;
         if (!user) return [];
         try {
+            // Requête simple sans orderBy pour éviter le besoin d'index
             const snapshot = await db.collection('scores')
                 .where('userId', '==', user.uid)
-                .orderBy('date', 'desc')
                 .get();
-            return snapshot.docs.map(doc => {
+            
+            const scores = snapshot.docs.map(doc => {
                 const data = doc.data();
                 return {
                     id: doc.id,
                     ...data,
-                    date: data.date?.toDate().toISOString() || new Date().toISOString()
+                    date: data.date?.toDate?.() ? data.date.toDate().toISOString() : new Date().toISOString()
                 };
             });
+            
+            // Tri côté client (évite le besoin d'index)
+            scores.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            return scores;
         } catch (error) {
             console.error('Erreur récupération scores:', error);
             return [];
@@ -257,13 +208,18 @@ const FirebaseScores = {
 
     getLeaderboard: async (matiere = null) => {
         try {
-            let query = db.collection('scores');
-            if (matiere) query = query.where('matiere', '==', matiere);
-            const snapshot = await query.get();
+            // Récupérer tous les scores (sans filtre pour éviter les index)
+            const snapshot = await db.collection('scores').get();
             const userScores = {};
             
             snapshot.docs.forEach(doc => {
                 const data = doc.data();
+                
+                // Filtrer par matière côté client si nécessaire
+                if (matiere && data.matiere !== matiere) {
+                    return;
+                }
+                
                 const userId = data.userId;
                 if (!userScores[userId]) {
                     userScores[userId] = {
@@ -298,7 +254,7 @@ const FirebaseScores = {
                 leaderboard.push({
                     uid: userId,
                     name: profileData.pseudo,
-                    avatar: profileData.avatar.value,
+                    avatar: profileData.avatar?.value || profileData.avatar || '👤',
                     niveau: profileData.niveau,
                     totalScore: data.totalScore,
                     quizCount: data.quizCount,
@@ -306,6 +262,7 @@ const FirebaseScores = {
                 });
             }
 
+            // Tri côté client
             leaderboard.sort((a, b) => b.totalScore - a.totalScore);
             return leaderboard;
         } catch (error) {
@@ -314,29 +271,41 @@ const FirebaseScores = {
         }
     },
 
-    // Nouveau: Récupérer le classement par XP
+    // CORRIGÉ: Classement par XP sans index composite
     getXPLeaderboard: async (limit = 20) => {
         try {
-            const snapshot = await db.collection('profiles')
-                .where('preferences.afficherProfil', '==', true)
-                .orderBy('experiencePoints', 'desc')
-                .limit(limit)
-                .get();
+            // Récupérer TOUS les profils (sans where/orderBy combinés)
+            const snapshot = await db.collection('profiles').get();
 
-            return snapshot.docs.map((doc, index) => {
-                const data = doc.data();
-                return {
-                    rank: index + 1,
-                    uid: doc.id,
-                    pseudo: data.pseudo || 'Joueur',
-                    avatar: data.avatar?.value || '👤',
-                    niveau: data.niveau || 1,
-                    experiencePoints: data.experiencePoints || 0,
-                    totalQuiz: data.stats?.totalQuiz || 0,
-                    tauxReussite: data.stats?.tauxReussite || 0,
-                    badges: data.badges || []
-                };
-            });
+            // Filtrer et trier côté client
+            const profiles = snapshot.docs
+                .map(doc => {
+                    const data = doc.data();
+                    return {
+                        uid: doc.id,
+                        pseudo: data.pseudo || 'Joueur',
+                        avatar: data.avatar?.value || data.avatar || '👤',
+                        niveau: data.niveau || 1,
+                        experiencePoints: data.experiencePoints || 0,
+                        totalQuiz: data.stats?.totalQuiz || 0,
+                        tauxReussite: data.stats?.tauxReussite || 0,
+                        badges: data.badges || [],
+                        afficherProfil: data.preferences?.afficherProfil !== false
+                    };
+                })
+                // Filtrer les profils publics
+                .filter(p => p.afficherProfil)
+                // Trier par XP décroissant
+                .sort((a, b) => b.experiencePoints - a.experiencePoints)
+                // Limiter le nombre
+                .slice(0, limit)
+                // Ajouter le rang
+                .map((p, index) => ({
+                    ...p,
+                    rank: index + 1
+                }));
+
+            return profiles;
         } catch (error) {
             console.error('Erreur récupération classement XP:', error);
             return [];

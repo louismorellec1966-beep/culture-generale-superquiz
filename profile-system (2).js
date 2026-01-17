@@ -1,190 +1,56 @@
-// ========== SYSTÈME DE PROFILS ENRICHIS - SUPERQUIZ ==========
-
-// ========== CONFIGURATION DES BADGES ==========
-const BADGES = {
-    "premier_quiz": {
-        nom: "Première fois",
-        description: "Terminer votre premier quiz",
-        icone: "🎯",
-        condition: (stats) => stats.totalQuiz >= 1
-    },
-    "parfait": {
-        nom: "Perfection",
-        description: "Faire un sans-faute sur un quiz",
-        icone: "💯",
-        condition: (stats) => stats.quizParfaits >= 1
-    },
-    "marathonien": {
-        nom: "Marathonien",
-        description: "Répondre à 100 questions en une journée",
-        icone: "🏃",
-        condition: (stats) => stats.questionsAujourdHui >= 100
-    },
-    "historien": {
-        nom: "Historien",
-        description: "90% de réussite en Histoire sur 20 quiz",
-        icone: "📚",
-        condition: (stats) => stats.matieres?.histoire?.quizCount >= 20 && stats.matieres?.histoire?.tauxReussite >= 90
-    },
-    "geographe": {
-        nom: "Géographe",
-        description: "90% de réussite en Géographie sur 20 quiz",
-        icone: "🗺️",
-        condition: (stats) => stats.matieres?.geographie?.quizCount >= 20 && stats.matieres?.geographie?.tauxReussite >= 90
-    },
-    "scientifique": {
-        nom: "Scientifique",
-        description: "90% de réussite en Science sur 20 quiz",
-        icone: "🔬",
-        condition: (stats) => stats.matieres?.science?.quizCount >= 20 && stats.matieres?.science?.tauxReussite >= 90
-    },
-    "litteraire": {
-        nom: "Littéraire",
-        description: "90% de réussite en Littérature sur 20 quiz",
-        icone: "✍️",
-        condition: (stats) => stats.matieres?.litterature?.quizCount >= 20 && stats.matieres?.litterature?.tauxReussite >= 90
-    },
-    "serie_3": {
-        nom: "Série de 3",
-        description: "Jouer 3 jours d'affilée",
-        icone: "🔥",
-        condition: (stats) => stats.streakActuelle >= 3
-    },
-    "serie_7": {
-        nom: "Série de 7",
-        description: "Jouer 7 jours d'affilée",
-        icone: "🔥🔥",
-        condition: (stats) => stats.streakActuelle >= 7
-    },
-    "serie_30": {
-        nom: "Série de 30",
-        description: "Jouer 30 jours d'affilée",
-        icone: "🏆",
-        condition: (stats) => stats.streakActuelle >= 30
-    },
-    "rapide": {
-        nom: "Éclair",
-        description: "Finir un quiz en moins de 30 secondes",
-        icone: "⚡",
-        condition: (stats) => stats.tempsRecordQuiz && stats.tempsRecordQuiz <= 30
-    },
-    "veteran": {
-        nom: "Vétéran",
-        description: "Compléter 50 quiz",
-        icone: "🎖️",
-        condition: (stats) => stats.totalQuiz >= 50
-    },
-    "expert": {
-        nom: "Expert",
-        description: "Compléter 100 quiz",
-        icone: "👑",
-        condition: (stats) => stats.totalQuiz >= 100
-    },
-    "debutant": {
-        nom: "Débutant",
-        description: "Atteindre le niveau 5",
-        icone: "🌱",
-        condition: (stats) => stats.niveau >= 5
-    },
-    "intermediaire": {
-        nom: "Intermédiaire",
-        description: "Atteindre le niveau 15",
-        icone: "🌿",
-        condition: (stats) => stats.niveau >= 15
-    },
-    "avance": {
-        nom: "Avancé",
-        description: "Atteindre le niveau 30",
-        icone: "🌳",
-        condition: (stats) => stats.niveau >= 30
-    },
-    "maitre": {
-        nom: "Maître",
-        description: "Atteindre le niveau 50",
-        icone: "🏅",
-        condition: (stats) => stats.niveau >= 50
-    },
-    "polyvalent": {
-        nom: "Polyvalent",
-        description: "Jouer dans les 4 matières",
-        icone: "🎭",
-        condition: (stats) => {
-            const matieres = stats.matieres || {};
-            return Object.keys(matieres).length >= 4;
-        }
-    },
-    "noctambule": {
-        nom: "Noctambule",
-        description: "Jouer après minuit",
-        icone: "🦉",
-        condition: (stats) => stats.aJoueApresMinuit
-    },
-    "matinal": {
-        nom: "Matinal",
-        description: "Jouer avant 7h du matin",
-        icone: "🌅",
-        condition: (stats) => stats.aJoueAvant7h
-    }
-};
-
-// ========== AVATARS PRÉDÉFINIS ==========
-const AVATARS_PREDEFINIES = [
-    { id: 'default', url: null, emoji: '👤', nom: 'Par défaut' },
-    { id: 'scholar', url: null, emoji: '🎓', nom: 'Érudit' },
-    { id: 'scientist', url: null, emoji: '🧑‍🔬', nom: 'Scientifique' },
-    { id: 'reader', url: null, emoji: '📖', nom: 'Lecteur' },
-    { id: 'explorer', url: null, emoji: '🧭', nom: 'Explorateur' },
-    { id: 'thinker', url: null, emoji: '🤔', nom: 'Penseur' },
-    { id: 'genius', url: null, emoji: '🧠', nom: 'Génie' },
-    { id: 'champion', url: null, emoji: '🏆', nom: 'Champion' },
-    { id: 'ninja', url: null, emoji: '🥷', nom: 'Ninja' },
-    { id: 'wizard', url: null, emoji: '🧙', nom: 'Mage' },
-    { id: 'robot', url: null, emoji: '🤖', nom: 'Robot' },
-    { id: 'alien', url: null, emoji: '👽', nom: 'Alien' },
-    { id: 'astronaut', url: null, emoji: '👨‍🚀', nom: 'Astronaute' },
-    { id: 'detective', url: null, emoji: '🕵️', nom: 'Détective' },
-    { id: 'artist', url: null, emoji: '🎨', nom: 'Artiste' },
-    { id: 'musician', url: null, emoji: '🎵', nom: 'Musicien' }
-];
-
-// ========== SYSTÈME DE NIVEAUX ET XP ==========
+// ========== SYSTÈME XP & NIVEAUX ==========
 const XPSystem = {
-    // Calcul de l'XP nécessaire pour un niveau
-    xpPourNiveau: (niveau) => {
-        return Math.floor(100 * Math.pow(niveau, 1.5));
-    },
+    // Table d'XP nécessaire par niveau
+    xpParNiveau: [
+        0,      // Niveau 1
+        100,    // Niveau 2
+        250,    // Niveau 3
+        500,    // Niveau 4
+        850,    // Niveau 5
+        1300,   // Niveau 6
+        1900,   // Niveau 7
+        2600,   // Niveau 8
+        3500,   // Niveau 9
+        4600,   // Niveau 10
+        6000,   // Niveau 11
+        7700,   // Niveau 12
+        9700,   // Niveau 13
+        12000,  // Niveau 14
+        15000   // Niveau 15+
+    ],
 
-    // Calcul du niveau à partir de l'XP total
+    // Calculer le niveau depuis l'XP
     niveauDepuisXP: (xp) => {
-        let niveau = 1;
-        while (XPSystem.xpPourNiveau(niveau + 1) <= xp) {
-            niveau++;
+        for (let i = XPSystem.xpParNiveau.length - 1; i >= 0; i--) {
+            if (xp >= XPSystem.xpParNiveau[i]) {
+                return i + 1;
+            }
         }
-        return niveau;
+        return 1;
     },
 
-    // XP restant pour le prochain niveau
-    xpRestantPourProchainNiveau: (xpTotal) => {
-        const niveauActuel = XPSystem.niveauDepuisXP(xpTotal);
-        const xpProchainNiveau = XPSystem.xpPourNiveau(niveauActuel + 1);
-        return xpProchainNiveau - xpTotal;
+    // XP nécessaire pour le prochain niveau
+    xpPourProchainNiveau: (niveau) => {
+        if (niveau >= XPSystem.xpParNiveau.length) {
+            return XPSystem.xpParNiveau[XPSystem.xpParNiveau.length - 1] + (niveau - 14) * 4000;
+        }
+        return XPSystem.xpParNiveau[niveau];
     },
 
-    // Pourcentage de progression vers le prochain niveau
-    progressionNiveau: (xpTotal) => {
-        const niveauActuel = XPSystem.niveauDepuisXP(xpTotal);
-        const xpNiveauActuel = XPSystem.xpPourNiveau(niveauActuel);
-        const xpProchainNiveau = XPSystem.xpPourNiveau(niveauActuel + 1);
-        const xpDansNiveau = xpTotal - xpNiveauActuel;
-        const xpNecessaire = xpProchainNiveau - xpNiveauActuel;
-        return Math.floor((xpDansNiveau / xpNecessaire) * 100);
+    // Progression en pourcentage vers le prochain niveau
+    progressionNiveau: (xp) => {
+        const niveau = XPSystem.niveauDepuisXP(xp);
+        const xpNiveauActuel = XPSystem.xpParNiveau[niveau - 1] || 0;
+        const xpNiveauSuivant = XPSystem.xpPourProchainNiveau(niveau);
+        const progression = (xp - xpNiveauActuel) / (xpNiveauSuivant - xpNiveauActuel);
+        return Math.min(Math.max(progression * 100, 0), 100);
     },
 
-    // Calcul des XP gagnés pour un quiz
-    calculerXPQuiz: (score, total, mode, tempsEnSecondes) => {
+    // Calculer les XP gagnés pour un quiz
+    calculerXPQuiz: (score, total, mode = 'classic', tempsEnSecondes = null) => {
         let xp = 0;
         
-        // XP de base : 10 XP par bonne réponse
+        // XP par bonne réponse
         xp += score * 10;
         
         // Bonus quiz complet
@@ -211,6 +77,118 @@ const XPSystem = {
         }
         
         return xp;
+    }
+};
+
+// ========== BADGES ==========
+const BADGES = {
+    'premier_quiz': {
+        id: 'premier_quiz',
+        nom: 'Première Victoire',
+        description: 'Compléter son premier quiz',
+        icone: '🎯',
+        condition: (stats) => stats.totalQuiz >= 1
+    },
+    'dix_quiz': {
+        id: 'dix_quiz',
+        nom: 'Explorateur',
+        description: 'Compléter 10 quiz',
+        icone: '🧭',
+        condition: (stats) => stats.totalQuiz >= 10
+    },
+    'cinquante_quiz': {
+        id: 'cinquante_quiz',
+        nom: 'Expert',
+        description: 'Compléter 50 quiz',
+        icone: '🏆',
+        condition: (stats) => stats.totalQuiz >= 50
+    },
+    'cent_quiz': {
+        id: 'cent_quiz',
+        nom: 'Maître Quiz',
+        description: 'Compléter 100 quiz',
+        icone: '👑',
+        condition: (stats) => stats.totalQuiz >= 100
+    },
+    'parfait': {
+        id: 'parfait',
+        nom: 'Perfectionniste',
+        description: 'Obtenir un score parfait',
+        icone: '⭐',
+        condition: (stats) => stats.quizParfaits >= 1
+    },
+    'dix_parfaits': {
+        id: 'dix_parfaits',
+        nom: 'Sans Faute',
+        description: 'Obtenir 10 scores parfaits',
+        icone: '🌟',
+        condition: (stats) => stats.quizParfaits >= 10
+    },
+    'streak_7': {
+        id: 'streak_7',
+        nom: 'Semaine Parfaite',
+        description: 'Jouer 7 jours de suite',
+        icone: '🔥',
+        condition: (stats) => stats.recordStreak >= 7
+    },
+    'streak_30': {
+        id: 'streak_30',
+        nom: 'Mois de Feu',
+        description: 'Jouer 30 jours de suite',
+        icone: '💫',
+        condition: (stats) => stats.recordStreak >= 30
+    },
+    'niveau_5': {
+        id: 'niveau_5',
+        nom: 'Apprenti',
+        description: 'Atteindre le niveau 5',
+        icone: '📚',
+        condition: (stats) => stats.niveau >= 5
+    },
+    'niveau_10': {
+        id: 'niveau_10',
+        nom: 'Érudit',
+        description: 'Atteindre le niveau 10',
+        icone: '🎓',
+        condition: (stats) => stats.niveau >= 10
+    },
+    'polyvalent': {
+        id: 'polyvalent',
+        nom: 'Polyvalent',
+        description: 'Jouer dans toutes les matières',
+        icone: '🎨',
+        condition: (stats) => {
+            const matieres = Object.keys(stats.matieres || {});
+            return matieres.length >= 4;
+        }
+    },
+    'rapide': {
+        id: 'rapide',
+        nom: 'Éclair',
+        description: 'Finir un quiz en moins de 30 secondes',
+        icone: '⚡',
+        condition: (stats) => stats.tempsRecordQuiz && stats.tempsRecordQuiz < 30
+    },
+    'noctambule': {
+        id: 'noctambule',
+        nom: 'Noctambule',
+        description: 'Jouer après minuit',
+        icone: '🌙',
+        condition: (stats) => stats.aJoueApresMinuit === true
+    },
+    'matinal': {
+        id: 'matinal',
+        nom: 'Lève-tôt',
+        description: 'Jouer avant 7h du matin',
+        icone: '🌅',
+        condition: (stats) => stats.aJoueAvant7h === true
+    },
+    'marathonien': {
+        id: 'marathonien',
+        nom: 'Marathonien',
+        description: 'Répondre à 100 questions en une journée',
+        icone: '🏃',
+        condition: (stats) => stats.questionsAujourdHui >= 100
     }
 };
 
@@ -488,42 +466,61 @@ const ProfileSystem = {
         }
     },
 
-    // Récupérer le classement avec les profils
+    // CORRIGÉ: Récupérer le classement avec les profils (sans index composite)
     getLeaderboardWithProfiles: async (limit = 20) => {
         try {
-            const snapshot = await db.collection('profiles')
-                .where('preferences.afficherProfil', '==', true)
-                .orderBy('experiencePoints', 'desc')
-                .limit(limit)
-                .get();
+            // Récupérer TOUS les profils (sans where + orderBy combinés)
+            const snapshot = await db.collection('profiles').get();
 
-            return snapshot.docs.map((doc, index) => ({
-                rank: index + 1,
-                ...doc.data(),
-                id: doc.id
-            }));
+            // Filtrer et trier côté client
+            const profiles = snapshot.docs
+                .map(doc => ({
+                    ...doc.data(),
+                    id: doc.id
+                }))
+                // Filtrer les profils publics
+                .filter(p => p.preferences?.afficherProfil !== false)
+                // Trier par XP décroissant
+                .sort((a, b) => (b.experiencePoints || 0) - (a.experiencePoints || 0))
+                // Limiter
+                .slice(0, limit)
+                // Ajouter le rang
+                .map((p, index) => ({
+                    rank: index + 1,
+                    ...p
+                }));
+
+            return profiles;
         } catch (error) {
             console.error('Erreur récupération classement:', error);
             return [];
         }
     },
 
-    // Rechercher des profils
+    // CORRIGÉ: Rechercher des profils (sans index composite)
     searchProfiles: async (searchTerm) => {
         try {
-            // Recherche simple par pseudo (Firebase ne supporte pas la recherche full-text)
-            const snapshot = await db.collection('profiles')
-                .where('preferences.afficherProfil', '==', true)
-                .orderBy('pseudo')
-                .startAt(searchTerm)
-                .endAt(searchTerm + '\uf8ff')
-                .limit(10)
-                .get();
+            // Récupérer tous les profils publics
+            const snapshot = await db.collection('profiles').get();
 
-            return snapshot.docs.map(doc => ({
-                ...doc.data(),
-                id: doc.id
-            }));
+            // Filtrer côté client
+            const searchLower = searchTerm.toLowerCase();
+            const profiles = snapshot.docs
+                .map(doc => ({
+                    ...doc.data(),
+                    id: doc.id
+                }))
+                // Filtrer les profils publics
+                .filter(p => p.preferences?.afficherProfil !== false)
+                // Filtrer par recherche
+                .filter(p => {
+                    const pseudo = (p.pseudo || '').toLowerCase();
+                    return pseudo.includes(searchLower) || pseudo.startsWith(searchLower);
+                })
+                // Limiter
+                .slice(0, 10);
+
+            return profiles;
         } catch (error) {
             console.error('Erreur recherche profils:', error);
             return [];
@@ -546,29 +543,20 @@ const ProfileSystem = {
     },
 
     // Système d'amis - Accepter une demande
-    acceptFriendRequest: async (requestId, userId, friendId) => {
+    acceptFriendRequest: async (requestId, fromUserId, toUserId) => {
         try {
             // Mettre à jour la demande
             await db.collection('friendRequests').doc(requestId).update({
                 status: 'accepted'
             });
 
-            // Ajouter comme amis mutuellement
-            const userProfile = await ProfileSystem.getProfile(userId);
-            const friendProfile = await ProfileSystem.getProfile(friendId);
-
-            const userAmis = userProfile.social?.amis || [];
-            const friendAmis = friendProfile.social?.amis || [];
-
-            if (!userAmis.includes(friendId)) {
-                userAmis.push(friendId);
-            }
-            if (!friendAmis.includes(userId)) {
-                friendAmis.push(userId);
-            }
-
-            await ProfileSystem.updateProfile(userId, { 'social.amis': userAmis });
-            await ProfileSystem.updateProfile(friendId, { 'social.amis': friendAmis });
+            // Ajouter aux amis des deux côtés
+            await db.collection('profiles').doc(fromUserId).update({
+                'social.amis': firebase.firestore.FieldValue.arrayUnion(toUserId)
+            });
+            await db.collection('profiles').doc(toUserId).update({
+                'social.amis': firebase.firestore.FieldValue.arrayUnion(fromUserId)
+            });
 
             return { success: true };
         } catch (error) {
@@ -576,7 +564,7 @@ const ProfileSystem = {
         }
     },
 
-    // Récupérer les demandes d'amis en attente
+    // Récupérer les demandes d'ami en attente
     getPendingFriendRequests: async (userId) => {
         try {
             const snapshot = await db.collection('friendRequests')
@@ -584,18 +572,10 @@ const ProfileSystem = {
                 .where('status', '==', 'pending')
                 .get();
 
-            const requests = [];
-            for (const doc of snapshot.docs) {
-                const data = doc.data();
-                const fromProfile = await ProfileSystem.getProfile(data.from);
-                requests.push({
-                    id: doc.id,
-                    ...data,
-                    fromProfile
-                });
-            }
-
-            return requests;
+            return snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
         } catch (error) {
             console.error('Erreur récupération demandes:', error);
             return [];
@@ -603,10 +583,9 @@ const ProfileSystem = {
     }
 };
 
-// ========== EXPORT GLOBAL ==========
-window.BADGES = BADGES;
-window.AVATARS_PREDEFINIES = AVATARS_PREDEFINIES;
+// ========== EXPORTS GLOBAUX ==========
 window.XPSystem = XPSystem;
 window.ProfileSystem = ProfileSystem;
+window.BADGES = BADGES;
 
-console.log('✅ Système de profils enrichis chargé');
+console.log('✅ Profile System chargé');

@@ -747,8 +747,9 @@
             const niveau = profile.niveau || 1;
             const xp = profile.experiencePoints || 0;
             const xpProgress = XPSystem.progressionNiveau(xp);
-            const xpPourProchain = XPSystem.xpPourNiveau(niveau + 1);
+            const xpPourProchain = XPSystem.xpPourProchainNiveau(niveau);
             
+        
             // Avatar
             const avatarDisplay = profile.avatar?.value || '👤';
             

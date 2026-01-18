@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Mode Survie - SuperQuiz</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #e74c3c 0%, #f39c12 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .survival-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .game-header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .game-header h1 {
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .lives-display {
+            font-size: 3em;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .progress-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar-container {
+            background: #ecf0f1;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .next-milestone {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #2c3e50;
+        }
+
+        .badge-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+            font-size: 1.3em;
+        }
+
+        .badge-icon {
+            font-size: 2em;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .question-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .question-section.active {
+            display: block;
+        }
+
+        .question-number {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-badge {
+            background: #95a5a6;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .difficulty-badge.facile {
+            background: #2ecc71;
+        }
+
+        .difficulty-badge.moyen {
+            background: #f39c12;
+        }
+
+        .difficulty-badge.difficile {
+            background: #e74c3c;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #2c3e50;
+        }
+
+        .answer-option {
+            display: block;
+            margin: 15px 0;
+            padding: 20px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1.1em;
+        }
+
+        .answer-option:hover {
+            background: #f8f9fa;
+            border-color: #e74c3c;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #ffe5e5;
+            border-color: #e74c3c;
+        }
+
+        .answer-option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: pulse-correct 0.5s;
+        }
+
+        .answer-option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse-correct {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .validate-btn {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .validate-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .validate-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .start-screen {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .start-screen h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .rules-list {
+            text-align: left;
+            max-width: 500px;
+            margin: 30px auto;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .rules-list li {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #e74c3c, #f39c12);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            border-radius: 30px;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+        }
+
+        .game-over-screen {
+            background: white;
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .game-over-screen.active {
+            display: block;
+        }
+
+        .final-score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #e74c3c;
+            margin: 20px 0;
+        }
+
+        .achievement {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .records-display {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .record-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .record-title {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .record-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-top: 10px;
+        }
+
+        .leaderboard {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+        }
+
+        .leaderboard-item.current-user {
+            background: #ffe5e5;
+            border: 2px solid #e74c3c;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .game-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .lives-display {
+                font-size: 2em;
+            }
+            
+            .final-score {
+                font-size: 3em;
+            }
+            
+            .records-display {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Navigation -->
+    <nav style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 30px; max-width: 900px; margin: 0 auto 30px;">
+        <ul class="menu" style="list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; flex-wrap: wrap;">
+            <li><a href="Accueil.html" style="color: #3498db; text-decoration: none;">🏠 Accueil</a></li>
+            <li><a href="quiz-du-jour.html" style="color: #3498db; text-decoration: none;">📅 Quiz du Jour</a></li>
+            <li><a href="mode-survie.html" style="color: #e74c3c; text-decoration: none; font-weight: bold;">🎮 Mode Survie</a></li>
+            <li><a href="Scores.html" style="color: #3498db; text-decoration: none;">🏆 Mes Scores</a></li>
+        </ul>
+    </nav>
+
+    <div class="survival-container">
+        <!-- En-tête du jeu -->
+        <div class="game-header">
+            <h1>🎮 MODE SURVIE</h1>
+            <p style="color: #7f8c8d; font-size: 1.1em;">Enchaîne les questions jusqu'à 3 erreurs !</p>
+            
+            <div class="game-stats">
+                <div class="stat-box">
+                    <div class="stat-value" id="current-score">0</div>
+                    <div class="stat-label">Score Actuel</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="personal-record">-</div>
+                    <div class="stat-label">Record Personnel</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value" id="world-record">-</div>
+                    <div class="stat-label">Record Mondial</div>
+                </div>
+            </div>
+            
+            <div class="lives-display" id="lives-display">❤️❤️❤️</div>
+        </div>
+
+        <!-- Progression vers palier -->
+        <div class="progress-section" id="progress-section" style="display: none;">
+            <div class="badge-display" id="current-badge">
+                <span class="badge-icon">🥉</span>
+                <span>Débutant</span>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar" style="width: 0%;">0/10</div>
+            </div>
+            
+            <div class="next-milestone" id="next-milestone">
+                Prochain palier : Confirmé (10 questions) 🥈
+            </div>
+        </div>
+
+        <!-- Écran de démarrage -->
+        <div class="start-screen" id="start-screen">
+            <h2>Prêt pour le défi ? 🔥</h2>
+            
+            <ul class="rules-list">
+                <li>🎯 <strong>Questions infinies</strong> de toutes catégories</li>
+                <li>📈 <strong>Difficulté progressive</strong> (facile → difficile)</li>
+                <li>❤️ <strong>3 vies</strong> au départ</li>
+                <li>❌ <strong>1 erreur = -1 vie</strong></li>
+                <li>🏆 <strong>Paliers à débloquer</strong> : Débutant, Confirmé, Expert, Maître, Légende</li>
+                <li>🌟 <strong>Records</strong> personnels et mondiaux</li>
+            </ul>
+            
+            <button class="start-btn" onclick="startGame()">🚀 Commencer</button>
+            
+            <div class="leaderboard">
+                <div class="leaderboard-title">🏆 Top 10 Mondial</div>
+                <div id="leaderboard-preview">
+                    <div class="loading">Chargement...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Question -->
+        <div class="question-section" id="question-section">
+            <div>
+                <span class="question-number" id="question-counter">Question #1</span>
+                <span class="difficulty-badge" id="difficulty-badge">Facile</span>
+            </div>
+            
+            <div class="question-text" id="question-text"></div>
+            
+            <div id="answers-container"></div>
+            
+            <button class="validate-btn" id="validate-btn" onclick="validateAnswer()">
+                ✅ Valider
+            </button>
+        </div>
+
+        <!-- Écran Game Over -->
+        <div class="game-over-screen" id="game-over-screen">
+            <h2>🎮 GAME OVER</h2>
+            
+            <div class="final-score" id="final-score">0</div>
+            
+            <div class="achievement" id="achievement">
+                <span id="achievement-badge">🥉</span>
+                <span id="achievement-title">Débutant</span>
+            </div>
+            
+            <div class="records-display">
+                <div class="record-card">
+                    <div class="record-title">Ton Record</div>
+                    <div class="record-value" id="final-personal-record">0</div>
+                </div>
+                <div class="record-card">
+                    <div class="record-title">Record Mondial</div>
+                    <div class="record-value" id="final-world-record">0</div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 30px;">
+                <button class="start-btn" onclick="location.reload()">
+                    🔄 Rejouer
+                </button>
+                <button class="start-btn" style="background: linear-gradient(135deg, #3498db, #2ecc71);" onclick="window.location.href='Accueil.html'">
+                    🏠 Accueil
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let allQuestions = [];
+        let currentQuestion = null;
+        let currentScore = 0;
+        let lives = 3;
+        let personalRecord = 0;
+        let worldRecord = 0;
+        let selectedAnswer = null;
+
+        // Paliers
+        const MILESTONES = {
+            0: { title: "Débutant", badge: "🥉" },
+            10: { title: "Confirmé", badge: "🥈" },
+            25: { title: "Expert", badge: "🥇" },
+            50: { title: "Maître", badge: "👑" },
+            100: { title: "Légende", badge: "🌟" }
+        };
+
+        // Initialisation
+        window.addEventListener('load', async () => {
+            await waitForFirebase();
+            
+            FirebaseAuth.onAuthStateChanged(async (user) => {
+                currentUser = user;
+                updateAuthMenu(user);
+                
+                if (user) {
+                    await loadPersonalRecord();
+                }
+                
+                await loadWorldRecord();
+                await loadLeaderboard();
+                await loadQuestions();
+            });
+        });
+
+        // Attendre Firebase
+        function waitForFirebase() {
+            return new Promise((resolve) => {
+                const check = setInterval(() => {
+                    if (typeof FirebaseAuth !== 'undefined' && typeof firebase !== 'undefined') {
+                        clearInterval(check);
+                        resolve();
+                    }
+                }, 100);
+            });
+        }
+
+        // Charger toutes les questions
+        async function loadQuestions() {
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('questionBank')
+                    .get();
+
+                allQuestions = snapshot.docs.map(doc => doc.data());
+                
+                if (allQuestions.length === 0) {
+                    alert('❌ Aucune question trouvée. Veuillez importer les questions d\'abord.');
+                }
+            } catch (error) {
+                console.error('Erreur chargement questions:', error);
+                alert('❌ Erreur lors du chargement des questions');
+            }
+        }
+
+        // Charger record personnel
+        async function loadPersonalRecord() {
+            if (!currentUser) return;
+
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('survivalRecords')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('score', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (!snapshot.empty) {
+                    personalRecord = snapshot.docs[0].data().score;
+                    document.getElementById('personal-record').textContent = personalRecord;
+                }
+            } catch (error) {
+                console.error('Erreur chargement record perso:', error);
+            }
+        }
+
+        // Charger record mondial
+        async function loadWorldRecord() {
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('survivalRecords')
+                    .orderBy('score', 'desc')
+                    .limit(1)
+                    .get();
+
+                if (!snapshot.empty) {
+                    const record = snapshot.docs[0].data();
+                    worldRecord = record.score;
+                    document.getElementById('world-record').textContent = 
+                        `${worldRecord} (${record.pseudo || 'Anonyme'})`;
+                    document.getElementById('final-world-record').textContent = worldRecord;
+                }
+            } catch (error) {
+                console.error('Erreur chargement record mondial:', error);
+            }
+        }
+
+        // Charger leaderboard
+        async function loadLeaderboard() {
+            const container = document.getElementById('leaderboard-preview');
+            
+            try {
+                const snapshot = await firebase.firestore()
+                    .collection('survivalRecords')
+                    .orderBy('score', 'desc')
+                    .limit(10)
+                    .get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Aucun record pour l\'instant. Soyez le premier !</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                snapshot.forEach((doc, index) => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'leaderboard-item';
+                    
+                    if (currentUser && data.userId === currentUser.uid) {
+                        item.classList.add('current-user');
+                    }
+                    
+                    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+                    
+                    item.innerHTML = `
+                        <span>${medal || (index + 1)}. ${data.pseudo || 'Joueur'}</span>
+                        <span style="font-weight: bold; color: #e74c3c;">${data.score}</span>
+                    `;
+                    
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Erreur leaderboard:', error);
+                container.innerHTML = '<p style="color: #e74c3c;">Erreur de chargement</p>';
+            }
+        }
+
+        // Démarrer le jeu
+        function startGame() {
+            if (!currentUser) {
+                if (confirm('Connectez-vous pour sauvegarder votre score !')) {
+                    window.location.href = 'Auth.html';
+                }
+                return;
+            }
+
+            if (allQuestions.length === 0) {
+                alert('❌ Aucune question disponible. Veuillez importer les questions.');
+                return;
+            }
+
+            currentScore = 0;
+            lives = 3;
+            selectedAnswer = null;
+            
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('progress-section').style.display = 'block';
+            document.getElementById('question-section').classList.add('active');
+            
+            updateDisplay();
+            loadNextQuestion();
+        }
+
+        // Charger la question suivante
+        function loadNextQuestion() {
+            // Déterminer la difficulté en fonction du score
+            let difficulty;
+            if (currentScore < 10) {
+                difficulty = 'facile';
+            } else if (currentScore < 25) {
+                difficulty = 'moyen';
+            } else {
+                difficulty = 'difficile';
+            }
+
+            // Filtrer les questions par difficulté
+            let filteredQuestions = allQuestions.filter(q => q.difficulty === difficulty);
+            
+            // Si pas assez de questions de cette difficulté, prendre toutes les questions
+            if (filteredQuestions.length === 0) {
+                filteredQuestions = allQuestions;
+            }
+
+            // Sélectionner une question aléatoire
+            currentQuestion = filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)];
+            
+            displayQuestion();
+        }
+
+        // Afficher la question
+        function displayQuestion() {
+            document.getElementById('question-counter').textContent = `Question #${currentScore + 1}`;
+            document.getElementById('difficulty-badge').textContent = capitalizeFirst(currentQuestion.difficulty);
+            document.getElementById('difficulty-badge').className = `difficulty-badge ${currentQuestion.difficulty}`;
+            document.getElementById('question-text').textContent = currentQuestion.question;
+            
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+            
+            currentQuestion.answers.forEach((answer, index) => {
+                const option = document.createElement('label');
+                option.className = 'answer-option';
+                option.onclick = () => selectAnswer(index);
+                option.innerHTML = `
+                    <input type="radio" name="answer" value="${index}" style="margin-right: 10px;">
+                    ${answer}
+                `;
+                container.appendChild(option);
+            });
+            
+            selectedAnswer = null;
+            document.getElementById('validate-btn').disabled = false;
+        }
+
+        // Sélectionner une réponse
+        function selectAnswer(index) {
+            selectedAnswer = index;
+            
+            document.querySelectorAll('.answer-option').forEach((opt, i) => {
+                opt.classList.remove('selected');
+                if (i === index) {
+                    opt.classList.add('selected');
+                    opt.querySelector('input').checked = true;
+                }
+            });
+        }
+
+        // Valider la réponse
+        function validateAnswer() {
+            if (selectedAnswer === null) {
+                alert('⚠️ Veuillez sélectionner une réponse !');
+                return;
+            }
+
+            document.getElementById('validate-btn').disabled = true;
+            
+            const isCorrect = selectedAnswer === currentQuestion.correct;
+            const options = document.querySelectorAll('.answer-option');
+            
+            if (isCorrect) {
+                // Bonne réponse
+                options[selectedAnswer].classList.add('correct');
+                currentScore++;
+                
+                setTimeout(() => {
+                    updateDisplay();
+                    loadNextQuestion();
+                }, 1000);
+            } else {
+                // Mauvaise réponse
+                options[selectedAnswer].classList.add('incorrect');
+                options[currentQuestion.correct].classList.add('correct');
+                lives--;
+                
+                setTimeout(() => {
+                    if (lives === 0) {
+                        gameOver();
+                    } else {
+                        updateDisplay();
+                        loadNextQuestion();
+                    }
+                }, 1500);
+            }
+        }
+
+        // Mettre à jour l'affichage
+        function updateDisplay() {
+            // Score
+            document.getElementById('current-score').textContent = currentScore;
+            
+            // Vies
+            const heartsDisplay = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+            document.getElementById('lives-display').textContent = heartsDisplay;
+            
+            // Badge et progression
+            const currentMilestone = getCurrentMilestone();
+            const nextMilestone = getNextMilestone();
+            
+            if (currentMilestone) {
+                document.getElementById('current-badge').innerHTML = `
+                    <span class="badge-icon">${currentMilestone.badge}</span>
+                    <span>${currentMilestone.title}</span>
+                `;
+            }
+            
+            if (nextMilestone) {
+                const progress = ((currentScore - currentMilestone.threshold) / (nextMilestone.threshold - currentMilestone.threshold)) * 100;
+                const remaining = nextMilestone.threshold - currentScore;
+                
+                document.getElementById('progress-bar').style.width = progress + '%';
+                document.getElementById('progress-bar').textContent = `${currentScore}/${nextMilestone.threshold}`;
+                document.getElementById('next-milestone').textContent = 
+                    `Prochain palier : ${nextMilestone.title} (${remaining} question${remaining > 1 ? 's' : ''}) ${nextMilestone.badge}`;
+            } else {
+                // Palier maximum atteint
+                document.getElementById('progress-bar').style.width = '100%';
+                document.getElementById('progress-bar').textContent = 'MAX';
+                document.getElementById('next-milestone').textContent = 
+                    '🌟 Palier maximum atteint ! Continuez pour battre le record !';
+            }
+        }
+
+        // Obtenir le palier actuel
+        function getCurrentMilestone() {
+            const thresholds = Object.keys(MILESTONES).map(Number).sort((a, b) => b - a);
+            
+            for (const threshold of thresholds) {
+                if (currentScore >= threshold) {
+                    return {
+                        threshold: threshold,
+                        title: MILESTONES[threshold].title,
+                        badge: MILESTONES[threshold].badge
+                    };
+                }
+            }
+            
+            return {
+                threshold: 0,
+                title: MILESTONES[0].title,
+                badge: MILESTONES[0].badge
+            };
+        }
+
+        // Obtenir le prochain palier
+        function getNextMilestone() {
+            const thresholds = Object.keys(MILESTONES).map(Number).sort((a, b) => a - b);
+            
+            for (const threshold of thresholds) {
+                if (currentScore < threshold) {
+                    return {
+                        threshold: threshold,
+                        title: MILESTONES[threshold].title,
+                        badge: MILESTONES[threshold].badge
+                    };
+                }
+            }
+            
+            return null;
+        }
+
+        // Game Over
+        async function gameOver() {
+            document.getElementById('question-section').classList.remove('active');
+            document.getElementById('progress-section').style.display = 'none';
+            document.getElementById('game-over-screen').classList.add('active');
+            
+            // Afficher le score final
+            document.getElementById('final-score').textContent = currentScore;
+            
+            // Afficher le palier atteint
+            const milestone = getCurrentMilestone();
+            document.getElementById('achievement-badge').textContent = milestone.badge;
+            document.getElementById('achievement-title').textContent = milestone.title;
+            
+            // Afficher les records
+            document.getElementById('final-personal-record').textContent = 
+                Math.max(currentScore, personalRecord);
+            
+            // Sauvegarder le score
+            if (currentUser) {
+                await saveScore();
+            }
+        }
+
+        // Sauvegarder le score
+        async function saveScore() {
+            try {
+                await firebase.firestore()
+                    .collection('survivalRecords')
+                    .add({
+                        userId: currentUser.uid,
+                        pseudo: currentUser.displayName || 'Joueur',
+                        score: currentScore,
+                        timestamp: new Date()
+                    });
+
+                // Recharger les records
+                await loadPersonalRecord();
+                await loadWorldRecord();
+            } catch (error) {
+                console.error('Erreur sauvegarde score:', error);
+            }
+        }
+
+        // Utilitaires
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function updateAuthMenu(user) {
+            const nav = document.querySelector('.menu');
+            if (!nav) return;
+
+            const existingAuthItem = document.getElementById('auth-menu-item');
+            if (existingAuthItem) existingAuthItem.remove();
+
+            const authItem = document.createElement('li');
+            authItem.id = 'auth-menu-item';
+
+            if (user) {
+                authItem.innerHTML = `
+                    <a href="#" onclick="logout(event)" style="color: #2ecc71; text-decoration: none;">
+                        👤 ${user.displayName || 'Joueur'} <span style="font-size: 0.8em;">(Déco)</span>
+                    </a>
+                `;
+            } else {
+                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c; text-decoration: none;">🔐 Connexion</a>';
+            }
+
+            nav.appendChild(authItem);
+        }
+
+        async function logout(event) {
+            event.preventDefault();
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                try {
+                    await FirebaseAuth.logout();
+                    location.reload();
+                } catch (error) {
+                    alert('Erreur lors de la déconnexion');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

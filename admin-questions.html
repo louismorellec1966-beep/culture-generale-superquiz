@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛠️ Admin - Gestion Questions</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .answers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .answer-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .answer-input input[type="text"] {
+            flex: 1;
+        }
+
+        .answer-input input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .questions-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #3498db;
+        }
+
+        .question-item.facile {
+            border-left-color: #2ecc71;
+        }
+
+        .question-item.moyen {
+            border-left-color: #f39c12;
+        }
+
+        .question-item.difficile {
+            border-left-color: #e74c3c;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .question-meta {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .question-text-display {
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+
+        .question-answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .answer-display {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .answer-display.correct {
+            background: #d4edda;
+            font-weight: bold;
+        }
+
+        .json-input {
+            width: 100%;
+            min-height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .example-json {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #7f8c8d;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 10px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <div class="header">
+            <h1>🛠️ Administration - Gestion des Questions</h1>
+            <p style="color: #7f8c8d; margin-top: 10px;">Outil universel et réutilisable</p>
+        </div>
+
+        <!-- Onglets -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('add')">➕ Ajouter une Question</div>
+            <div class="tab" onclick="switchTab('bulk')">📦 Import en Masse</div>
+            <div class="tab" onclick="switchTab('view')">👁️ Voir les Questions</div>
+            <div class="tab" onclick="switchTab('stats')">📊 Statistiques</div>
+        </div>
+
+        <!-- Onglet 1 : Ajouter une Question -->
+        <div id="tab-add" class="tab-content active">
+            <h2 style="margin-bottom: 20px;">➕ Ajouter une Nouvelle Question</h2>
+            
+            <div id="message-add"></div>
+            
+            <form id="form-add" onsubmit="addQuestion(event)">
+                <div class="form-group">
+                    <label>🎯 Thème *</label>
+                    <select id="theme" required>
+                        <option value="">-- Choisir un thème --</option>
+                        <option value="Histoire du XXe siècle">Histoire du XXe siècle</option>
+                        <option value="Géographie mondiale">Géographie mondiale</option>
+                        <option value="Sciences et découvertes">Sciences et découvertes</option>
+                        <option value="Littérature française">Littérature française</option>
+                        <option value="Arts et culture">Arts et culture</option>
+                        <option value="Cinéma et séries">Cinéma et séries</option>
+                        <option value="Sport et olympisme">Sport et olympisme</option>
+                        <option value="Musique classique et moderne">Musique classique et moderne</option>
+                        <option value="Mythologie et légendes">Mythologie et légendes</option>
+                        <option value="Astronomie et espace">Astronomie et espace</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📊 Difficulté *</label>
+                    <select id="difficulty" required>
+                        <option value="">-- Choisir --</option>
+                        <option value="facile">Facile</option>
+                        <option value="moyen">Moyen</option>
+                        <option value="difficile">Difficile</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>❓ Question *</label>
+                    <textarea id="question" required placeholder="Ex: Quelle est la capitale de la France ?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>✅ Réponses * (Cochez la bonne réponse)</label>
+                    <div class="answers-grid">
+                        <div class="answer-input">
+                            <input type="radio" name="correct" value="0" required>
+                            <input type="text" id="answer0" placeholder="Réponse A" required>
+                        </div>
+                        <div class="answer-input">
+                            <input type="radio" name="correct" value="1">
+                            <input type="text" id="answer1" placeholder="Réponse B" required>
+                        </div>
+                        <div class="answer-input">
+                            <input type="radio" name="correct" value="2">
+                            <input type="text" id="answer2" placeholder="Réponse C" required>
+                        </div>
+                        <div class="answer-input">
+                            <input type="radio" name="correct" value="3">
+                            <input type="text" id="answer3" placeholder="Réponse D" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>🏷️ Tags (séparés par des virgules, optionnel)</label>
+                    <input type="text" id="tags" placeholder="Ex: histoire, france, capitale">
+                </div>
+
+                <button type="submit" class="btn">💾 Enregistrer la Question</button>
+            </form>
+        </div>
+
+        <!-- Onglet 2 : Import en Masse -->
+        <div id="tab-bulk" class="tab-content">
+            <h2 style="margin-bottom: 20px;">📦 Import en Masse (JSON)</h2>
+            
+            <div id="message-bulk"></div>
+            
+            <div class="example-json">
+<strong>Format JSON :</strong>
+[
+  {
+    "theme": "Histoire du XXe siècle",
+    "difficulty": "facile",
+    "question": "En quelle année...",
+    "answers": ["1914", "1918", "1939", "1945"],
+    "correct": 0,
+    "tags": ["histoire", "guerre"]
+  }
+]
+            </div>
+
+            <div class="form-group">
+                <label>📝 Collez votre JSON ici :</label>
+                <textarea id="json-input" class="json-input" placeholder='[{"theme": "...", ...}]'></textarea>
+            </div>
+
+            <button onclick="importBulk()" class="btn">📥 Importer</button>
+        </div>
+
+        <!-- Onglet 3 : Voir les Questions -->
+        <div id="tab-view" class="tab-content">
+            <h2 style="margin-bottom: 20px;">👁️ Liste des Questions</h2>
+            
+            <div class="filter-bar">
+                <select id="filter-theme" onchange="loadQuestions()">
+                    <option value="">Tous les thèmes</option>
+                    <option value="Histoire du XXe siècle">Histoire du XXe siècle</option>
+                    <option value="Géographie mondiale">Géographie mondiale</option>
+                    <option value="Sciences et découvertes">Sciences et découvertes</option>
+                    <option value="Littérature française">Littérature française</option>
+                    <option value="Arts et culture">Arts et culture</option>
+                    <option value="Cinéma et séries">Cinéma et séries</option>
+                    <option value="Sport et olympisme">Sport et olympisme</option>
+                    <option value="Musique classique et moderne">Musique classique et moderne</option>
+                    <option value="Mythologie et légendes">Mythologie et légendes</option>
+                    <option value="Astronomie et espace">Astronomie et espace</option>
+                </select>
+
+                <select id="filter-difficulty" onchange="loadQuestions()">
+                    <option value="">Toutes difficultés</option>
+                    <option value="facile">Facile</option>
+                    <option value="moyen">Moyen</option>
+                    <option value="difficile">Difficile</option>
+                </select>
+
+                <button onclick="loadQuestions()" class="btn btn-secondary">🔄 Rafraîchir</button>
+            </div>
+
+            <div id="questions-list" class="questions-list">
+                <div class="loading">Chargement des questions...</div>
+            </div>
+        </div>
+
+        <!-- Onglet 4 : Statistiques -->
+        <div id="tab-stats" class="tab-content">
+            <h2 style="margin-bottom: 20px;">📊 Statistiques</h2>
+            
+            <div class="stats-grid" id="stats-grid">
+                <div class="loading">Chargement des statistiques...</div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px 0;">📈 Par Thème</h3>
+            <div id="theme-stats"></div>
+        </div>
+    </div>
+
+    <script>
+        // Utiliser la db globale de firebase-config.js au lieu de redéclarer
+        // let db = null; ← SUPPRIMÉ (conflit avec firebase-config.js)
+
+        // Initialisation
+        window.addEventListener('load', async () => {
+            // Attendre que Firebase soit complètement chargé
+            await new Promise(resolve => {
+                const check = setInterval(() => {
+                    if (typeof firebase !== 'undefined' && firebase.apps.length > 0 && typeof db !== 'undefined') {
+                        clearInterval(check);
+                        console.log('✅ Admin Questions initialisé avec Firebase');
+                        resolve();
+                    }
+                }, 100);
+                
+                // Timeout après 10 secondes
+                setTimeout(() => {
+                    if (typeof db === 'undefined') {
+                        console.error('❌ Firebase/db non chargé après 10 secondes');
+                        alert('❌ Erreur : Firebase ne se charge pas. Vérifiez firebase-config.js');
+                    }
+                }, 10000);
+            });
+        });
+
+        // Changer d'onglet
+        function switchTab(tabName) {
+            // Désactiver tous les onglets et contenus
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            // Activer l'onglet cliqué
+            const tabs = document.querySelectorAll('.tab');
+            const tabIndex = {
+                'add': 0,
+                'bulk': 1,
+                'view': 2,
+                'stats': 3
+            };
+            tabs[tabIndex[tabName]].classList.add('active');
+            
+            // Activer le contenu correspondant
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            // Charger les données si nécessaire
+            if (tabName === 'view') loadQuestions();
+            if (tabName === 'stats') loadStats();
+        }
+
+        // Ajouter une question
+        async function addQuestion(e) {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('message-add');
+            messageDiv.innerHTML = '';
+
+            const question = {
+                theme: document.getElementById('theme').value,
+                difficulty: document.getElementById('difficulty').value,
+                question: document.getElementById('question').value,
+                answers: [
+                    document.getElementById('answer0').value,
+                    document.getElementById('answer1').value,
+                    document.getElementById('answer2').value,
+                    document.getElementById('answer3').value
+                ],
+                correct: parseInt(document.querySelector('input[name="correct"]:checked').value),
+                tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
+                addedAt: new Date()
+            };
+
+            try {
+                await db.collection('questionBank').add(question);
+                
+                messageDiv.innerHTML = '<div class="alert alert-success">✅ Question ajoutée avec succès !</div>';
+                document.getElementById('form-add').reset();
+                
+                setTimeout(() => {
+                    messageDiv.innerHTML = '';
+                }, 3000);
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        // Import en masse
+        async function importBulk() {
+            const messageDiv = document.getElementById('message-bulk');
+            const jsonInput = document.getElementById('json-input').value.trim();
+            
+            messageDiv.innerHTML = '';
+
+            if (!jsonInput) {
+                messageDiv.innerHTML = '<div class="alert alert-error">❌ Veuillez coller du JSON</div>';
+                return;
+            }
+
+            try {
+                const questions = JSON.parse(jsonInput);
+                
+                if (!Array.isArray(questions)) {
+                    throw new Error('Le JSON doit être un tableau');
+                }
+
+                let imported = 0;
+                for (const q of questions) {
+                    await db.collection('questionBank').add({
+                        ...q,
+                        addedAt: new Date()
+                    });
+                    imported++;
+                }
+
+                messageDiv.innerHTML = `<div class="alert alert-success">✅ ${imported} questions importées avec succès !</div>`;
+                document.getElementById('json-input').value = '';
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        // Charger les questions
+        async function loadQuestions() {
+            const container = document.getElementById('questions-list');
+            const themeFilter = document.getElementById('filter-theme').value;
+            const difficultyFilter = document.getElementById('filter-difficulty').value;
+            
+            container.innerHTML = '<div class="loading">Chargement...</div>';
+
+            try {
+                let query = db.collection('questionBank');
+                
+                if (themeFilter) {
+                    query = query.where('theme', '==', themeFilter);
+                }
+                if (difficultyFilter) {
+                    query = query.where('difficulty', '==', difficultyFilter);
+                }
+
+                const snapshot = await query.orderBy('addedAt', 'desc').get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 50px;">Aucune question trouvée. Utilisez l\'onglet "Ajouter" pour créer vos premières questions !</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const q = doc.data();
+                    const item = document.createElement('div');
+                    item.className = `question-item ${q.difficulty}`;
+                    item.innerHTML = `
+                        <div class="question-header">
+                            <div>
+                                <div class="question-meta">
+                                    📁 ${q.theme} | 📊 ${q.difficulty.charAt(0).toUpperCase() + q.difficulty.slice(1)}
+                                </div>
+                                <div class="question-text-display">${q.question}</div>
+                            </div>
+                        </div>
+                        <div class="question-answers">
+                            ${q.answers.map((a, i) => `
+                                <div class="answer-display ${i === q.correct ? 'correct' : ''}">
+                                    ${i === q.correct ? '✅' : '○'} ${a}
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${q.tags && q.tags.length > 0 ? `<div style="margin-top: 10px; font-size: 0.85em; color: #7f8c8d;">🏷️ ${q.tags.join(', ')}</div>` : ''}
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Erreur loadQuestions:', error);
+                container.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        // Charger les statistiques
+        async function loadStats() {
+            const statsGrid = document.getElementById('stats-grid');
+            const themeStats = document.getElementById('theme-stats');
+            
+            statsGrid.innerHTML = '<div class="loading">Chargement...</div>';
+
+            try {
+                const snapshot = await db.collection('questionBank').get();
+                
+                if (snapshot.empty) {
+                    statsGrid.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">Questions Totales</div>
+                        </div>
+                    `;
+                    themeStats.innerHTML = '<p style="text-align: center; color: #7f8c8d; padding: 50px;">Aucune question dans la base de données. Utilisez l\'onglet "Ajouter" pour créer vos premières questions !</p>';
+                    return;
+                }
+
+                const questions = snapshot.docs.map(doc => doc.data());
+
+                // Stats globales
+                const total = questions.length;
+                const byDifficulty = {
+                    facile: questions.filter(q => q.difficulty === 'facile').length,
+                    moyen: questions.filter(q => q.difficulty === 'moyen').length,
+                    difficile: questions.filter(q => q.difficulty === 'difficile').length
+                };
+
+                statsGrid.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">${total}</div>
+                        <div class="stat-label">Questions Totales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${byDifficulty.facile}</div>
+                        <div class="stat-label">Faciles</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${byDifficulty.moyen}</div>
+                        <div class="stat-label">Moyennes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${byDifficulty.difficile}</div>
+                        <div class="stat-label">Difficiles</div>
+                    </div>
+                `;
+
+                // Stats par thème
+                const themes = {};
+                questions.forEach(q => {
+                    if (!themes[q.theme]) {
+                        themes[q.theme] = { total: 0, facile: 0, moyen: 0, difficile: 0 };
+                    }
+                    themes[q.theme].total++;
+                    themes[q.theme][q.difficulty]++;
+                });
+
+                let themeHtml = '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">';
+                Object.keys(themes).sort().forEach(theme => {
+                    const stats = themes[theme];
+                    themeHtml += `
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid #3498db;">
+                            <div style="font-weight: bold; margin-bottom: 10px; color: #2c3e50;">${theme}</div>
+                            <div style="font-size: 2em; font-weight: bold; color: #3498db; margin: 10px 0;">${stats.total}</div>
+                            <div style="font-size: 0.9em; color: #7f8c8d;">
+                                🟢 ${stats.facile} faciles | 🟡 ${stats.moyen} moyennes | 🔴 ${stats.difficile} difficiles
+                            </div>
+                        </div>
+                    `;
+                });
+                themeHtml += '</div>';
+                themeStats.innerHTML = themeHtml;
+
+            } catch (error) {
+                console.error('Erreur loadStats:', error);
+                statsGrid.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

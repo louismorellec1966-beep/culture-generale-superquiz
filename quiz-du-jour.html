@@ -17,6 +17,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            padding-top: 40px;
         }
 
         .daily-quiz-container {
@@ -396,7 +397,7 @@
 </head>
 <body>
     <!-- Menu Navigation -->
-    <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin-bottom: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+    <nav style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 15px; margin-bottom: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
         <ul style="list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; flex-wrap: wrap; align-items: center; justify-content: center;">
             <li><a href="Accueil.html" style="color: white; text-decoration: none; font-size: 1.1em; font-weight: 500; transition: all 0.3s; padding: 8px 15px; border-radius: 8px; display: inline-block;">🏠 Accueil</a></li>
             <li><a href="quiz-du-jour.html" style="color: #ffd700; text-decoration: none; font-size: 1.1em; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5); padding: 8px 15px; border-radius: 8px; display: inline-block; background: rgba(255,255,255,0.1);">📅 Quiz du Jour</a></li>
@@ -405,7 +406,7 @@
         </ul>
     </nav>
 
-    <div class="daily-quiz-container" style="margin-top: 0;">
+    <div class="daily-quiz-container" style="margin-top: 0; padding-top: 20px;">
         <!-- En-tête du Quiz du Jour -->
         <div class="daily-header">
             <h1>📅 Quiz du Jour</h1>
@@ -680,84 +681,48 @@
             const dayIndex = new Date(date).getDate();
             const theme = themes[dayIndex % themes.length];
 
-            // Questions d'exemple (à remplacer par vos vraies questions)
-            const allQuestions = generateSampleQuestions(theme);
+            // CHARGER LES VRAIES QUESTIONS DEPUIS FIRESTORE
+            try {
+                const questionsSnapshot = await firebase.firestore()
+                    .collection('questionBank')
+                    .where('theme', '==', theme)
+                    .get();
 
-            // Sélectionner 10 questions aléatoires
-            const questions = shuffleArray(allQuestions).slice(0, 10);
-
-            const quizData = {
-                date: date,
-                theme: theme,
-                questions: questions,
-                createdAt: new Date()
-            };
-
-            // Sauvegarder dans Firestore
-            await firebase.firestore()
-                .collection('dailyQuiz')
-                .doc(date)
-                .set(quizData);
-
-            return quizData;
-        }
-
-        // Générer des questions d'exemple (REMPLACEZ par vos vraies questions)
-        function generateSampleQuestions(theme) {
-            const questions = [
-                {
-                    question: `Question 1 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 0
-                },
-                {
-                    question: `Question 2 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 1
-                },
-                {
-                    question: `Question 3 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 2
-                },
-                {
-                    question: `Question 4 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 3
-                },
-                {
-                    question: `Question 5 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 0
-                },
-                {
-                    question: `Question 6 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 1
-                },
-                {
-                    question: `Question 7 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 2
-                },
-                {
-                    question: `Question 8 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 3
-                },
-                {
-                    question: `Question 9 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 0
-                },
-                {
-                    question: `Question 10 sur le thème : ${theme}`,
-                    answers: ['Réponse A', 'Réponse B', 'Réponse C', 'Réponse D'],
-                    correct: 1
+                if (questionsSnapshot.empty) {
+                    console.error('Aucune question trouvée pour le thème:', theme);
+                    alert('❌ Aucune question disponible pour ce thème. Veuillez importer les questions.');
+                    return null;
                 }
-            ];
 
-            return questions;
+                const allQuestions = questionsSnapshot.docs.map(doc => doc.data());
+                
+                // Sélectionner 10 questions aléatoires
+                const questions = shuffleArray(allQuestions).slice(0, 10);
+
+                if (questions.length < 10) {
+                    console.warn(`Seulement ${questions.length} questions disponibles pour ${theme}`);
+                }
+
+                const quizData = {
+                    date: date,
+                    theme: theme,
+                    questions: questions,
+                    createdAt: new Date()
+                };
+
+                // Sauvegarder dans Firestore
+                await firebase.firestore()
+                    .collection('dailyQuiz')
+                    .doc(date)
+                    .set(quizData);
+
+                return quizData;
+                
+            } catch (error) {
+                console.error('Erreur chargement questions:', error);
+                alert('❌ Erreur lors du chargement des questions');
+                return null;
+            }
         }
 
         // Mélanger un tableau

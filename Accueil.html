@@ -7,20 +7,22 @@
 
 <!-- Configuration Firebase -->
 <script src="firebase-config.js"></script>
+
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SuperQuiz - Testez vos connaissances en culture générale avec nos quiz d'histoire, géographie, science et littérature">
+    <meta name="description"
+        content="SuperQuiz - Testez vos connaissances en culture générale avec nos quiz d'histoire, géographie, science et littérature">
     <meta name="keywords" content="quiz, culture générale, histoire, géographie, science, littérature, test">
     <title>SuperQuiz.com - Accueil</title>
     <link rel="preload" href="CSS/style.css" as="style">
@@ -36,19 +38,19 @@
             margin: 20px auto;
             max-width: 800px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
-        
+
         .welcome-box h2 {
             margin: 0 0 10px 0;
             font-size: 1.8em;
         }
-        
+
         .welcome-box p {
             margin: 10px 0;
             font-size: 1.1em;
         }
-        
+
         .btn-cta {
             display: inline-block;
             padding: 12px 30px;
@@ -60,7 +62,7 @@
             font-weight: bold;
             transition: transform 0.3s;
         }
-        
+
         .btn-cta:hover {
             transform: translateY(-2px);
         }
@@ -74,7 +76,7 @@
             <span class="hamburger"></span>
             <span class="hamburger"></span>
         </button>
-        
+
         <ul class="menu">
             <li><a href="Accueil.html" aria-current="page">Accueil</a></li>
             <li class="dropdown">
@@ -93,6 +95,33 @@
             <li><a href="Experimentation.html">Expérience</a></li>
         </ul>
     </nav>
+    <div class="quiz-highlight"
+        style="background: linear-gradient(135deg, #3498db, #2ecc71); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
+        <h2 style="margin: 0;">📅 Quiz du Jour</h2>
+        <p id="daily-theme-home" style="font-size: 1.2em; margin: 15px 0;">Chargement...</p>
+        <a href="quiz-du-jour.html"
+            style="display: inline-block; background: white; color: #3498db; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px;">
+            Jouer maintenant 🎯
+        </a>
+    </div>
+
+    <script>
+        // Afficher le thème du jour
+        window.addEventListener('load', async () => {
+            if (typeof firebase === 'undefined') return;
+
+            const today = new Date().toISOString().split('T')[0];
+            const quizDoc = await firebase.firestore()
+                .collection('dailyQuiz')
+                .doc(today)
+                .get();
+
+            if (quizDoc.exists) {
+                document.getElementById('daily-theme-home').textContent =
+                    `Thème du jour : ${quizDoc.data().theme}`;
+            }
+        });
+    </script>
 
     <header>
         <div class="h1">
@@ -107,9 +136,11 @@
 
         <div class="updates-info">
             <h2>Mises à jour du site</h2>
-            <p>✨ <strong>Nouveau :</strong> Système de comptes utilisateurs ! Connectez-vous pour sauvegarder vos scores et suivre vos progrès.</p>
-            <p>Publication du site dans sa version Alpha avec 5 menus dont 5 sous-menus présents dans Quiz afin d'avoir une variété de matières où 
-            l'utilisateur peut trouver des questions en rapport avec le sous-menu choisi.</p>
+            <p>✨ <strong>Nouveau :</strong> Système de comptes utilisateurs ! Connectez-vous pour sauvegarder vos scores
+                et suivre vos progrès.</p>
+            <p>Publication du site dans sa version Alpha avec 5 menus dont 5 sous-menus présents dans Quiz afin d'avoir
+                une variété de matières où
+                l'utilisateur peut trouver des questions en rapport avec le sous-menu choisi.</p>
             <p class="update-divider">.............................</p>
             <p class="update-divider">.............................</p>
         </div>
@@ -117,8 +148,10 @@
 
     <main>
         <figure>
-            <img src="Images/bretagne.jpg" alt="Paysage de Bretagne avec ses côtes pittoresques" width="100" height="100" loading="lazy" />
-            <figcaption>La Bretagne est une région de l'ouest de la France connue pour ses côtes pittoresques et son riche
+            <img src="Images/bretagne.jpg" alt="Paysage de Bretagne avec ses côtes pittoresques" width="100"
+                height="100" loading="lazy" />
+            <figcaption>La Bretagne est une région de l'ouest de la France connue pour ses côtes pittoresques et son
+                riche
                 patrimoine culturel.</figcaption>
         </figure>
     </main>
@@ -131,7 +164,7 @@
         // Afficher un message de bienvenue personnalisé si connecté
         function displayWelcome() {
             const user = FirebaseAuth.getCurrentUser();
-            
+
             if (user) {
                 const welcomeDiv = document.getElementById('user-welcome');
                 welcomeDiv.innerHTML = `
@@ -179,7 +212,7 @@
             }
 
             nav.appendChild(authItem);
-            
+
             // Mettre à jour le message de bienvenue
             displayWelcome();
         });

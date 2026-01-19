@@ -1,6 +1,6 @@
 // ========== CONFIGURATION FIREBASE ==========
 // Configuration Firebase pour SuperQuiz avec système de profils enrichis
-// VERSION CORRIGÉE - Sans index composites (tri côté client)
+// VERSION CORRIGÉE - Compatible avec et sans Realtime Database
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAEGKVsQYmKnzkMu8vclmxrf01sHmvZXA",
@@ -9,17 +9,30 @@ const firebaseConfig = {
     storageBucket: "super-quiz-da40b.firebasestorage.app",
     messagingSenderId: "535455857030",
     appId: "1:535455857030:web:441af3ea2cdbc3a0c91407",
-    measurementId: "G-G3YEKJLDRT"
+    measurementId: "G-G3YEKJLDRT",
+    // URL pour Realtime Database (nécessaire pour le mode multijoueur)
+    databaseURL: "https://super-quiz-da40b-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
 // Initialiser Firebase (compat version)
 firebase.initializeApp(firebaseConfig);
 
-// Références globales
+// Références globales - Firestore (toujours disponible)
 const auth = firebase.auth();
 const db = firebase.firestore();
 
 console.log('🔥 Firebase initialisé');
+console.log('✅ Firestore prêt');
+
+// Realtime Database - SEULEMENT si le SDK est chargé
+let rtdb = null;
+if (typeof firebase.database === 'function') {
+    rtdb = firebase.database();
+    window.rtdb = rtdb;
+    console.log('✅ Realtime Database prêt');
+} else {
+    console.log('ℹ️ Realtime Database non chargé (normal si pas sur une page multijoueur)');
+}
 
 // ========== SYSTÈME D'AUTHENTIFICATION ==========
 const FirebaseAuth = {
@@ -47,6 +60,7 @@ const FirebaseAuth = {
                     bio: '',
                     niveau: 1,
                     experiencePoints: 0,
+                    elo: 1000, // Pour le mode multijoueur
                     badges: [],
                     stats: {
                         totalQuiz: 0,
@@ -60,6 +74,12 @@ const FirebaseAuth = {
                         dernierJeuDate: null,
                         quizParfaits: 0,
                         matieres: {}
+                    },
+                    multiplayerStats: {
+                        wins: 0,
+                        losses: 0,
+                        draws: 0,
+                        totalGames: 0
                     },
                     preferences: {
                         theme: 'light',
@@ -203,14 +223,13 @@ const FirebaseScores = {
                 return {
                     id: doc.id,
                     ...data,
-                    date: data.date?.toDate?.() ? data.date.toDate().toISOString() : new Date().toISOString()
+                    date: data.date?.toDate?.() || new Date()
                 };
             });
             
-            // Tri côté client (évite le besoin d'index composite)
-            scores.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Tri côté client (plus récent d'abord)
+            scores.sort((a, b) => b.date - a.date);
             
-            console.log('✅ Scores triés et prêts');
             return scores;
         } catch (error) {
             console.error('❌ Erreur récupération scores:', error);
@@ -218,82 +237,12 @@ const FirebaseScores = {
         }
     },
 
-    // CORRIGÉ: Classement sans index composite
-    getLeaderboard: async (matiere = null) => {
+    // Classement global (XP) - Sans index composite
+    getLeaderboardByXP: async (limit = 20) => {
         try {
-            console.log('📊 Récupération classement par scores...');
+            console.log('📥 Récupération classement XP...');
             
-            // Récupérer tous les scores (sans filtre pour éviter les index)
-            const snapshot = await db.collection('scores').get();
-            const userScores = {};
-            
-            snapshot.docs.forEach(doc => {
-                const data = doc.data();
-                
-                // Filtrer par matière côté client si nécessaire
-                if (matiere && data.matiere !== matiere) {
-                    return;
-                }
-                
-                const userId = data.userId;
-                if (!userScores[userId]) {
-                    userScores[userId] = {
-                        uid: userId,
-                        email: data.userEmail,
-                        totalScore: 0,
-                        quizCount: 0
-                    };
-                }
-                userScores[userId].totalScore += data.score || 0;
-                userScores[userId].quizCount += 1;
-            });
-
-            // Récupérer les profils pour les noms et avatars
-            const leaderboard = [];
-            for (const [userId, data] of Object.entries(userScores)) {
-                let profileData = { pseudo: data.email.split('@')[0], avatar: { value: '👤' }, niveau: 1 };
-                try {
-                    const profileDoc = await db.collection('profiles').doc(userId).get();
-                    if (profileDoc.exists) {
-                        const profile = profileDoc.data();
-                        profileData = {
-                            pseudo: profile.pseudo || data.email.split('@')[0],
-                            avatar: profile.avatar || { value: '👤' },
-                            niveau: profile.niveau || 1
-                        };
-                    }
-                } catch (e) {
-                    // Utiliser les données par défaut
-                }
-
-                leaderboard.push({
-                    uid: userId,
-                    name: profileData.pseudo,
-                    avatar: profileData.avatar?.value || profileData.avatar || '👤',
-                    niveau: profileData.niveau,
-                    totalScore: data.totalScore,
-                    quizCount: data.quizCount,
-                    average: Math.round((data.totalScore / data.quizCount) * 100) / 100
-                });
-            }
-
-            // Tri côté client
-            leaderboard.sort((a, b) => b.totalScore - a.totalScore);
-            
-            console.log('✅ Classement prêt:', leaderboard.length, 'joueurs');
-            return leaderboard;
-        } catch (error) {
-            console.error('❌ Erreur récupération classement:', error);
-            return [];
-        }
-    },
-
-    // CORRIGÉ: Classement par XP sans index composite
-    getXPLeaderboard: async (limit = 20) => {
-        try {
-            console.log('📊 Récupération classement XP...');
-            
-            // Récupérer TOUS les profils (sans where/orderBy combinés)
+            // Récupérer TOUS les profils puis trier côté client
             const snapshot = await db.collection('profiles').get();
             
             console.log('📥 Profils récupérés:', snapshot.docs.length);
@@ -303,11 +252,12 @@ const FirebaseScores = {
                 .map(doc => {
                     const data = doc.data();
                     return {
-                        uid: doc.id,
+                        odexid: doc.id,
                         pseudo: data.pseudo || 'Joueur',
                         avatar: data.avatar?.value || data.avatar || '👤',
                         niveau: data.niveau || 1,
                         experiencePoints: data.experiencePoints || 0,
+                        elo: data.elo || 1000,
                         totalQuiz: data.stats?.totalQuiz || 0,
                         tauxReussite: data.stats?.tauxReussite || 0,
                         badges: data.badges || [],
@@ -332,6 +282,41 @@ const FirebaseScores = {
             console.error('❌ Erreur récupération classement XP:', error);
             return [];
         }
+    },
+
+    // Classement par ELO (pour le mode multijoueur)
+    getLeaderboardByELO: async (limit = 20) => {
+        try {
+            console.log('📥 Récupération classement ELO...');
+            
+            const snapshot = await db.collection('profiles').get();
+
+            const profiles = snapshot.docs
+                .map(doc => {
+                    const data = doc.data();
+                    return {
+                        odexid: doc.id,
+                        pseudo: data.pseudo || 'Joueur',
+                        avatar: data.avatar?.value || data.avatar || '👤',
+                        elo: data.elo || 1000,
+                        multiplayerStats: data.multiplayerStats || { wins: 0, losses: 0 },
+                        afficherProfil: data.preferences?.afficherProfil !== false
+                    };
+                })
+                .filter(p => p.afficherProfil)
+                .sort((a, b) => b.elo - a.elo)
+                .slice(0, limit)
+                .map((p, index) => ({
+                    ...p,
+                    rank: index + 1
+                }));
+
+            console.log('✅ Classement ELO prêt:', profiles.length, 'profils');
+            return profiles;
+        } catch (error) {
+            console.error('❌ Erreur récupération classement ELO:', error);
+            return [];
+        }
     }
 };
 
@@ -341,5 +326,7 @@ window.FirebaseScores = FirebaseScores;
 window.db = db;
 window.auth = auth;
 window.firebase = firebase;
+
+// rtdb est déjà exporté plus haut si disponible
 
 console.log('✅ Firebase Config chargé avec succès');

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SuperQuiz - Mode Multijoueur - Affrontez d'autres joueurs en temps réel">
+    <title>SuperQuiz - Mode Multijoueur 🎮</title>
+    
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="CSS/multiplayer.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="js/questions-loader.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
+            <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
+            <li><a href="multiplayer.html" aria-current="page" class="active">⚔️ Multijoueur</a></li>
+            <li><a href="Profil.html">👤 Profil</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- Section Connexion Requise -->
+        <div id="login-required" class="section-card" style="display: none;">
+            <div class="login-prompt">
+                <h2>🔒 Connexion requise</h2>
+                <p>Vous devez être connecté pour accéder au mode multijoueur.</p>
+                <a href="Auth.html" class="btn-primary">Se connecter</a>
+            </div>
+        </div>
+
+        <!-- Écran Principal - Lobby -->
+        <div id="lobby-screen" class="section-card">
+            <div class="multiplayer-header">
+                <h1>⚔️ Mode Multijoueur</h1>
+                <p class="subtitle">Affrontez des joueurs du monde entier en temps réel !</p>
+            </div>
+
+            <!-- Stats du joueur -->
+            <div class="player-stats-card" id="player-stats">
+                <div class="player-info">
+                    <div class="player-avatar" id="player-avatar">👤</div>
+                    <div class="player-details">
+                        <h3 id="player-name">Chargement...</h3>
+                        <div class="rank-badge" id="player-rank">
+                            <span class="rank-icon">🥉</span>
+                            <span class="rank-name">Bronze</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="elo-display">
+                    <div class="elo-score" id="player-elo">1000</div>
+                    <div class="elo-label">Points ELO</div>
+                </div>
+                <div class="stats-mini">
+                    <div class="stat-item">
+                        <span class="stat-value" id="wins-count">0</span>
+                        <span class="stat-label">Victoires</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="losses-count">0</span>
+                        <span class="stat-label">Défaites</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="winrate">0%</span>
+                        <span class="stat-label">Winrate</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modes de jeu -->
+            <div class="game-modes">
+                <h2>🎮 Choisissez votre mode</h2>
+                
+                <div class="modes-grid">
+                    <!-- Duel 1v1 -->
+                    <div class="mode-card" onclick="startMatchmaking('duel')">
+                        <div class="mode-icon">⚔️</div>
+                        <h3>Duel 1v1</h3>
+                        <p>Affrontez un adversaire de niveau similaire</p>
+                        <ul class="mode-details">
+                            <li>🎯 10 questions</li>
+                            <li>⏱️ 15s par question</li>
+                            <li>📊 Classé (ELO)</li>
+                        </ul>
+                        <button class="btn-play">Jouer</button>
+                    </div>
+
+                    <!-- Partie rapide -->
+                    <div class="mode-card" onclick="startMatchmaking('quick')">
+                        <div class="mode-icon">⚡</div>
+                        <h3>Partie Rapide</h3>
+                        <p>Match rapide sans impact sur le classement</p>
+                        <ul class="mode-details">
+                            <li>🎯 5 questions</li>
+                            <li>⏱️ 10s par question</li>
+                            <li>🎲 Non classé</li>
+                        </ul>
+                        <button class="btn-play secondary">Jouer</button>
+                    </div>
+
+                    <!-- Tournoi (bientôt) -->
+                    <div class="mode-card disabled">
+                        <div class="mode-icon">🏆</div>
+                        <h3>Tournoi</h3>
+                        <p>Compétitions hebdomadaires</p>
+                        <div class="coming-soon">Bientôt disponible</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classement Multijoueur -->
+            <div class="leaderboard-section">
+                <h2>🏅 Classement Multijoueur</h2>
+                <div class="leaderboard-tabs">
+                    <button class="tab-btn active" onclick="switchLeaderboard('global')">🌍 Global</button>
+                    <button class="tab-btn" onclick="switchLeaderboard('weekly')">📅 Cette semaine</button>
+                </div>
+                <div class="leaderboard-list" id="leaderboard-list">
+                    <div class="loading-spinner">Chargement...</div>
+                </div>
+            </div>
+
+            <!-- Joueurs en ligne -->
+            <div class="online-players">
+                <div class="online-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="online-count">0</span> joueurs en ligne
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran Matchmaking -->
+        <div id="matchmaking-screen" class="section-card" style="display: none;">
+            <div class="matchmaking-container">
+                <h2>🔍 Recherche d'adversaire...</h2>
+                
+                <div class="matchmaking-animation">
+                    <div class="player-card self">
+                        <div class="avatar" id="mm-player-avatar">👤</div>
+                        <div class="name" id="mm-player-name">Vous</div>
+                        <div class="elo" id="mm-player-elo">1000</div>
+                    </div>
+                    
+                    <div class="vs-animation">
+                        <div class="vs-text">VS</div>
+                        <div class="search-spinner"></div>
+                    </div>
+                    
+                    <div class="player-card opponent">
+                        <div class="avatar">❓</div>
+                        <div class="name">Recherche...</div>
+                        <div class="elo">???</div>
+                    </div>
+                </div>
+
+                <div class="matchmaking-info">
+                    <div class="queue-time">
+                        <span>Temps d'attente :</span>
+                        <span id="queue-timer">0:00</span>
+                    </div>
+                    <div class="queue-range">
+                        <span>Recherche ELO :</span>
+                        <span id="elo-range">±50</span>
+                    </div>
+                </div>
+
+                <button class="btn-cancel" onclick="cancelMatchmaking()">
+                    ❌ Annuler
+                </button>
+            </div>
+        </div>
+
+        <!-- Écran Adversaire Trouvé -->
+        <div id="opponent-found-screen" class="section-card" style="display: none;">
+            <div class="opponent-found-container">
+                <h2>⚔️ Adversaire trouvé !</h2>
+                
+                <div class="versus-display">
+                    <div class="player-profile">
+                        <div class="avatar large" id="vs-player-avatar">👤</div>
+                        <div class="name" id="vs-player-name">Vous</div>
+                        <div class="rank-badge" id="vs-player-rank">🥉 Bronze</div>
+                        <div class="elo" id="vs-player-elo">1000 ELO</div>
+                    </div>
+                    
+                    <div class="vs-center">
+                        <div class="vs-badge">VS</div>
+                        <div class="countdown" id="start-countdown">3</div>
+                    </div>
+                    
+                    <div class="player-profile">
+                        <div class="avatar large" id="vs-opponent-avatar">👤</div>
+                        <div class="name" id="vs-opponent-name">Adversaire</div>
+                        <div class="rank-badge" id="vs-opponent-rank">🥉 Bronze</div>
+                        <div class="elo" id="vs-opponent-elo">1000 ELO</div>
+                    </div>
+                </div>
+
+                <div class="match-info">
+                    <span class="match-type" id="match-type">Duel 1v1 Classé</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran de Duel -->
+        <div id="duel-screen" class="section-card" style="display: none;">
+            <div class="duel-container">
+                <!-- Header du duel -->
+                <div class="duel-header">
+                    <div class="player-status you">
+                        <div class="avatar-small" id="duel-player-avatar">👤</div>
+                        <div class="player-name" id="duel-player-name">Vous</div>
+                        <div class="hearts" id="player-hearts">
+                            <span class="heart full">❤️</span>
+                            <span class="heart full">❤️</span>
+                            <span class="heart full">❤️</span>
+                        </div>
+                        <div class="score" id="player-score">0</div>
+                    </div>
+
+                    <div class="duel-info">
+                        <div class="question-counter">
+                            Question <span id="current-question">1</span>/<span id="total-questions">10</span>
+                        </div>
+                        <div class="duel-timer" id="duel-timer">15</div>
+                        <div class="score-diff" id="score-diff">0-0</div>
+                    </div>
+
+                    <div class="player-status opponent">
+                        <div class="avatar-small" id="duel-opponent-avatar">👤</div>
+                        <div class="player-name" id="duel-opponent-name">Adversaire</div>
+                        <div class="hearts" id="opponent-hearts">
+                            <span class="heart full">❤️</span>
+                            <span class="heart full">❤️</span>
+                            <span class="heart full">❤️</span>
+                        </div>
+                        <div class="score" id="opponent-score">0</div>
+                    </div>
+                </div>
+
+                <!-- Zone de question -->
+                <div class="question-area">
+                    <div class="question-text" id="question-text">
+                        Chargement de la question...
+                    </div>
+
+                    <div class="answers-grid" id="answers-grid">
+                        <!-- Les réponses seront injectées ici -->
+                    </div>
+
+                    <!-- Feedback après réponse -->
+                    <div class="answer-feedback" id="answer-feedback" style="display: none;">
+                        <div class="feedback-content">
+                            <div class="feedback-icon" id="feedback-icon">✅</div>
+                            <div class="feedback-text" id="feedback-text">Bonne réponse !</div>
+                            <div class="opponent-answer" id="opponent-answer-status">
+                                En attente de l'adversaire...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barre de progression -->
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="question-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran Résultats -->
+        <div id="results-screen" class="section-card" style="display: none;">
+            <div class="results-container">
+                <div class="result-banner" id="result-banner">
+                    <div class="result-icon" id="result-icon">🏆</div>
+                    <h2 id="result-title">Victoire !</h2>
+                </div>
+
+                <div class="final-scores">
+                    <div class="final-player you">
+                        <div class="avatar" id="result-player-avatar">👤</div>
+                        <div class="name" id="result-player-name">Vous</div>
+                        <div class="final-score" id="result-player-score">0</div>
+                    </div>
+
+                    <div class="score-separator">-</div>
+
+                    <div class="final-player opponent">
+                        <div class="avatar" id="result-opponent-avatar">👤</div>
+                        <div class="name" id="result-opponent-name">Adversaire</div>
+                        <div class="final-score" id="result-opponent-score">0</div>
+                    </div>
+                </div>
+
+                <div class="elo-change" id="elo-change-section">
+                    <div class="elo-change-display" id="elo-change">
+                        <span class="elo-label">Changement ELO</span>
+                        <span class="elo-value positive" id="elo-diff">+25</span>
+                    </div>
+                    <div class="new-elo">
+                        Nouveau classement : <strong id="new-elo">1025</strong> ELO
+                    </div>
+                    <div class="rank-progress" id="rank-progress">
+                        <!-- Barre de progression vers le prochain rang -->
+                    </div>
+                </div>
+
+                <div class="match-stats">
+                    <h3>📊 Statistiques du match</h3>
+                    <div class="stats-comparison">
+                        <div class="stat-row">
+                            <span class="stat-you" id="stat-correct-you">0</span>
+                            <span class="stat-name">Bonnes réponses</span>
+                            <span class="stat-opponent" id="stat-correct-opponent">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-you" id="stat-time-you">0s</span>
+                            <span class="stat-name">Temps moyen</span>
+                            <span class="stat-opponent" id="stat-time-opponent">0s</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-you" id="stat-streak-you">0</span>
+                            <span class="stat-name">Meilleure série</span>
+                            <span class="stat-opponent" id="stat-streak-opponent">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn-action primary" onclick="startMatchmaking(lastGameMode)">
+                        🔄 Revanche
+                    </button>
+                    <button class="btn-action secondary" onclick="backToLobby()">
+                        🏠 Retour au lobby
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Écran Déconnexion Adversaire -->
+        <div id="disconnect-screen" class="section-card" style="display: none;">
+            <div class="disconnect-container">
+                <div class="disconnect-icon">😔</div>
+                <h2>Adversaire déconnecté</h2>
+                <p>Votre adversaire a quitté la partie.</p>
+                <p class="win-message">Vous remportez la victoire par forfait !</p>
+                <button class="btn-action primary" onclick="backToLobby()">
+                    Retour au lobby
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+        <p style="margin-top: 10px;">
+            <a href="Mentions-Legales.html" style="color: white;">Mentions Légales</a> | 
+            <a href="Politique-Confidentialite.html" style="color: white;">Politique de Confidentialité</a>
+        </p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script src="js/multiplayer.js"></script>
+</body>
+</html>

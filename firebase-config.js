@@ -34,6 +34,23 @@ if (typeof firebase.database === 'function') {
     console.log('ℹ️ Realtime Database non chargé (normal si pas sur une page multijoueur)');
 }
 
+// Chargement anticipé du module ProfileSystem si disponible
+let ProfileSystemLoaded = null;
+if (ProfileSystemLoaded) {
+    ProfileSystemLoaded = ProfileSystem;
+}
+
+// Centralisation des messages d'erreur
+const ERROR_MESSAGES = {
+    'auth/email-already-in-use': 'Cet email est déjà utilisé',
+    'auth/invalid-email': 'Email invalide',
+    'auth/weak-password': 'Mot de passe trop faible (min. 6 caractères)',
+    'auth/user-not-found': 'Email ou mot de passe incorrect',
+    'auth/wrong-password': 'Email ou mot de passe incorrect',
+    'auth/too-many-requests': 'Trop de tentatives. Réessayez plus tard.',
+    'auth/network-request-failed': 'Erreur réseau. Vérifiez votre connexion.'
+};
+
 // ========== SYSTÈME D'AUTHENTIFICATION ==========
 const FirebaseAuth = {
     register: async (name, email, password) => {
@@ -50,8 +67,8 @@ const FirebaseAuth = {
             });
 
             // Créer le profil enrichi
-            if (typeof ProfileSystem !== 'undefined') {
-                await ProfileSystem.createProfile(user.uid, { name, email });
+            if (ProfileSystemLoaded) {
+                await ProfileSystemLoaded.createProfile(user.uid, { name, email });
             } else {
                 // Créer un profil basique si ProfileSystem n'est pas chargé
                 await db.collection('profiles').doc(user.uid).set({

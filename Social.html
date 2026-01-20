@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperQuiz - Amis & Social</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="js/auth-menu.js" defer></script>
+    <script src="js/social-system.js" defer></script>
+    
+    <style>
+        .social-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .social-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .social-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+        
+        .social-header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .social-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .social-tab {
+            padding: 12px 25px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .social-tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .social-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .social-tab .badge {
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Section recherche */
+        .search-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-box button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .search-results {
+            margin-top: 20px;
+        }
+        
+        /* Cartes utilisateur/ami */
+        .user-card, .friend-card, .request-card, .challenge-card {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        
+        .user-card:hover, .friend-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .user-avatar .online-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background: #2ecc71;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-info h3 {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+        
+        .user-info p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-accept {
+            background: #2ecc71;
+            color: white;
+        }
+        
+        .btn-decline {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-challenge {
+            background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
+            color: white;
+        }
+        
+        .btn-remove {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        /* Challenge card */
+        .challenge-card {
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe6e6 100%);
+            border: 2px solid #f39c12;
+        }
+        
+        .challenge-info {
+            flex: 1;
+        }
+        
+        .challenge-info h3 {
+            margin: 0 0 5px 0;
+            color: #e74c3c;
+        }
+        
+        .challenge-info .quiz-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 5px 0;
+        }
+        
+        .challenge-info .score-info {
+            color: #7f8c8d;
+        }
+        
+        /* Feed d'activité */
+        .feed-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feed-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .feed-header h2 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .feed-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+        
+        .feed-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .feed-content {
+            flex: 1;
+        }
+        
+        .feed-content p {
+            margin: 0 0 5px 0;
+            color: #2c3e50;
+        }
+        
+        .feed-time {
+            font-size: 0.85em;
+            color: #95a5a6;
+        }
+        
+        /* Notifications */
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .notification-item.unread {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+        }
+        
+        .notification-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-content p {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .notification-time {
+            font-size: 0.85em;
+            color: #95a5a6;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #95a5a6;
+        }
+        
+        .empty-state .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h3 {
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+        
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Liste d'amis grid */
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .social-header {
+                padding: 25px;
+            }
+            
+            .social-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .user-card, .friend-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-avatar {
+                margin: 0 0 15px 0;
+            }
+            
+            .user-actions {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .friends-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Login required */
+        .login-required {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .login-required h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .login-required p {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+        
+        .btn-login {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="Navigation principale">
+        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+            <span class="hamburger"></span>
+        </button>
+        <ul class="menu">
+            <li><a href="Accueil.html">Accueil</a></li>
+            <li class="dropdown">
+                <a href="Quiz.html">Quiz</a>
+                <ul class="submenu">
+                    <li><a href="Histoire.html">Histoire</a></li>
+                    <li><a href="Géographie.html">Géographie</a></li>
+                    <li><a href="Science.html">Science</a></li>
+                    <li><a href="Littérature.html">Littérature</a></li>
+                    <li><a href="Sport.html">Sport</a></li>
+                    <li><a href="Musique.html">Musique</a></li>
+                    <li><a href="Art.html">Art</a></li>
+                    <li><a href="Culture.html">Culture</a></li>
+                    <li><a href="Cinéma.html">Cinéma</a></li>
+                    <li><a href="Gastronomie.html">Gastronomie</a></li>
+                    <li><a href="Politique.html">Politique</a></li>
+                    <li><a href="Philosophie.html">Philosophie</a></li>
+                </ul>
+            </li>
+            <li><a href="Classement.html">🏆 Classement</a></li>
+            <li><a href="Scores.html">Scores</a></li>
+            <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
+            <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
+            <li><a href="multiplayer.html">⚔️ Multijoueur</a></li>
+            <li><a href="Profil.html">👤 Profil</a></li>
+            <li><a href="Social.html" aria-current="page">👥 Social</a></li>
+            <li><a href="Contact.html">Contact</a></li>
+        </ul>
+    </nav>
+
+    <div class="social-container">
+        <div class="social-header">
+            <h1>👥 Amis & Social</h1>
+            <p>Connectez-vous avec d'autres joueurs, défiez vos amis et partagez vos scores !</p>
+        </div>
+
+        <!-- Contenu si non connecté -->
+        <div id="login-required" class="login-required" style="display: none;">
+            <h2>🔐 Connexion requise</h2>
+            <p>Connectez-vous pour accéder aux fonctionnalités sociales</p>
+            <a href="Auth.html" class="btn-login">Se connecter</a>
+        </div>
+
+        <!-- Contenu si connecté -->
+        <div id="social-content" style="display: none;">
+            <!-- Onglets -->
+            <div class="social-tabs">
+                <div class="social-tab active" data-tab="friends">👥 Mes amis <span id="friends-count" class="badge" style="display:none;">0</span></div>
+                <div class="social-tab" data-tab="requests">📬 Demandes <span id="requests-count" class="badge" style="display:none;">0</span></div>
+                <div class="social-tab" data-tab="challenges">⚔️ Défis <span id="challenges-count" class="badge" style="display:none;">0</span></div>
+                <div class="social-tab" data-tab="feed">📰 Actualités</div>
+                <div class="social-tab" data-tab="search">🔍 Rechercher</div>
+            </div>
+
+            <!-- Onglet Amis -->
+            <div id="tab-friends" class="tab-content active">
+                <div class="friends-grid" id="friends-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Chargement de vos amis...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Demandes -->
+            <div id="tab-requests" class="tab-content">
+                <div id="requests-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Chargement des demandes...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Défis -->
+            <div id="tab-challenges" class="tab-content">
+                <div id="challenges-list">
+                    <div class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Chargement des défis...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Feed -->
+            <div id="tab-feed" class="tab-content">
+                <div class="feed-container">
+                    <div class="feed-header">
+                        <h2>📰 Fil d'actualité</h2>
+                    </div>
+                    <div id="feed-list">
+                        <div class="loading">
+                            <div class="loading-spinner"></div>
+                            <p>Chargement des actualités...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Onglet Recherche -->
+            <div id="tab-search" class="tab-content">
+                <div class="search-section">
+                    <h2>🔍 Rechercher des joueurs</h2>
+                    <div class="search-box">
+                        <input type="text" id="search-input" placeholder="Entrez un pseudo..." maxlength="50">
+                        <button onclick="searchUsers()">Rechercher</button>
+                    </div>
+                    <div class="search-results" id="search-results"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Variables globales
+        let currentTab = 'friends';
+        let friendsList = [];
+        let pendingRequests = [];
+        let pendingChallenges = [];
+        let pendingQuizChallenge = null; // Quiz à utiliser pour défier
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Vérifier si on vient d'un quiz pour défier
+            const quizToChallenge = sessionStorage.getItem('quizToChallenge');
+            if (quizToChallenge) {
+                pendingQuizChallenge = JSON.parse(quizToChallenge);
+                sessionStorage.removeItem('quizToChallenge');
+            }
+
+            // Vérifier l'authentification
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById('login-required').style.display = 'none';
+                    document.getElementById('social-content').style.display = 'block';
+                    loadInitialData();
+
+                    // Si on a un quiz à défier, montrer un message
+                    if (pendingQuizChallenge) {
+                        showChallengeBanner();
+                    }
+                } else {
+                    document.getElementById('login-required').style.display = 'block';
+                    document.getElementById('social-content').style.display = 'none';
+                }
+            });
+
+            // Gestion des onglets
+            document.querySelectorAll('.social-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Recherche avec Entrée
+            document.getElementById('search-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') searchUsers();
+            });
+        });
+
+        // Afficher la bannière de défi
+        function showChallengeBanner() {
+            const banner = document.createElement('div');
+            banner.id = 'challenge-banner';
+            banner.style.cssText = 'background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center;';
+            banner.innerHTML = `
+                <h3 style="margin: 0 0 10px 0;">⚔️ Défiez un ami !</h3>
+                <p style="margin: 0;">Quiz : "${escapeHtml(pendingQuizChallenge.titre)}" - Score : ${pendingQuizChallenge.score}/${pendingQuizChallenge.total}</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.9em; opacity: 0.9;">Cliquez sur "⚔️ Défier" à côté d'un ami pour l'envoyer</p>
+                <button onclick="cancelChallenge()" style="margin-top: 10px; padding: 8px 15px; border: 2px solid white; background: transparent; color: white; border-radius: 5px; cursor: pointer;">✖ Annuler</button>
+            `;
+            document.querySelector('.social-tabs').before(banner);
+        }
+
+        function cancelChallenge() {
+            pendingQuizChallenge = null;
+            const banner = document.getElementById('challenge-banner');
+            if (banner) banner.remove();
+        }
+
+        // Charger les données initiales
+        async function loadInitialData() {
+            try {
+                // Charger en parallèle
+                const [friends, requests, challenges] = await Promise.all([
+                    SocialSystem.getFriends(),
+                    SocialSystem.getPendingRequests(),
+                    SocialSystem.getReceivedChallenges()
+                ]);
+
+                friendsList = friends;
+                pendingRequests = requests;
+                pendingChallenges = challenges;
+
+                // Mettre à jour les compteurs
+                updateBadges();
+
+                // Afficher les amis
+                renderFriends();
+            } catch (error) {
+                console.error('Erreur chargement données:', error);
+            }
+        }
+
+        // Mettre à jour les badges
+        function updateBadges() {
+            const friendsCount = document.getElementById('friends-count');
+            const requestsCount = document.getElementById('requests-count');
+            const challengesCount = document.getElementById('challenges-count');
+
+            if (friendsList.length > 0) {
+                friendsCount.textContent = friendsList.length;
+                friendsCount.style.display = 'inline';
+            } else {
+                friendsCount.style.display = 'none';
+            }
+
+            if (pendingRequests.length > 0) {
+                requestsCount.textContent = pendingRequests.length;
+                requestsCount.style.display = 'inline';
+            } else {
+                requestsCount.style.display = 'none';
+            }
+
+            if (pendingChallenges.length > 0) {
+                challengesCount.textContent = pendingChallenges.length;
+                challengesCount.style.display = 'inline';
+            } else {
+                challengesCount.style.display = 'none';
+            }
+        }
+
+        // Changer d'onglet
+        function switchTab(tabName) {
+            currentTab = tabName;
+
+            // Mettre à jour les onglets
+            document.querySelectorAll('.social-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+
+            // Afficher le contenu
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === `tab-${tabName}`);
+            });
+
+            // Charger les données
+            switch (tabName) {
+                case 'friends':
+                    renderFriends();
+                    break;
+                case 'requests':
+                    renderRequests();
+                    break;
+                case 'challenges':
+                    renderChallenges();
+                    break;
+                case 'feed':
+                    loadFeed();
+                    break;
+            }
+        }
+
+        // Afficher la liste d'amis
+        function renderFriends() {
+            const container = document.getElementById('friends-list');
+
+            if (friendsList.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">👥</div>
+                        <h3>Pas encore d'amis</h3>
+                        <p>Recherchez des joueurs pour les ajouter comme amis !</p>
+                        <button class="btn-action btn-add" onclick="switchTab('search')">🔍 Rechercher</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = friendsList.map(friend => `
+                <div class="friend-card">
+                    <div class="user-avatar">
+                        ${friend.avatar}
+                        ${friend.isOnline ? '<span class="online-dot"></span>' : ''}
+                    </div>
+                    <div class="user-info">
+                        <h3>${escapeHtml(friend.odexpseudo)}</h3>
+                        <p>Niveau ${friend.niveau} • ${friend.experiencePoints} XP</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn-action btn-challenge" onclick="challengeFriend('${friend.odexid}', '${escapeHtml(friend.odexpseudo)}')">⚔️ Défier</button>
+                        <button class="btn-action btn-remove" onclick="removeFriend('${friend.odexid}')">✖</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Afficher les demandes
+        function renderRequests() {
+            const container = document.getElementById('requests-list');
+
+            if (pendingRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📬</div>
+                        <h3>Aucune demande</h3>
+                        <p>Vous n'avez pas de demande d'ami en attente</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pendingRequests.map(request => `
+                <div class="request-card">
+                    <div class="user-avatar">${request.fromAvatar}</div>
+                    <div class="user-info">
+                        <h3>${escapeHtml(request.fromPseudo)}</h3>
+                        <p>Niveau ${request.fromNiveau} • ${formatTimeAgo(request.sentAt)}</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn-action btn-accept" onclick="acceptRequest('${request.id}')">✓ Accepter</button>
+                        <button class="btn-action btn-decline" onclick="declineRequest('${request.id}')">✗ Refuser</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Afficher les défis
+        function renderChallenges() {
+            const container = document.getElementById('challenges-list');
+
+            if (pendingChallenges.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">⚔️</div>
+                        <h3>Aucun défi</h3>
+                        <p>Personne ne vous a encore défié. Défiez vos amis !</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = pendingChallenges.map(challenge => `
+                <div class="challenge-card">
+                    <div class="user-avatar">${challenge.fromAvatar}</div>
+                    <div class="challenge-info">
+                        <h3>💌 ${escapeHtml(challenge.fromPseudo)} vous a défié !</h3>
+                        <p class="quiz-name">Quiz : "${escapeHtml(challenge.titre)}"</p>
+                        <p class="score-info">Son score : ${challenge.challengerScore}/${challenge.challengerTotal} en ${challenge.challengerTime}s</p>
+                    </div>
+                    <div class="user-actions">
+                        <button class="btn-action btn-challenge" onclick="acceptChallenge('${challenge.id}', '${challenge.matiere}', '${challenge.categorie}')">🎯 Relever le défi</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Charger le feed d'activité
+        async function loadFeed() {
+            const container = document.getElementById('feed-list');
+
+            try {
+                const activities = await SocialSystem.getFriendsFeed();
+
+                if (activities.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">📰</div>
+                            <h3>Rien à afficher</h3>
+                            <p>Ajoutez des amis pour voir leurs activités !</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = activities.map(activity => `
+                    <div class="feed-item">
+                        <div class="feed-avatar">${activity.avatar}</div>
+                        <div class="feed-content">
+                            <p>${SocialSystem.formatActivity(activity)}</p>
+                            <span class="feed-time">${formatTimeAgo(activity.createdAt)}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur chargement feed:', error);
+                container.innerHTML = '<p class="error">Erreur de chargement</p>';
+            }
+        }
+
+        // Rechercher des utilisateurs
+        async function searchUsers() {
+            const query = document.getElementById('search-input').value.trim();
+            const container = document.getElementById('search-results');
+
+            if (query.length < 2) {
+                container.innerHTML = '<p style="color: #e74c3c;">Entrez au moins 2 caractères</p>';
+                return;
+            }
+
+            container.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>Recherche...</p></div>';
+
+            try {
+                const results = await SocialSystem.searchUsers(query);
+
+                if (results.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🔍</div>
+                            <h3>Aucun résultat</h3>
+                            <p>Aucun joueur trouvé pour "${escapeHtml(query)}"</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Vérifier le statut d'amitié pour chaque résultat
+                const resultsWithStatus = await Promise.all(results.map(async user => {
+                    const isFriend = await SocialSystem.areFriends(firebase.auth().currentUser.uid, user.odexid);
+                    return { ...user, isFriend };
+                }));
+
+                container.innerHTML = resultsWithStatus.map(user => `
+                    <div class="user-card">
+                        <div class="user-avatar">${user.avatar}</div>
+                        <div class="user-info">
+                            <h3>${escapeHtml(user.odexpseudo)}</h3>
+                            <p>Niveau ${user.niveau} • ${user.experiencePoints} XP</p>
+                        </div>
+                        <div class="user-actions">
+                            ${user.isFriend 
+                                ? '<span style="color: #2ecc71;">✓ Déjà amis</span>'
+                                : `<button class="btn-action btn-add" onclick="sendFriendRequest('${user.odexid}', this)">➕ Ajouter</button>`
+                            }
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur recherche:', error);
+                container.innerHTML = '<p class="error">Erreur de recherche</p>';
+            }
+        }
+
+        // Envoyer une demande d'ami
+        async function sendFriendRequest(userId, button) {
+            try {
+                button.disabled = true;
+                button.textContent = '⏳...';
+
+                await SocialSystem.sendFriendRequest(userId);
+
+                button.textContent = '✓ Envoyé';
+                button.style.background = '#2ecc71';
+            } catch (error) {
+                alert(error.message);
+                button.disabled = false;
+                button.textContent = '➕ Ajouter';
+            }
+        }
+
+        // Accepter une demande
+        async function acceptRequest(requestId) {
+            try {
+                await SocialSystem.acceptFriendRequest(requestId);
+                
+                // Recharger les données
+                pendingRequests = await SocialSystem.getPendingRequests();
+                friendsList = await SocialSystem.getFriends();
+                
+                updateBadges();
+                renderRequests();
+                
+                alert('Ami ajouté avec succès !');
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        // Refuser une demande
+        async function declineRequest(requestId) {
+            if (!confirm('Refuser cette demande d\'ami ?')) return;
+
+            try {
+                await SocialSystem.declineFriendRequest(requestId);
+                
+                pendingRequests = await SocialSystem.getPendingRequests();
+                updateBadges();
+                renderRequests();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        // Supprimer un ami
+        async function removeFriend(friendId) {
+            if (!confirm('Supprimer cet ami ?')) return;
+
+            try {
+                await SocialSystem.removeFriend(friendId);
+                
+                friendsList = await SocialSystem.getFriends();
+                updateBadges();
+                renderFriends();
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        }
+
+        // Défier un ami
+        async function challengeFriend(friendId, friendPseudo) {
+            // Si on a un quiz en attente, envoyer le défi directement
+            if (pendingQuizChallenge) {
+                try {
+                    await SocialSystem.sendChallenge(friendId, pendingQuizChallenge);
+                    alert(`Défi envoyé à ${friendPseudo} !`);
+                    cancelChallenge();
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            } else {
+                // Sinon, rediriger vers la page de sélection de quiz
+                sessionStorage.setItem('challengeTarget', JSON.stringify({
+                    odexid: friendId,
+                    pseudo: friendPseudo
+                }));
+                window.location.href = 'Quiz.html?challenge=true';
+            }
+        }
+
+        // Relever un défi
+        function acceptChallenge(challengeId, matiere, categorie) {
+            // Stocker le défi en cours
+            sessionStorage.setItem('currentChallenge', challengeId);
+            // Rediriger vers le quiz
+            window.location.href = `mode-selection.html?matiere=${matiere}&categorie=${categorie}&challenge=${challengeId}`;
+        }
+
+        // Utilitaires
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatTimeAgo(date) {
+            if (!date) return '';
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'À l\'instant';
+            if (minutes < 60) return `Il y a ${minutes} min`;
+            if (hours < 24) return `Il y a ${hours}h`;
+            if (days < 7) return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+            return date.toLocaleDateString('fr-FR');
+        }
+    </script>
+</body>
+</html>

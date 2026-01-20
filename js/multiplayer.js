@@ -231,11 +231,67 @@ async function startMatchmaking(mode) {
     
     if (window.rtdb) {
         // Mode réel avec Firebase Realtime Database
-        await joinMatchmakingQueue();
+        try {
+            await joinMatchmakingQueue();
+        } catch (error) {
+            console.error('❌ Erreur matchmaking:', error);
+            if (error.message && error.message.includes('permission_denied')) {
+                handlePermissionError();
+            } else {
+                // Fallback vers simulation si Firebase échoue
+                console.log('⚠️ Fallback vers mode simulation');
+                simulateMatchmaking();
+            }
+        }
     } else {
         // Mode simulation (pour les tests)
         simulateMatchmaking();
     }
+}
+
+// Gérer l'erreur de permissions Firebase
+function handlePermissionError() {
+    gameState.isSearching = false;
+    clearInterval(gameState.queueTimer);
+    
+    showScreen('lobby-screen');
+    
+    // Afficher un message d'erreur explicatif
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    `;
+    modal.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; text-align: center;">
+            <h2 style="color: #e74c3c; margin-bottom: 15px;">⚠️ Configuration Firebase requise</h2>
+            <p style="color: #2c3e50; margin-bottom: 20px;">
+                Le mode multijoueur nécessite une configuration des règles Firebase Realtime Database.
+            </p>
+            <p style="color: #7f8c8d; font-size: 0.9em; margin-bottom: 20px;">
+                Rendez-vous dans la console Firebase → Realtime Database → Règles, et ajoutez les règles de sécurité appropriées.
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="this.closest('div').parentElement.remove(); simulateMatchmaking();" 
+                        style="padding: 12px 25px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    🎮 Jouer en mode démo
+                </button>
+                <button onclick="this.closest('div').parentElement.remove();" 
+                        style="padding: 12px 25px; background: #95a5a6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 }
 
 // Rejoindre la file d'attente
@@ -255,7 +311,12 @@ async function joinMatchmakingQueue() {
     
     // Ajouter à la file
     gameState.matchmakingRef = queueRef.child(gameState.currentUser.uid);
-    await gameState.matchmakingRef.set(playerData);
+    
+    try {
+        await gameState.matchmakingRef.set(playerData);
+    } catch (error) {
+        throw error; // Propager l'erreur pour la gérer dans startMatchmaking
+    }
     
     // Écouter les changements (pour trouver un match)
     gameState.matchmakingRef.on('value', async (snapshot) => {

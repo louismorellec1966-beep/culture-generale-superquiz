@@ -1,43 +1,53 @@
 // Script pour gérer l'affichage du menu d'authentification sur toutes les pages
+// Utilise Firebase Auth - Compatible avec toutes les pages du site
 
-async function initAuthMenu() {
-    const nav = document.querySelector('.menu');
-    if (!nav) return;
-
-    // Supprimer l'ancien item d'auth s'il existe
-    const existingAuthItem = document.getElementById('auth-menu-item');
-    if (existingAuthItem) {
-        existingAuthItem.remove();
+function initAuthMenu() {
+    // Vérifier que Firebase Auth est chargé
+    if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function') {
+        console.warn('Firebase Auth non chargé - auth-menu désactivé');
+        return;
     }
 
-    // Créer le nouvel item
-    const authItem = document.createElement('li');
-    authItem.id = 'auth-menu-item';
-    authItem.style.marginLeft = 'auto'; // Pousser à droite
+    const auth = firebase.auth();
 
-    try {
-        const sessionResult = await window.storage.get('session:current');
-        
-        if (sessionResult) {
-            const session = JSON.parse(sessionResult.value);
-            if (session.connected) {
-                // Utilisateur connecté
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" title="Déconnexion" style="color: #2ecc71;">
-                        👤 ${session.name} <span style="font-size: 0.8em;">(Déconnexion)</span>
-                    </a>
-                `;
-                nav.appendChild(authItem);
-                return;
-            }
+    auth.onAuthStateChanged(user => {
+        const nav = document.querySelector('.menu');
+        if (!nav) return;
+
+        // Supprimer l'ancien item d'auth s'il existe
+        const existingAuthItem = document.getElementById('auth-menu-item');
+        if (existingAuthItem) existingAuthItem.remove();
+
+        // Créer le nouvel item
+        const authItem = document.createElement('li');
+        authItem.id = 'auth-menu-item';
+
+        if (user) {
+            // Utilisateur connecté - Récupérer le pseudo depuis Firestore
+            const db = firebase.firestore();
+            db.collection('profiles').doc(user.uid).get()
+                .then(doc => {
+                    const pseudo = doc.exists ? (doc.data().pseudo || user.email.split('@')[0]) : user.email.split('@')[0];
+                    authItem.innerHTML = `
+                        <a href="#" onclick="logout(event)" title="Déconnexion" style="color: #2ecc71;">
+                            👤 ${pseudo} <span style="font-size: 0.8em;">(Déco)</span>
+                        </a>
+                    `;
+                })
+                .catch(() => {
+                    authItem.innerHTML = `
+                        <a href="#" onclick="logout(event)" title="Déconnexion" style="color: #2ecc71;">
+                            👤 ${user.email.split('@')[0]} <span style="font-size: 0.8em;">(Déco)</span>
+                        </a>
+                    `;
+                });
+        } else {
+            // Utilisateur non connecté
+            authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
         }
-    } catch (error) {
-        // Pas de session
-    }
 
-    // Utilisateur non connecté
-    authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-    nav.appendChild(authItem);
+        nav.appendChild(authItem);
+    });
 }
 
 // Fonction de déconnexion globale
@@ -45,7 +55,7 @@ async function logout(event) {
     event.preventDefault();
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
         try {
-            await window.storage.delete('session:current');
+            await firebase.auth().signOut();
             alert('Déconnexion réussie !');
             window.location.href = 'Accueil.html';
         } catch (error) {

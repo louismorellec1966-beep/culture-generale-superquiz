@@ -448,6 +448,46 @@ const ProfileSystem = {
                 nouveauxBadges: nouveauxBadges.map(id => BADGES[id]),
                 stats
             };
+
+            // Enregistrer l'activité dans le feed (si SocialSystem est disponible)
+            if (typeof SocialSystem !== 'undefined') {
+                try {
+                    // Enregistrer le quiz
+                    await SocialSystem.recordQuizActivity({
+                        matiere: quizResult.matiere,
+                        categorie: quizResult.categorie || '',
+                        titre: quizResult.titre || quizResult.matiere,
+                        score: quizResult.score,
+                        total: quizResult.total
+                    });
+
+                    // Si level up
+                    if (levelUp) {
+                        await SocialSystem.recordLevelUp(newNiveau);
+                    }
+
+                    // Si nouveaux badges
+                    for (const badgeId of nouveauxBadges) {
+                        const badge = BADGES[badgeId];
+                        if (badge) {
+                            await SocialSystem.recordBadgeEarned(badge.nom, badge.icone);
+                        }
+                    }
+                } catch (e) {
+                    // Erreur silencieuse pour le feed
+                    console.warn('Erreur enregistrement feed:', e);
+                }
+            }
+
+            return {
+                success: true,
+                xpGagne,
+                newXP,
+                newNiveau,
+                levelUp,
+                nouveauxBadges: nouveauxBadges.map(id => BADGES[id]),
+                stats
+            };
         } catch (error) {
             console.error('Erreur mise à jour stats:', error);
             throw error;

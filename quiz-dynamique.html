@@ -20,7 +20,9 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
+    <script defer src="js/auth-menu.js"></script>
     <script defer src="js/profile-system.js"></script>
+    <script defer src="js/social-system.js"></script>
 
     <style>
         .quiz-header {
@@ -372,6 +374,13 @@
                     <li><a href="Science.html">Science</a></li>
                     <li><a href="Littérature.html">Littérature</a></li>
                     <li><a href="Sport.html">Sport</a></li>
+                    <li><a href="Musique.html">Musique</a></li>
+                    <li><a href="Art.html">Art</a></li>
+                    <li><a href="Culture.html">Culture</a></li>
+                    <li><a href="Cinéma.html">Cinéma</a></li>
+                    <li><a href="Gastronomie.html">Gastronomie</a></li>
+                    <li><a href="Politique.html">Politique</a></li>
+                    <li><a href="Philosophie.html">Philosophie</a></li>
                 </ul>
             </li>
             <li><a href="Scores.html">Scores</a></li>
@@ -379,6 +388,7 @@
             <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
             <li><a href="Classement.html">🏆 Classement</a></li>
             <li><a href="Profil.html">👤 Profil</a></li>
+            <li><a href="Social.html">👥 Social</a></li>
             <li><a href="Contact.html">Contact</a></li>
         </ul>
     </nav>
@@ -424,6 +434,23 @@
             </div>
 
             <div class="new-badges" id="new-badges-section"></div>
+
+            <!-- Section partage et défis -->
+            <div class="share-section" id="share-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <p style="margin: 0 0 15px 0; font-weight: 600; color: #2c3e50;">📤 Partager ce score</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <button onclick="shareResult('twitter')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #1DA1F2; color: white; cursor: pointer; font-weight: 600;">🐦 Twitter</button>
+                    <button onclick="shareResult('facebook')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #4267B2; color: white; cursor: pointer; font-weight: 600;">📘 Facebook</button>
+                    <button onclick="shareResult('whatsapp')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #25D366; color: white; cursor: pointer; font-weight: 600;">💬 WhatsApp</button>
+                    <button onclick="shareResult('download')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #667eea; color: white; cursor: pointer; font-weight: 600;">📥 Image</button>
+                    <button onclick="shareResult('copy')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #95a5a6; color: white; cursor: pointer; font-weight: 600;">📋 Copier</button>
+                </div>
+            </div>
+
+            <!-- Bouton défier un ami -->
+            <div id="challenge-friend-section" style="margin: 15px 0; display: none;">
+                <button onclick="openChallengeModal()" style="padding: 12px 25px; border: none; border-radius: 10px; background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white; cursor: pointer; font-weight: 600; font-size: 1.1em;">⚔️ Défier un ami</button>
+            </div>
 
             <div class="results-actions">
                 <a href="Quiz.html" class="btn-result secondary">← Autre Quiz</a>
@@ -669,8 +696,19 @@
             }
         }
 
+        // Variables pour le partage
+        let lastQuizScore = null;
+        let lastQuizTotal = null;
+        let lastQuizTime = null;
+
         function showResults(score, total, profileUpdate) {
             const percentage = Math.round((score / total) * 100);
+            const elapsedTime = Math.floor((Date.now() - quizStartTime) / 1000);
+
+            // Stocker pour le partage
+            lastQuizScore = score;
+            lastQuizTotal = total;
+            lastQuizTime = elapsedTime;
 
             // Emoji selon le score
             let emoji = '😔';
@@ -708,6 +746,55 @@
 
             // Afficher le modal
             document.getElementById('results-modal').classList.add('active');
+
+            // Afficher le bouton de défi si connecté
+            if (firebase.auth().currentUser) {
+                document.getElementById('challenge-friend-section').style.display = 'block';
+            }
+        }
+
+        // Fonctions de partage
+        async function shareResult(platform) {
+            const scoreData = {
+                score: lastQuizScore,
+                total: lastQuizTotal,
+                tempsEnSecondes: lastQuizTime,
+                matiere: matiere,
+                categorie: categorie,
+                titre: document.getElementById('quiz-title').textContent
+            };
+
+            if (typeof SocialSystem !== 'undefined') {
+                const result = await SocialSystem.shareResult(scoreData, platform);
+                if (result && result.message) {
+                    alert(result.message);
+                }
+            } else {
+                // Fallback si SocialSystem n'est pas chargé
+                const text = `🎯 J'ai fait ${scoreData.score}/${scoreData.total} au quiz "${scoreData.titre}" sur SuperQuiz ! Peux-tu faire mieux ?`;
+                const url = window.location.origin;
+                
+                if (platform === 'copy') {
+                    await navigator.clipboard.writeText(text + ' ' + url);
+                    alert('Lien copié !');
+                } else if (platform === 'twitter') {
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                }
+            }
+        }
+
+        // Modal de défi
+        function openChallengeModal() {
+            // Rediriger vers la page sociale avec les infos du quiz
+            sessionStorage.setItem('quizToChallenge', JSON.stringify({
+                matiere: matiere,
+                categorie: categorie,
+                titre: document.getElementById('quiz-title').textContent,
+                score: lastQuizScore,
+                total: lastQuizTotal,
+                tempsEnSecondes: lastQuizTime
+            }));
+            window.location.href = 'Social.html?action=challenge';
         }
 
         function initAuthMenu() {

@@ -663,29 +663,39 @@
 
         // Générer un nouveau quiz quotidien
         async function generateDailyQuiz(date) {
-            // Thèmes possibles
-            const themes = [
-                'Histoire du XXe siècle',
-                'Géographie mondiale',
-                'Sciences et découvertes',
-                'Littérature française',
-                'Arts et culture',
-                'Cinéma et séries',
-                'Sport et olympisme',
-                'Musique classique et moderne',
-                'Mythologie et légendes',
-                'Astronomie et espace'
-            ];
+            const CATEGORIES = {
+                histoire: { antiquite: 'Antiquité', moyenage: 'Moyen Âge', art: "Histoire de l'Art", guerres: 'Guerres Mondiales', france: 'Histoire de France', contemporaine: 'Histoire Contemporaine', préhistoire: 'Préhistoire' },
+                geographie: { capitales: 'Capitales du Monde', france: 'Géographie de France', europe: 'Europe', continents: 'Continents & Océans', nature: 'Géographie Physique', culture: 'Géographie Culturelle' },
+                science: { physique: 'Physique', chimie: 'Chimie', biologie: 'Biologie', astronomie: 'Astronomie', mathematiques: 'Mathématiques', technologie: 'Technologie' },
+                litterature: { classiques: 'Classiques Français', poesie: 'Poésie', theatre: 'Théâtre', romans: 'Romans du XXe siècle', mondiale: 'Littérature Mondiale', contemporaine: 'Littérature Contemporaine' },
+                sport: { football: 'Football', basketball: 'Basketball', tennis: 'Tennis', athletisme: 'Athlétisme', natation: 'Natation', 'jeux-olympiques': 'Jeux Olympiques' }
+            };
 
-            // Choisir un thème basé sur la date
+            // Aplatir les catégories pour en choisir une au hasard
+            const flatCategories = [];
+            for (const matiere in CATEGORIES) {
+                for (const categorie in CATEGORIES[matiere]) {
+                    flatCategories.push({
+                        matiere: matiere,
+                        categorie: categorie,
+                        nom: CATEGORIES[matiere][categorie]
+                    });
+                }
+            }
+
+            // Choisir une catégorie basée sur la date
             const dayIndex = new Date(date).getDate();
-            const theme = themes[dayIndex % themes.length];
+            const chosenCategory = flatCategories[dayIndex % flatCategories.length];
 
-            // CHARGER LES VRAIES QUESTIONS DEPUIS FIRESTORE
+            const matiere = chosenCategory.matiere;
+            const categorie = chosenCategory.categorie;
+            const theme = chosenCategory.nom;
+
             try {
                 const questionsSnapshot = await firebase.firestore()
                     .collection('questionBank')
-                    .where('theme', '==', theme)
+                    .where('matiere', '==', matiere)
+                    .where('categorie', '==', categorie)
                     .get();
 
                 if (questionsSnapshot.empty) {
@@ -694,7 +704,14 @@
                     return null;
                 }
 
-                const allQuestions = questionsSnapshot.docs.map(doc => doc.data());
+                const allQuestions = questionsSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Assurer la compatibilité entre "reponses" et "answers"
+                    if (!data.reponses && data.answers) {
+                        data.reponses = data.answers;
+                    }
+                    return data;
+                });
                 
                 // Sélectionner 10 questions aléatoires
                 const questions = shuffleArray(allQuestions).slice(0, 10);
@@ -706,7 +723,7 @@
                 const quizData = {
                     date: date,
                     theme: theme,
-                    questions: questions,
+                    questions: questions.map(({answers, ...rest}) => rest), // Nettoyer l'ancien champ 'answers'
                     createdAt: new Date()
                 };
 
@@ -720,7 +737,7 @@
                 
             } catch (error) {
                 console.error('Erreur chargement questions:', error);
-                alert('❌ Erreur lors du chargement des questions');
+                alert('❌ Erreur lors du chargement des questions. Un index Firestore est peut-être manquant. Vérifiez la console (F12).');
                 return null;
             }
         }

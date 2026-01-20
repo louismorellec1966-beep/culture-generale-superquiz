@@ -3,19 +3,16 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quiz de sport - Choisissez votre thème : Football, Basketball, Tennis, Athlétisme">
-    <meta name="keywords" content="quiz sport, football, basketball, tennis, athlétisme">
     <title>SuperQuiz.com - Sport</title>
     <link rel="preload" href="CSS/style.css" as="style">
     <link rel="stylesheet" href="CSS/style.css" type="text/css">
@@ -58,7 +55,7 @@
             <h1>SUPERQUIZ - SPORT</h1>
         </div>
         <div class="phrase-de-bienvenue">
-            <p>Testez vos connaissances sportives</p>
+            <p>Êtes-vous incollable sur le sport ?</p>
         </div>
     </header>
 
@@ -68,27 +65,27 @@
             <div class="categories-grid">
                 <a href="mode-selection.html?matiere=sport&categorie=football" class="category-card">
                     <h3>⚽ Football</h3>
-                    <p>Coupes du monde, clubs, joueurs légendaires</p>
+                    <p>Coupes du monde et légendes</p>
                 </a>
                 <a href="mode-selection.html?matiere=sport&categorie=basketball" class="category-card">
                     <h3>🏀 Basketball</h3>
-                    <p>NBA, équipes, stars du basket</p>
+                    <p>NBA et basket international</p>
                 </a>
                 <a href="mode-selection.html?matiere=sport&categorie=tennis" class="category-card">
                     <h3>🎾 Tennis</h3>
-                    <p>Grand Chelem, joueurs, tournois</p>
+                    <p>Grands Chelems et champions</p>
                 </a>
                 <a href="mode-selection.html?matiere=sport&categorie=athletisme" class="category-card">
                     <h3>🏃 Athlétisme</h3>
-                    <p>Records, Jeux Olympiques, disciplines</p>
+                    <p>Records et disciplines</p>
                 </a>
                 <a href="mode-selection.html?matiere=sport&categorie=natation" class="category-card">
                     <h3>🏊 Natation</h3>
-                    <p>Records mondiaux, nageurs célèbres</p>
+                    <p>Nages et médailles</p>
                 </a>
                 <a href="mode-selection.html?matiere=sport&categorie=jeux-olympiques" class="category-card">
                     <h3>🏅 Jeux Olympiques</h3>
-                    <p>Histoire, disciplines, médailles</p>
+                    <p>Histoire et records olympiques</p>
                 </a>
             </div>
         </div>
@@ -97,43 +94,14 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-<script>
+    <script>
         // Gestion du menu d'authentification Firebase
-        FirebaseAuth.onAuthStateChanged(user => {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        });
-
-        // Fonction de déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
+        if (typeof FirebaseAuth !== 'undefined') {
+            FirebaseAuth.onAuthStateChanged(user => {
+                const nav = document.querySelector('.menu');
+                if (!nav) return;
+                // (Logique d'auth gérée par auth-menu.js ou script.js si présent)
+            });
         }
     </script>
 </body>

@@ -3,20 +3,17 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quiz de sciences - Choisissez votre domaine : Physique, Biologie, Chimie, Astronomie">
-    <meta name="keywords" content="quiz science, physique, biologie, chimie, astronomie">
-    <title>SuperQuiz.com - Sciences</title>
+    <title>SuperQuiz.com - Science</title>
     <link rel="preload" href="CSS/style.css" as="style">
     <link rel="stylesheet" href="CSS/style.css" type="text/css">
     <link rel="preload" href="js/script.js" as="script">
@@ -40,12 +37,14 @@
                     <li><a href="Géographie.html">Géographie</a></li>
                     <li><a href="Science.html" aria-current="page">Science</a></li>
                     <li><a href="Littérature.html">Littérature</a></li>
+                    <li><a href="Sport.html">Sport</a></li>
                 </ul>
             </li>
             <li><a href="Classement.html">🏆 Classement</a></li>
             <li><a href="Scores.html">Scores</a></li>
             <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
             <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
+            <li><a href="multiplayer.html">⚔️ Multijoueur</a></li>
             <li><a href="Profil.html">👤 Profil</a></li>
             <li><a href="Contact.html">Contact</a></li>
         </ul>
@@ -53,40 +52,40 @@
 
     <header>
         <div class="h1">
-            <h1>SUPERQUIZ - SCIENCES</h1>
+            <h1>SUPERQUIZ - SCIENCE</h1>
         </div>
         <div class="phrase-de-bienvenue">
-            <p>Découvrez les merveilles de la science</p>
+            <p>Testez vos connaissances scientifiques</p>
         </div>
     </header>
 
     <main>
         <div class="quiz-categories">
-            <h2>Catégories de Sciences</h2>
+            <h2>Catégories de Science</h2>
             <div class="categories-grid">
                 <a href="mode-selection.html?matiere=science&categorie=physique" class="category-card">
                     <h3>⚛️ Physique</h3>
-                    <p>Mécanique, électricité, relativité</p>
+                    <p>Lois de l'univers et matière</p>
                 </a>
                 <a href="mode-selection.html?matiere=science&categorie=chimie" class="category-card">
                     <h3>🧪 Chimie</h3>
-                    <p>Atomes, molécules, réactions</p>
+                    <p>Éléments et réactions</p>
                 </a>
                 <a href="mode-selection.html?matiere=science&categorie=biologie" class="category-card">
                     <h3>🧬 Biologie</h3>
-                    <p>Cellules, génétique, évolution</p>
+                    <p>Le vivant et le corps humain</p>
                 </a>
                 <a href="mode-selection.html?matiere=science&categorie=astronomie" class="category-card">
                     <h3>🌌 Astronomie</h3>
-                    <p>Planètes, étoiles, galaxies</p>
+                    <p>Espace, planètes et étoiles</p>
                 </a>
                 <a href="mode-selection.html?matiere=science&categorie=mathematiques" class="category-card">
                     <h3>📐 Mathématiques</h3>
-                    <p>Géométrie, algèbre, calcul</p>
+                    <p>Nombres, géométrie et logique</p>
                 </a>
                 <a href="mode-selection.html?matiere=science&categorie=technologie" class="category-card">
                     <h3>💻 Technologie</h3>
-                    <p>Informatique, inventions, innovation</p>
+                    <p>Informatique et innovations</p>
                 </a>
             </div>
         </div>
@@ -95,47 +94,15 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-<script>
+    <script>
         // Gestion du menu d'authentification Firebase
-        FirebaseAuth.onAuthStateChanged(user => {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        });
-
-        // Fonction de déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
+        if (typeof FirebaseAuth !== 'undefined') {
+            FirebaseAuth.onAuthStateChanged(user => {
+                const nav = document.querySelector('.menu');
+                if (!nav) return;
+                // (Logique d'auth gérée par auth-menu.js ou script.js si présent)
+            });
         }
     </script>
 </body>
-</html>
-</body>
-
 </html>

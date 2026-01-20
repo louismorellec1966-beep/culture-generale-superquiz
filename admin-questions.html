@@ -435,18 +435,27 @@
             <form id="form-add" onsubmit="addQuestion(event)">
                 <div class="form-group">
                     <label>🎯 Thème *</label>
-                    <select id="theme" required>
-                        <option value="">-- Choisir un thème --</option>
-                        <option value="Histoire du XXe siècle">Histoire du XXe siècle</option>
-                        <option value="Géographie mondiale">Géographie mondiale</option>
-                        <option value="Sciences et découvertes">Sciences et découvertes</option>
-                        <option value="Littérature française">Littérature française</option>
-                        <option value="Arts et culture">Arts et culture</option>
-                        <option value="Sport">Sport</option>
-                        <option value="Cinéma et séries">Cinéma et séries</option>
-                        <option value="Musique">Musique</option>
-                        <option value="Informatique">Informatique</option>
-                        <option value="Gastronomie">Gastronomie</option>
+                    <select id="matiere" required onchange="updateCategories('add')">
+                        <option value="">-- Choisir une matière --</option>
+                        <option value="histoire">Histoire</option>
+                        <option value="geographie">Géographie</option>
+                        <option value="science">Science</option>
+                        <option value="litterature">Littérature</option>
+                        <option value="sport">Sport</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📚 Catégorie *</label>
+                    <select id="categorie" required>
+                        <option value="">-- D'abord choisir une matière --</option>
+                        <option value="antiquite">Antiquité</option>
+                        <option value="moyenage">Moyen Âge</option>
+                        <option value="art">Histoire de l'Art</option>
+                        <option value="guerres">Guerres Mondiales</option>
+                        <option value="france">Histoire de France</option>
+                        <option value="contemporaine">Histoire Contemporaine</option>
+                        <option value="préhistoire">Préhistoire</option>
                     </select>
                 </div>
 
@@ -459,7 +468,6 @@
                         <option value="difficile">🔴 Difficile</option>
                     </select>
                 </div>
-
                 <div class="form-group">
                     <label>❓ Question *</label>
                     <textarea id="question" rows="2" required placeholder="Tapez votre question ici..."></textarea>
@@ -467,10 +475,10 @@
 
                 <div class="form-group">
                     <label>📝 Réponses (4 réponses) *</label>
-                    <input type="text" id="answer0" placeholder="Réponse A" required style="margin-bottom: 10px;">
-                    <input type="text" id="answer1" placeholder="Réponse B" required style="margin-bottom: 10px;">
-                    <input type="text" id="answer2" placeholder="Réponse C" required style="margin-bottom: 10px;">
-                    <input type="text" id="answer3" placeholder="Réponse D" required>
+                    <input type="text" id="reponse0" placeholder="Réponse A" required style="margin-bottom: 10px;">
+                    <input type="text" id="reponse1" placeholder="Réponse B" required style="margin-bottom: 10px;">
+                    <input type="text" id="reponse2" placeholder="Réponse C" required style="margin-bottom: 10px;">
+                    <input type="text" id="reponse3" placeholder="Réponse D" required>
                 </div>
 
                 <div class="form-group">
@@ -501,7 +509,7 @@
 
             <div class="form-group">
                 <label>📋 Collez votre JSON ici :</label>
-                <textarea id="json-input" placeholder='[{"theme": "...", "difficulty": "facile", "question": "...", "answers": ["A", "B", "C", "D"], "correct": 0}]'></textarea>
+                <textarea id="json-input" placeholder='[{"matiere": "histoire", "categorie": "antiquite", "difficulty": "facile", "question": "...", "reponses": ["A", "B", "C", "D"], "correct": 0}]'></textarea>
             </div>
 
             <button onclick="importBulk()" class="btn btn-success">📥 Importer</button>
@@ -510,10 +518,11 @@
                 <strong>📖 Format JSON attendu :</strong>
                 <pre>[
   {
-    "theme": "Histoire du XXe siècle",
+    "matiere": "histoire",
+    "categorie": "antiquite",
     "difficulty": "facile",
     "question": "En quelle année a débuté la Première Guerre mondiale ?",
-    "answers": ["1914", "1915", "1916", "1918"],
+    "reponses": ["1914", "1915", "1916", "1918"],
     "correct": 0,
     "tags": ["guerre", "histoire"]
   }
@@ -526,18 +535,17 @@
             <h2 style="margin-bottom: 20px;">👁️ Voir et Gérer les Questions</h2>
             
             <div class="filters">
-                <select id="filter-theme" onchange="loadQuestions()">
-                    <option value="">📁 Tous les thèmes</option>
-                    <option value="Histoire du XXe siècle">Histoire du XXe siècle</option>
-                    <option value="Géographie mondiale">Géographie mondiale</option>
-                    <option value="Sciences et découvertes">Sciences et découvertes</option>
-                    <option value="Littérature française">Littérature française</option>
-                    <option value="Arts et culture">Arts et culture</option>
-                    <option value="Sport">Sport</option>
-                    <option value="Cinéma et séries">Cinéma et séries</option>
-                    <option value="Musique">Musique</option>
-                    <option value="Informatique">Informatique</option>
-                    <option value="Gastronomie">Gastronomie</option>
+                <select id="filter-matiere" onchange="updateCategories('filter'); loadQuestions();">
+                    <option value="">Toutes les matières</option>
+                    <option value="histoire">Histoire</option>
+                    <option value="geographie">Géographie</option>
+                    <option value="science">Science</option>
+                    <option value="litterature">Littérature</option>
+                    <option value="sport">Sport</option>
+                </select>
+
+                <select id="filter-categorie" onchange="loadQuestions()">
+                    <option value="">Toutes les catégories</option>
                 </select>
 
                 <select id="filter-difficulty" onchange="loadQuestions()">
@@ -588,17 +596,18 @@
                 
                 <div class="form-group">
                     <label>🎯 Thème *</label>
-                    <select id="edit-theme" required>
-                        <option value="Histoire du XXe siècle">Histoire du XXe siècle</option>
-                        <option value="Géographie mondiale">Géographie mondiale</option>
-                        <option value="Sciences et découvertes">Sciences et découvertes</option>
-                        <option value="Littérature française">Littérature française</option>
-                        <option value="Arts et culture">Arts et culture</option>
-                        <option value="Sport">Sport</option>
-                        <option value="Cinéma et séries">Cinéma et séries</option>
-                        <option value="Musique">Musique</option>
-                        <option value="Informatique">Informatique</option>
-                        <option value="Gastronomie">Gastronomie</option>
+                    <select id="edit-matiere" required onchange="updateCategories('edit')">
+                        <option value="histoire">Histoire</option>
+                        <option value="geographie">Géographie</option>
+                        <option value="science">Science</option>
+                        <option value="litterature">Littérature</option>
+                        <option value="sport">Sport</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📚 Catégorie *</label>
+                    <select id="edit-categorie" required>
                     </select>
                 </div>
 
@@ -618,10 +627,10 @@
 
                 <div class="form-group">
                     <label>📝 Réponses *</label>
-                    <input type="text" id="edit-answer0" required style="margin-bottom: 10px;">
-                    <input type="text" id="edit-answer1" required style="margin-bottom: 10px;">
-                    <input type="text" id="edit-answer2" required style="margin-bottom: 10px;">
-                    <input type="text" id="edit-answer3" required>
+                    <input type="text" id="edit-reponse0" required style="margin-bottom: 10px;">
+                    <input type="text" id="edit-reponse1" required style="margin-bottom: 10px;">
+                    <input type="text" id="edit-reponse2" required style="margin-bottom: 10px;">
+                    <input type="text" id="edit-reponse3" required>
                 </div>
 
                 <div class="form-group">
@@ -651,6 +660,31 @@
         // Variable globale pour stocker toutes les questions
         let allQuestions = [];
 
+        const CATEGORIES = {
+            histoire: {
+                antiquite: 'Antiquité',
+                moyenage: 'Moyen Âge',
+                art: "Histoire de l'Art",
+                guerres: 'Guerres Mondiales',
+                france: 'Histoire de France',
+                contemporaine: 'Histoire Contemporaine',
+                préhistoire: 'Préhistoire'
+            },
+            geographie: {
+                capitales: 'Capitales du Monde',
+                france: 'Géographie de France',
+                europe: 'Europe',
+                continents: 'Continents & Océans',
+                nature: 'Géographie Physique',
+                culture: 'Géographie Culturelle'
+            },
+            science: {
+                physique: 'Physique', chimie: 'Chimie', biologie: 'Biologie', astronomie: 'Astronomie', mathematiques: 'Mathématiques', technologie: 'Technologie'
+            },
+            litterature: { classiques: 'Classiques Français', poesie: 'Poésie', theatre: 'Théâtre', romans: 'Romans du XXe siècle', mondiale: 'Littérature Mondiale', contemporaine: 'Littérature Contemporaine' },
+            sport: { football: 'Football', basketball: 'Basketball', tennis: 'Tennis', athletisme: 'Athlétisme', natation: 'Natation', 'jeux-olympiques': 'Jeux Olympiques' }
+        };
+
         // Initialisation
         window.addEventListener('load', async () => {
             // Attendre que Firebase soit chargé
@@ -673,6 +707,25 @@
             });
         });
 
+        // Mettre à jour les catégories
+        function updateCategories(prefix) {
+            const matiere = document.getElementById(`${prefix}-matiere`).value;
+            const categorieSelect = document.getElementById(`${prefix}-categorie`);
+            categorieSelect.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
+
+            if (matiere && CATEGORIES[matiere]) {
+                for (const [key, value] of Object.entries(CATEGORIES[matiere])) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = value;
+                    categorieSelect.appendChild(option);
+                }
+            }
+        }
+
+        // Initialiser les filtres
+        updateCategories('filter');
+
         // Changer d'onglet
         function switchTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -694,14 +747,15 @@
             messageDiv.innerHTML = '';
 
             const question = {
-                theme: document.getElementById('theme').value,
+                matiere: document.getElementById('matiere').value,
+                categorie: document.getElementById('categorie').value,
                 difficulty: document.getElementById('difficulty').value,
                 question: document.getElementById('question').value,
-                answers: [
-                    document.getElementById('answer0').value,
-                    document.getElementById('answer1').value,
-                    document.getElementById('answer2').value,
-                    document.getElementById('answer3').value
+                reponses: [
+                    document.getElementById('reponse0').value,
+                    document.getElementById('reponse1').value,
+                    document.getElementById('reponse2').value,
+                    document.getElementById('reponse3').value
                 ],
                 correct: parseInt(document.getElementById('correct').value),
                 tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
@@ -751,43 +805,34 @@
         // ========== CHARGER LES QUESTIONS (sans index) ==========
         async function loadQuestions() {
             const container = document.getElementById('questions-list');
-            const themeFilter = document.getElementById('filter-theme').value;
+            const matiereFilter = document.getElementById('filter-matiere').value;
+            const categorieFilter = document.getElementById('filter-categorie').value;
             const difficultyFilter = document.getElementById('filter-difficulty').value;
             
             container.innerHTML = '<div class="loading">⏳ Chargement...</div>';
 
             try {
-                // Charger TOUTES les questions (pas de filtre côté Firebase = pas besoin d'index)
-                const snapshot = await db.collection('questionBank').get();
+                let query = db.collection('questionBank');
+
+                if (matiereFilter) {
+                    query = query.where('matiere', '==', matiereFilter);
+                }
+                if (categorieFilter) {
+                    query = query.where('categorie', '==', categorieFilter);
+                }
+                if (difficultyFilter) {
+                    query = query.where('difficulty', '==', difficultyFilter);
+                }
+
+                const snapshot = await query.orderBy('addedAt', 'desc').get();
 
                 if (snapshot.empty) {
-                    container.innerHTML = '<div class="alert alert-info">📭 Aucune question trouvée. Utilisez l\'onglet "Ajouter" pour créer des questions.</div>';
+                    container.innerHTML = '<div class="alert alert-info">📭 Aucune question ne correspond aux filtres.</div>';
                     document.getElementById('questions-count').textContent = '0 questions';
                     return;
                 }
 
-                // Stocker toutes les questions
-                allQuestions = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                // Filtrer côté client
-                let filtered = allQuestions;
-                
-                if (themeFilter) {
-                    filtered = filtered.filter(q => q.theme === themeFilter);
-                }
-                if (difficultyFilter) {
-                    filtered = filtered.filter(q => q.difficulty === difficultyFilter);
-                }
-
-                // Trier par date (plus récent d'abord)
-                filtered.sort((a, b) => {
-                    const dateA = a.addedAt?.toDate?.() || new Date(0);
-                    const dateB = b.addedAt?.toDate?.() || new Date(0);
-                    return dateB - dateA;
-                });
+                const filtered = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
                 document.getElementById('questions-count').textContent = `${filtered.length} question${filtered.length > 1 ? 's' : ''}`;
 
@@ -802,7 +847,7 @@
                         <div class="question-header">
                             <div>
                                 <div class="question-meta">
-                                    📁 ${q.theme || 'Sans thème'} | 
+                                    📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'} | 
                                     ${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || 'Non défini')} |
                                     🆔 ${q.id.substring(0, 8)}...
                                 </div>
@@ -814,7 +859,7 @@
                             </div>
                         </div>
                         <div class="question-answers">
-                            ${(q.answers || []).map((a, i) => `
+                            ${(q.reponses || []).map((a, i) => `
                                 <div class="answer-display ${i === q.correct ? 'correct' : ''}">
                                     ${i === q.correct ? '✅' : '○'} ${a}
                                 </div>
@@ -830,7 +875,10 @@
 
             } catch (error) {
                 console.error('Erreur loadQuestions:', error);
-                container.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+                container.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}. <br>
+                Cela peut être dû à un index manquant dans Firestore. 
+                Veuillez consulter la console de votre navigateur (F12) pour voir le lien de création d'index.
+                </div>`;
             }
         }
 
@@ -851,23 +899,27 @@
 
         // ========== MODIFIER UNE QUESTION ==========
         function openEditModal(id) {
-            const question = allQuestions.find(q => q.id === id);
-            if (!question) {
-                alert('Question non trouvée');
-                return;
-            }
+            db.collection('questionBank').doc(id).get().then(doc => {
+                if (!doc.exists) {
+                    alert('Question non trouvée');
+                    return;
+                }
+                const question = doc.data();
 
-            // Remplir le formulaire
-            document.getElementById('edit-id').value = id;
-            document.getElementById('edit-theme').value = question.theme || '';
-            document.getElementById('edit-difficulty').value = question.difficulty || 'moyen';
-            document.getElementById('edit-question').value = question.question || '';
-            document.getElementById('edit-answer0').value = question.answers?.[0] || '';
-            document.getElementById('edit-answer1').value = question.answers?.[1] || '';
-            document.getElementById('edit-answer2').value = question.answers?.[2] || '';
-            document.getElementById('edit-answer3').value = question.answers?.[3] || '';
-            document.getElementById('edit-correct').value = question.correct ?? 0;
-            document.getElementById('edit-tags').value = (question.tags || []).join(', ');
+                // Remplir le formulaire
+                document.getElementById('edit-id').value = id;
+                document.getElementById('edit-matiere').value = question.matiere || '';
+                updateCategories('edit'); // Mettre à jour les catégories
+                document.getElementById('edit-categorie').value = question.categorie || '';
+                document.getElementById('edit-difficulty').value = question.difficulty || 'moyen';
+                document.getElementById('edit-question').value = question.question || '';
+                document.getElementById('edit-reponse0').value = question.reponses?.[0] || '';
+                document.getElementById('edit-reponse1').value = question.reponses?.[1] || '';
+                document.getElementById('edit-reponse2').value = question.reponses?.[2] || '';
+                document.getElementById('edit-reponse3').value = question.reponses?.[3] || '';
+                document.getElementById('edit-correct').value = question.correct ?? 0;
+                document.getElementById('edit-tags').value = (question.tags || []).join(', ');
+            });
 
             // Afficher le modal
             document.getElementById('edit-modal').classList.add('active');
@@ -885,14 +937,15 @@
             const id = document.getElementById('edit-id').value;
 
             const updatedQuestion = {
-                theme: document.getElementById('edit-theme').value,
+                matiere: document.getElementById('edit-matiere').value,
+                categorie: document.getElementById('edit-categorie').value,
                 difficulty: document.getElementById('edit-difficulty').value,
                 question: document.getElementById('edit-question').value,
-                answers: [
-                    document.getElementById('edit-answer0').value,
-                    document.getElementById('edit-answer1').value,
-                    document.getElementById('edit-answer2').value,
-                    document.getElementById('edit-answer3').value
+                reponses: [
+                    document.getElementById('edit-reponse0').value,
+                    document.getElementById('edit-reponse1').value,
+                    document.getElementById('edit-reponse2').value,
+                    document.getElementById('edit-reponse3').value
                 ],
                 correct: parseInt(document.getElementById('edit-correct').value),
                 tags: document.getElementById('edit-tags').value.split(',').map(t => t.trim()).filter(t => t),
@@ -926,13 +979,13 @@
                 const questions = snapshot.docs.map(doc => doc.data());
 
                 const total = questions.length;
-                const themes = {};
+                const matieres = {};
                 const difficulties = { facile: 0, moyen: 0, difficile: 0 };
 
                 questions.forEach(q => {
                     // Compter par thème
-                    const theme = q.theme || 'Non classé';
-                    themes[theme] = (themes[theme] || 0) + 1;
+                    const matiere = q.matiere || 'Non classé';
+                    matieres[matiere] = (matieres[matiere] || 0) + 1;
 
                     // Compter par difficulté
                     const diff = q.difficulty || 'moyen';
@@ -941,7 +994,7 @@
                     }
                 });
 
-                const themeCount = Object.keys(themes).length;
+                const matiereCount = Object.keys(matieres).length;
 
                 // Stats principales
                 statsGrid.innerHTML = `
@@ -950,8 +1003,8 @@
                         <div class="stat-label">Questions totales</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">${themeCount}</div>
-                        <div class="stat-label">Thèmes différents</div>
+                        <div class="stat-number">${matiereCount}</div>
+                        <div class="stat-label">Matières différentes</div>
                     </div>
                     <div class="stat-card" style="background: linear-gradient(135deg, #2ecc71, #27ae60);">
                         <div class="stat-number">${difficulties.facile}</div>
@@ -968,10 +1021,10 @@
                 `;
 
                 // Stats par thème
-                const sortedThemes = Object.entries(themes).sort((a, b) => b[1] - a[1]);
-                themeStats.innerHTML = sortedThemes.map(([theme, count]) => `
+                const sortedMatieres = Object.entries(matieres).sort((a, b) => b[1] - a[1]);
+                themeStats.innerHTML = sortedMatieres.map(([matiere, count]) => `
                     <div class="theme-stat">
-                        <span style="min-width: 200px;">${theme}</span>
+                        <span style="min-width: 200px;">${capitalizeFirst(matiere)}</span>
                         <div class="theme-bar">
                             <div class="theme-bar-fill" style="width: ${(count / total) * 100}%"></div>
                         </div>

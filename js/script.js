@@ -171,17 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========== GESTION DES BOUTONS DE VALIDATION DES QUIZ ==========
-    const boutonsValidation = document.querySelectorAll('.btn-valider');
-    console.log('📊 Nombre de boutons trouvés:', boutonsValidation.length);
-    
-    boutonsValidation.forEach(function(bouton) {
-        bouton.addEventListener('click', function() {
-            console.log('🖱️ Bouton cliqué !');
-            const questionName = this.getAttribute('data-question');
-            const feedbackId = this.getAttribute('data-feedback');
-            validerReponse(questionName, feedbackId);
-        });
-    });
+    attachValidationListeners();
 
     // ========== GESTION DU BOUTON DE RÉINITIALISATION ==========
     const btnResetScore = document.getElementById('btn-reset-score');
@@ -190,6 +180,24 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔄 Bouton de réinitialisation détecté');
     }
 });
+
+// ========== FONCTION POUR ATTACHER LES ÉCOUTEURS (Exportée) ==========
+function attachValidationListeners() {
+    const boutonsValidation = document.querySelectorAll('.btn-valider');
+    
+    boutonsValidation.forEach(function(bouton) {
+        // Évite d'ajouter plusieurs fois le même listener
+        if (!bouton.hasAttribute('data-listener-attached')) {
+            bouton.addEventListener('click', function() {
+                const questionName = this.getAttribute('data-question');
+                const feedbackId = this.getAttribute('data-feedback');
+                validerReponse(questionName, feedbackId);
+            });
+            bouton.setAttribute('data-listener-attached', 'true');
+        }
+    });
+}
+window.attachValidationListeners = attachValidationListeners;
 
 // ========== FONCTION OPTIMISÉE DE VALIDATION DES RÉPONSES ==========
 function validerReponse(questionName, feedbackId) {
@@ -240,6 +248,7 @@ function validerReponse(questionName, feedbackId) {
         radios.forEach(radio => radio.disabled = true);
     }
 }
+window.validerReponse = validerReponse;
 
 // ========== FONCTION D'AFFICHAGE DU FEEDBACK ==========
 function afficherFeedback(element, classe, message) {

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-G3YEKJLDRT');
     </script>
@@ -13,14 +14,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SuperQuiz - Quiz Dynamique</title>
     <link rel="stylesheet" href="CSS/style.css">
-    
+
     <!-- Firebase SDK -->
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
     <script defer src="js/profile-system.js"></script>
-    
+
     <style>
         .quiz-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -31,7 +32,10 @@
             border-radius: 10px;
         }
 
-        .quiz-header h1 { margin: 0; font-size: 2em; }
+        .quiz-header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
 
         .breadcrumb {
             margin: 20px 0;
@@ -55,7 +59,10 @@
             font-weight: bold;
         }
 
-        .score-display span { font-size: 1.3em; color: #ffd700; }
+        .score-display span {
+            font-size: 1.3em;
+            color: #ffd700;
+        }
 
         .question-card {
             background: white;
@@ -161,7 +168,7 @@
             padding: 15px 20px;
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
             z-index: 100;
             display: none;
         }
@@ -196,7 +203,7 @@
             padding: 50px;
             background: #fff;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .error-message h2 {
@@ -211,7 +218,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0, 0, 0, 0.8);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -232,8 +239,15 @@
         }
 
         @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .results-header {
@@ -282,8 +296,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .new-badges {
@@ -332,6 +353,7 @@
         }
     </style>
 </head>
+
 <body>
     <nav aria-label="Navigation principale">
         <button id="toggle-menu" aria-label="Ouvrir le menu">
@@ -391,7 +413,7 @@
             <div class="results-header" id="results-emoji">🎉</div>
             <div class="results-score" id="results-score">0/0</div>
             <div class="results-percentage" id="results-percentage">0%</div>
-            
+
             <div class="xp-gain" id="xp-section">
                 <div class="xp-gain-title">XP Gagnés</div>
                 <div class="xp-gain-value" id="xp-gained">+0 XP</div>
@@ -424,183 +446,16 @@
         const mode = urlParams.get('mode') || 'classic';
 
         let answeredQuestions = new Set();
-        let currentScore = 0;
+        let currentScoare = 0;
         let quizStartTime = null;
         let timerInterval = null;
-
-        // Données des quiz - CORRIGÉ: virgule ajoutée entre contemporaine et préhistoire
-        const quizData = {
-            "histoire": {
-                "antiquite": {
-                    "titre": "🏛️ Antiquité",
-                    "questions": [
-                        { "question": "Qui était le premier empereur romain ?", "reponses": ["Auguste", "Jules César", "Néron", "Tibère"], "correct": 0 },
-                        { "question": "En quelle année Jules César a-t-il été assassiné ?", "reponses": ["44 av. J.-C.", "55 av. J.-C.", "33 av. J.-C.", "27 av. J.-C."], "correct": 0 },
-                        { "question": "Quelle était la capitale de l'Égypte ancienne ?", "reponses": ["Memphis", "Alexandrie", "Thèbes", "Le Caire"], "correct": 0 },
-                        { "question": "Qui était le dieu principal dans la mythologie grecque ?", "reponses": ["Zeus", "Poséidon", "Hadès", "Apollon"], "correct": 0 },
-                        { "question": "Quelle bataille a marqué la fin de l'expansion perse en Grèce ?", "reponses": ["Salamine", "Marathon", "Thermopyles", "Platées"], "correct": 0 }
-                    ]
-                },
-                "moyenage": { 
-                    "titre": "⚔️ Moyen Âge", 
-                    "questions": [
-                        { "question": "En quelle année a eu lieu la bataille de Hastings ?", "reponses": ["1066", "1096", "1215", "1337"], "correct": 0 },
-                        { "question": "Qui a unifié les tribus mongoles ?", "reponses": ["Gengis Khan", "Kubilaï Khan", "Tamerlan", "Attila"], "correct": 0 }
-                    ]
-                },
-                "art": { 
-                    "titre": "🎨 Histoire de l'Art", 
-                    "questions": [
-                        { "question": "Qui a peint la Joconde ?", "reponses": ["Léonard de Vinci", "Michel-Ange", "Raphaël", "Botticelli"], "correct": 0 }
-                    ]
-                },
-                "guerres": { 
-                    "titre": "⚡ Guerres Mondiales", 
-                    "questions": [
-                        { "question": "En quelle année a commencé la Première Guerre mondiale ?", "reponses": ["1914", "1915", "1916", "1917"], "correct": 0 }
-                    ]
-                },
-                "france": { 
-                    "titre": "🇫🇷 Histoire de France", 
-                    "questions": [
-                        { "question": "En quelle année a eu lieu Marignan ?", "reponses": ["1515", "1519", "1518", "1517"], "correct": 0 }
-                    ]
-                },
-                "contemporaine": { 
-                    "titre": "📱 Histoire Contemporaine", 
-                    "questions": [
-                        { "question": "Année de la chute du mur de Berlin ?", "reponses": ["1989", "1987", "1991", "1985"], "correct": 0 }
-                    ]
-                },
-                "préhistoire": { 
-                    "titre": "🏛️ Préhistoire", 
-                    "questions": [
-                        { "question": "Quel est le plus grand dinosaure connu ?", "reponses": ["Argentinosaurus", "Tyrannosaurus Rex", "Brachiosaurus", "Velociraptor"], "correct": 0 }
-                    ]
-                }
-            },
-            "geographie": {
-                "capitales": { 
-                    "titre": "🏛️ Capitales", 
-                    "questions": [
-                        { "question": "Quelle est la capitale de l'Australie ?", "reponses": ["Canberra", "Sydney", "Melbourne", "Brisbane"], "correct": 0 }
-                    ]
-                },
-                "france": { 
-                    "titre": "🇫🇷 France", 
-                    "questions": [
-                        { "question": "Combien de régions en France ?", "reponses": ["13", "22", "18", "15"], "correct": 0 }
-                    ]
-                },
-                "europe": { 
-                    "titre": "🇪🇺 Europe", 
-                    "questions": [
-                        { "question": "Pays dans l'UE ?", "reponses": ["27", "28", "25", "30"], "correct": 0 }
-                    ]
-                },
-                "continents": { 
-                    "titre": "🌍 Continents", 
-                    "questions": [
-                        { "question": "Plus grand océan ?", "reponses": ["Pacifique", "Atlantique", "Indien", "Arctique"], "correct": 0 }
-                    ]
-                },
-                "nature": { 
-                    "titre": "🏔️ Physique", 
-                    "questions": [
-                        { "question": "Plus haut sommet ?", "reponses": ["Everest", "K2", "Kilimandjaro", "Mont Blanc"], "correct": 0 }
-                    ]
-                },
-                "culture": { 
-                    "titre": "🎭 Culture", 
-                    "questions": [
-                        { "question": "Où est la tour de Pise ?", "reponses": ["Italie", "France", "Espagne", "Grèce"], "correct": 0 }
-                    ]
-                }
-            },
-            "science": {
-                "physique": { 
-                    "titre": "⚛️ Physique", 
-                    "questions": [
-                        { "question": "Vitesse de la lumière ?", "reponses": ["300 000 km/s", "150 000", "500 000", "200 000"], "correct": 0 }
-                    ]
-                },
-                "chimie": { 
-                    "titre": "🧪 Chimie", 
-                    "questions": [
-                        { "question": "Symbole de l'or ?", "reponses": ["Au", "Ag", "Fe", "Cu"], "correct": 0 }
-                    ]
-                },
-                "biologie": { 
-                    "titre": "🧬 Biologie", 
-                    "questions": [
-                        { "question": "Support génétique ?", "reponses": ["ADN", "ARN", "Protéines", "Lipides"], "correct": 0 }
-                    ]
-                },
-                "astronomie": { 
-                    "titre": "🌌 Astronomie", 
-                    "questions": [
-                        { "question": "Planète proche du Soleil ?", "reponses": ["Mercure", "Vénus", "Mars", "Terre"], "correct": 0 }
-                    ]
-                },
-                "mathematiques": { 
-                    "titre": "📐 Maths", 
-                    "questions": [
-                        { "question": "Valeur de π ?", "reponses": ["3.14", "3.16", "3.12", "3.18"], "correct": 0 }
-                    ]
-                },
-                "technologie": { 
-                    "titre": "💻 Technologie", 
-                    "questions": [
-                        { "question": "Père de l'informatique ?", "reponses": ["Alan Turing", "Bill Gates", "Steve Jobs", "Tim"], "correct": 0 }
-                    ]
-                }
-            },
-            "litterature": {
-                "classiques": { 
-                    "titre": "📚 Classiques", 
-                    "questions": [
-                        { "question": "Auteur des Misérables ?", "reponses": ["Victor Hugo", "Zola", "Flaubert", "Balzac"], "correct": 0 }
-                    ]
-                },
-                "poesie": { 
-                    "titre": "✍️ Poésie", 
-                    "questions": [
-                        { "question": "Auteur des Fleurs du mal ?", "reponses": ["Baudelaire", "Rimbaud", "Verlaine", "Mallarmé"], "correct": 0 }
-                    ]
-                },
-                "theatre": { 
-                    "titre": "🎭 Théâtre", 
-                    "questions": [
-                        { "question": "Auteur de Phèdre ?", "reponses": ["Racine", "Corneille", "Molière", "Beaumarchais"], "correct": 0 }
-                    ]
-                },
-                "romans": { 
-                    "titre": "📖 Romans XXe", 
-                    "questions": [
-                        { "question": "Auteur de L'Étranger ?", "reponses": ["Camus", "Sartre", "Gide", "Malraux"], "correct": 0 }
-                    ]
-                },
-                "mondiale": { 
-                    "titre": "🌍 Mondiale", 
-                    "questions": [
-                        { "question": "Auteur de Roméo et Juliette ?", "reponses": ["Shakespeare", "Molière", "Goethe", "Dante"], "correct": 0 }
-                    ]
-                },
-                "contemporaine": { 
-                    "titre": "📱 Contemporaine", 
-                    "questions": [
-                        { "question": "Nobel 2014 ?", "reponses": ["Modiano", "Ernaux", "Le Clézio", "Gao"], "correct": 0 }
-                    ]
-                }
-            }
-        };
 
         // Initialisation
         window.addEventListener('load', () => {
             setTimeout(initQuiz, 100);
         });
 
-        function initQuiz() {
+        async function initQuiz() {
             if (typeof firebase === 'undefined') {
                 setTimeout(initQuiz, 200);
                 return;
@@ -612,58 +467,94 @@
                 return;
             }
 
-            const quizContent = quizData[matiere]?.[categorie];
-            if (!quizContent) {
+            try {
+                // Charger les questions depuis Firestore
+                if (typeof firebase === 'undefined' || typeof db === 'undefined') {
+                    throw new Error('Firebase non initialisé');
+                }
+
+                const questionsSnapshot = await db.collection('questionBank')
+                    .where('matiere', '==', matiere)
+                    .where('categorie', '==', categorie)
+                    .get();
+
+                if (questionsSnapshot.empty) {
+                    throw new Error(`Aucune question trouvée pour ${matiere} / ${categorie}.`);
+                }
+
+                const allQuestions = questionsSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    // Assurer la compatibilité entre "reponses" et "answers"
+                    if (!data.reponses && data.answers) {
+                        data.reponses = data.answers;
+                    }
+                    return data;
+                });
+
+                // Pour le titre, on va le construire dynamiquement
+                const categorieNom = categorie.charAt(0).toUpperCase() + categorie.slice(1).replace('-', ' ');
+                const titreQuiz = `Quiz de ${categorieNom}`;
+                if (!allQuestions) {
+                    throw new Error('Catégorie introuvable');
+                }
+
+                const shuffledQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
+                const selectedQuestions = shuffledQuestions.slice(0, 10);
+
+                // Titre avec badge de mode
+                const modeBadge = mode === 'challenge'
+                    ? '<span class="mode-badge challenge">🔥 DÉFI</span>'
+                    : '<span class="mode-badge classic">🎯 CLASSIQUE</span>';
+                document.getElementById('quiz-title').innerHTML = titreQuiz + modeBadge;
+
+                // Breadcrumb
+                const matiereNom = matiere.charAt(0).toUpperCase() + matiere.slice(1);
+                document.getElementById('breadcrumb').innerHTML =
+                    `<a href="Quiz.html">Quiz</a> > <a href="${matiereNom}.html">${matiereNom}</a> > ${categorieNom}`;
+
+                // Questions
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = '';
+
+                selectedQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question-card';
+                    questionDiv.innerHTML = `
+                        <span class="question-number">Question ${index + 1}</span>
+                        <div class="question-text">${q.question}</div>
+                        ${q.reponses.map((rep, i) => `
+                            <div class="answer-option" onclick="selectAnswer(${index}, ${i})">
+                                <input type="radio" id="q${index}_r${i}" name="q${index}" value="${i}">
+                                <label for="q${index}_r${i}">${rep}</label>
+                            </div>
+                        `).join('')}
+                        <button class="btn-valider" onclick="validerQuestion(${index}, ${q.correct})">Valider</button>
+                        <div id="feedback${index}" class="reponse-feedback"></div>
+                    `;
+                    container.appendChild(questionDiv);
+                });
+
+                document.getElementById('total-questions').textContent = selectedQuestions.length;
+
+                // Démarrer le timer en mode défi
+                if (mode === 'challenge') {
+                    startTimer();
+                }
+
+                // Timer de début
+                quizStartTime = Date.now();
+
+                // Menu auth
+                initAuthMenu();
+
+            } catch (error) {
+                console.error(error);
                 document.getElementById('quiz-container').innerHTML =
-                    '<div class="error-message"><h2>Quiz introuvable</h2><p>Catégorie: ' + categorie + '<br><a href="Quiz.html" style="color: #3498db;">Retour aux quiz</a></p></div>';
-                return;
+                    `<div class="error-message"><h2>Erreur de chargement</h2><p>${error.message}<br>
+                    Note: La recherche par catégorie peut nécessiter la création d'un index dans Firebase. 
+                    Vérifiez la console du navigateur (F12) pour un lien de création d'index.
+                    <br><a href="Quiz.html" style="color: #3498db;">Retour aux quiz</a></p></div>`;
             }
-
-            // Titre avec badge de mode
-            const modeBadge = mode === 'challenge'
-                ? '<span class="mode-badge challenge">🔥 DÉFI</span>'
-                : '<span class="mode-badge classic">🎯 CLASSIQUE</span>';
-            document.getElementById('quiz-title').innerHTML = quizContent.titre + modeBadge;
-
-            // Breadcrumb
-            const matiereNom = matiere.charAt(0).toUpperCase() + matiere.slice(1);
-            document.getElementById('breadcrumb').innerHTML =
-                `<a href="Quiz.html">Quiz</a> > <a href="${matiereNom}.html">${matiereNom}</a> > ${quizContent.titre}`;
-
-            // Questions
-            const container = document.getElementById('quiz-container');
-            container.innerHTML = '';
-
-            quizContent.questions.forEach((q, index) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'question-card';
-                questionDiv.innerHTML = `
-                    <span class="question-number">Question ${index + 1}</span>
-                    <div class="question-text">${q.question}</div>
-                    ${q.reponses.map((rep, i) => `
-                        <div class="answer-option" onclick="selectAnswer(${index}, ${i})">
-                            <input type="radio" id="q${index}_r${i}" name="q${index}" value="${i}">
-                            <label for="q${index}_r${i}">${rep}</label>
-                        </div>
-                    `).join('')}
-                    <button class="btn-valider" onclick="validerQuestion(${index}, ${q.correct})">Valider</button>
-                    <div id="feedback${index}" class="reponse-feedback"></div>
-                `;
-                container.appendChild(questionDiv);
-            });
-
-            document.getElementById('total-questions').textContent = quizContent.questions.length;
-
-            // Démarrer le timer en mode défi
-            if (mode === 'challenge') {
-                startTimer();
-            }
-
-            // Timer de début
-            quizStartTime = Date.now();
-
-            // Menu auth
-            initAuthMenu();
         }
 
         function startTimer() {
@@ -780,7 +671,7 @@
 
         function showResults(score, total, profileUpdate) {
             const percentage = Math.round((score / total) * 100);
-            
+
             // Emoji selon le score
             let emoji = '😔';
             if (percentage >= 90) emoji = '🏆';
@@ -795,7 +686,7 @@
             // XP et badges
             if (profileUpdate) {
                 document.getElementById('xp-gained').textContent = `+${profileUpdate.xpGagne} XP`;
-                
+
                 // Level up ?
                 if (profileUpdate.levelUp) {
                     document.getElementById('new-level').textContent = profileUpdate.newNiveau;
@@ -804,14 +695,14 @@
 
                 // Nouveaux badges ?
                 if (profileUpdate.nouveauxBadges && profileUpdate.nouveauxBadges.length > 0) {
-                    const badgesHtml = profileUpdate.nouveauxBadges.map(badge => 
+                    const badgesHtml = profileUpdate.nouveauxBadges.map(badge =>
                         `<div class="badge-earned">${badge.icone} ${badge.nom}</div>`
                     ).join('');
-                    document.getElementById('new-badges-section').innerHTML = 
+                    document.getElementById('new-badges-section').innerHTML =
                         '<p style="margin-bottom: 10px;">🎖️ Nouveaux badges :</p>' + badgesHtml;
                 }
             } else {
-                document.getElementById('xp-section').innerHTML = 
+                document.getElementById('xp-section').innerHTML =
                     '<p style="color: #7f8c8d;">Connectez-vous pour gagner des XP !</p>';
             }
 
@@ -821,7 +712,7 @@
 
         function initAuthMenu() {
             if (typeof FirebaseAuth === 'undefined') return;
-            
+
             FirebaseAuth.onAuthStateChanged(user => {
                 const nav = document.querySelector('.menu');
                 if (!nav) return;
@@ -859,4 +750,5 @@
         }
     </script>
 </body>
+
 </html>

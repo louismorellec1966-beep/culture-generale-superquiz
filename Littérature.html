@@ -3,19 +3,16 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quiz de littérature - Choisissez votre thème : Classiques, Poésie, Romans, Théâtre">
-    <meta name="keywords" content="quiz littérature, romans, poésie, théâtre, auteurs">
     <title>SuperQuiz.com - Littérature</title>
     <link rel="preload" href="CSS/style.css" as="style">
     <link rel="stylesheet" href="CSS/style.css" type="text/css">
@@ -47,6 +44,7 @@
             <li><a href="Scores.html">Scores</a></li>
             <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
             <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
+            <li><a href="multiplayer.html">⚔️ Multijoueur</a></li>
             <li><a href="Profil.html">👤 Profil</a></li>
             <li><a href="Contact.html">Contact</a></li>
         </ul>
@@ -57,7 +55,7 @@
             <h1>SUPERQUIZ - LITTÉRATURE</h1>
         </div>
         <div class="phrase-de-bienvenue">
-            <p>Plongez dans l'univers des lettres</p>
+            <p>Plongez dans les grands classiques</p>
         </div>
     </header>
 
@@ -67,27 +65,27 @@
             <div class="categories-grid">
                 <a href="mode-selection.html?matiere=litterature&categorie=classiques" class="category-card">
                     <h3>📚 Classiques Français</h3>
-                    <p>Molière, Hugo, Balzac, Flaubert</p>
+                    <p>Hugo, Zola, Balzac...</p>
                 </a>
                 <a href="mode-selection.html?matiere=litterature&categorie=poesie" class="category-card">
                     <h3>✍️ Poésie</h3>
-                    <p>Baudelaire, Rimbaud, Verlaine</p>
+                    <p>Vers, rimes et poètes célèbres</p>
                 </a>
                 <a href="mode-selection.html?matiere=litterature&categorie=theatre" class="category-card">
                     <h3>🎭 Théâtre</h3>
-                    <p>Racine, Corneille, Ionesco</p>
+                    <p>Molière, Racine et la scène</p>
                 </a>
                 <a href="mode-selection.html?matiere=litterature&categorie=romans" class="category-card">
                     <h3>📖 Romans du XXe siècle</h3>
-                    <p>Camus, Sartre, Duras</p>
+                    <p>Proust, Camus et les modernes</p>
                 </a>
                 <a href="mode-selection.html?matiere=litterature&categorie=mondiale" class="category-card">
                     <h3>🌍 Littérature Mondiale</h3>
-                    <p>Shakespeare, Cervantès, Dostoïevski</p>
+                    <p>Chefs-d'œuvre internationaux</p>
                 </a>
                 <a href="mode-selection.html?matiere=litterature&categorie=contemporaine" class="category-card">
                     <h3>📱 Littérature Contemporaine</h3>
-                    <p>Auteurs modernes et prix littéraires</p>
+                    <p>Auteurs actuels et best-sellers</p>
                 </a>
             </div>
         </div>
@@ -96,47 +94,15 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-<script>
+    <script>
         // Gestion du menu d'authentification Firebase
-        FirebaseAuth.onAuthStateChanged(user => {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        });
-
-        // Fonction de déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
+        if (typeof FirebaseAuth !== 'undefined') {
+            FirebaseAuth.onAuthStateChanged(user => {
+                const nav = document.querySelector('.menu');
+                if (!nav) return;
+                // (Logique d'auth gérée par auth-menu.js ou script.js si présent)
+            });
         }
     </script>
 </body>
-</html>
-</body>
-
 </html>

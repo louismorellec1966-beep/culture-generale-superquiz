@@ -50,13 +50,15 @@ let gameState = {
     opponentLives: MULTIPLAYER_CONFIG.STARTING_LIVES,
     gameMode: 'duel',
     timer: null,
+    safetyTimer: null,
     queueTimer: null,
     matchmakingRef: null,
     matchRef: null,
     isSearching: false,
     hasAnswered: false,
     playerAnswers: [],
-    opponentAnswers: [],
+    opponentAnswers: {},
+    opponentAnsweredCurrent: false,
     questionStartTime: null
 };
 
@@ -624,11 +626,17 @@ function showQuestion() {
     
     // Réinitialiser l'état
     gameState.hasAnswered = false;
+    gameState.opponentAnsweredCurrent = false;
     gameState.questionStartTime = Date.now();
+    
+    console.log(`📝 Question ${gameState.currentQuestionIndex + 1}/${gameState.questions.length}`);
     
     // Mettre à jour l'interface
     document.getElementById('current-question').textContent = gameState.currentQuestionIndex + 1;
     document.getElementById('question-text').textContent = question.question;
+    
+    // Réinitialiser le statut de l'adversaire
+    document.getElementById('opponent-answer-status').textContent = '';
     
     // Afficher les réponses
     const answersGrid = document.getElementById('answers-grid');
@@ -650,6 +658,25 @@ function showQuestion() {
     
     // Démarrer le timer
     startQuestionTimer();
+    
+    // Timeout de sécurité si l'adversaire ne répond pas (20 secondes après le timer normal)
+    if (window.rtdb && gameState.matchId) {
+        const safetyTimeout = (gameState.gameMode === 'duel' 
+            ? MULTIPLAYER_CONFIG.DUEL_TIME_PER_QUESTION 
+            : MULTIPLAYER_CONFIG.QUICK_TIME_PER_QUESTION) + 5;
+        
+        gameState.safetyTimer = setTimeout(() => {
+            if (gameState.hasAnswered && !gameState.opponentAnsweredCurrent) {
+                console.log('⏰ Timeout de sécurité - Adversaire n\'a pas répondu');
+                gameState.opponentAnsweredCurrent = true;
+                gameState.opponentLives--;
+                updateDuelHeader();
+                document.getElementById('opponent-answer-status').innerHTML = 
+                    `<span style="color: #e74c3c;">⏰ ${gameState.opponent.pseudo} n'a pas répondu</span>`;
+                setTimeout(() => nextQuestion(), 1500);
+            }
+        }, safetyTimeout * 1000);
+    }
 }
 
 // Timer de question
@@ -663,6 +690,11 @@ function startQuestionTimer() {
     
     timerEl.textContent = timeLeft;
     timerEl.classList.remove('warning', 'danger');
+    
+    // Annuler le timer de sécurité précédent s'il existe
+    if (gameState.safetyTimer) {
+        clearTimeout(gameState.safetyTimer);
+    }
     
     gameState.timer = setInterval(() => {
         timeLeft--;
@@ -715,6 +747,8 @@ function selectAnswer(index) {
     // Si jeu en temps réel, envoyer au serveur
     if (window.rtdb && gameState.matchId) {
         sendAnswerToServer(index, isCorrect, responseTime);
+        // Vérifier si l'adversaire a déjà répondu
+        checkBothAnswered();
     }
     
     // Simuler la réponse de l'adversaire (en mode simulation)
@@ -739,6 +773,12 @@ function handleTimeout() {
     
     const question = gameState.questions[gameState.currentQuestionIndex];
     showAnswerFeedback(-1, false, question.correct);
+    
+    // Si jeu en temps réel, envoyer le timeout au serveur
+    if (window.rtdb && gameState.matchId) {
+        sendAnswerToServer(-1, false, 0);
+        checkBothAnswered();
+    }
     
     if (!window.rtdb) {
         simulateOpponentAnswer(question.correct);
@@ -1129,8 +1169,12 @@ async function sendAnswerToServer(answerIndex, isCorrect, responseTime) {
 // Gérer les réponses de l'adversaire
 function handleOpponentAnswers(answers) {
     const currentAnswerKey = gameState.currentQuestionIndex.toString();
-    if (answers[currentAnswerKey] && !gameState.opponentAnswers[gameState.currentQuestionIndex]) {
+    
+    // Vérifier si l'adversaire a répondu à la question actuelle
+    if (answers[currentAnswerKey] && !gameState.opponentAnsweredCurrent) {
         const oppAnswer = answers[currentAnswerKey];
+        
+        console.log(`📨 Réponse adversaire reçue pour question ${currentAnswerKey}:`, oppAnswer);
         
         if (oppAnswer.correct) {
             gameState.opponentScore++;
@@ -1138,14 +1182,29 @@ function handleOpponentAnswers(answers) {
             gameState.opponentLives--;
         }
         
-        gameState.opponentAnswers[gameState.currentQuestionIndex] = oppAnswer;
+        gameState.opponentAnswers[currentAnswerKey] = oppAnswer;
+        gameState.opponentAnsweredCurrent = true;
+        
         updateDuelHeader();
         updateOpponentAnswerStatus(oppAnswer.correct);
         
         // Si les deux ont répondu, passer à la suite
-        if (gameState.hasAnswered) {
-            setTimeout(() => nextQuestion(), 1500);
+        checkBothAnswered();
+    }
+}
+
+// Vérifier si les deux joueurs ont répondu
+function checkBothAnswered() {
+    if (gameState.hasAnswered && gameState.opponentAnsweredCurrent) {
+        console.log('✅ Les deux joueurs ont répondu, passage à la question suivante...');
+        
+        // Annuler le timer de sécurité
+        if (gameState.safetyTimer) {
+            clearTimeout(gameState.safetyTimer);
+            gameState.safetyTimer = null;
         }
+        
+        setTimeout(() => nextQuestion(), 1500);
     }
 }
 

@@ -239,9 +239,37 @@
             border-color: #dc3545;
         }
 
-        .answer-option input[type="radio"] {
-            margin-right: 10px;
-            cursor: pointer;
+        .answer-option.correct-answer {
+            background: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+
+        .answer-option.wrong-answer {
+            background: #f8d7da !important;
+            border-color: #dc3545 !important;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .question-feedback {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        .question-feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .question-feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
         }
 
         .validate-btn {
@@ -493,9 +521,6 @@
                 <!-- Écran du Quiz -->
                 <div id="quiz-screen" style="display: none;">
                     <div id="questions-container"></div>
-                    <button class="validate-btn" onclick="submitQuiz()" style="display: block; margin: 30px auto;">
-                        ✅ Terminer le Quiz
-                    </button>
                 </div>
 
                 <!-- Écran des Résultats -->
@@ -804,35 +829,90 @@
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
 
+            // Stocker les mappings des réponses mélangées et les bonnes réponses
+            window.shuffledAnswersMap = [];
+            window.correctAnswersMap = [];
+            window.answeredQuestions = new Set();
+            window.dailyScore = 0;
+
             dailyQuizData.questions.forEach((q, index) => {
+                // Mélanger les réponses aléatoirement
+                const shuffledAnswers = q.answers.map((answer, i) => ({ text: answer, originalIndex: i }));
+                for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
+                }
+                // Stocker le mapping et la bonne réponse
+                window.shuffledAnswersMap[index] = shuffledAnswers;
+                window.correctAnswersMap[index] = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
+                
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'question-card';
                 questionDiv.innerHTML = `
                     <div class="question-number">Question ${index + 1}/10</div>
                     <div class="question-text">${q.question}</div>
-                    ${q.answers.map((answer, i) => `
-                        <label class="answer-option" onclick="selectAnswer(${index}, ${i})">
-                            <input type="radio" name="q${index}" value="${i}" id="q${index}_r${i}">
-                            ${answer}
-                        </label>
+                    ${shuffledAnswers.map((ans, i) => `
+                        <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
+                            ${ans.text}
+                        </div>
                     `).join('')}
+                    <div id="feedback${index}" class="question-feedback" style="display: none;"></div>
                 `;
                 container.appendChild(questionDiv);
             });
         }
 
-        // Sélectionner une réponse
-        function selectAnswer(qIndex, answerIndex) {
-            userAnswers[qIndex] = answerIndex;
+        // Valider une réponse au clic
+        function validateAnswer(qIndex, answerIndex) {
+            // Vérifier si déjà répondu
+            if (window.answeredQuestions.has(qIndex)) return;
+            window.answeredQuestions.add(qIndex);
             
-            const radio = document.getElementById(`q${qIndex}_r${answerIndex}`);
-            radio.checked = true;
+            const selectedOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${answerIndex}"]`);
             
             // Mettre à jour le style
-            document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
-                r.closest('.answer-option').classList.remove('selected');
+            document.querySelectorAll(`.answer-option[data-qindex="${qIndex}"]`).forEach(opt => {
+                opt.classList.remove('selected');
+                opt.classList.add('disabled');
             });
-            radio.closest('.answer-option').classList.add('selected');
+            selectedOption.classList.add('selected');
+            
+            // Vérifier la réponse
+            const correctIndex = window.correctAnswersMap[qIndex];
+            const isCorrect = answerIndex === correctIndex;
+            const feedback = document.getElementById(`feedback${qIndex}`);
+            
+            if (isCorrect) {
+                window.dailyScore++;
+                selectedOption.classList.add('correct-answer');
+                feedback.className = 'question-feedback correct';
+                feedback.textContent = '✅ Bonne réponse !';
+            } else {
+                selectedOption.classList.add('wrong-answer');
+                // Montrer la bonne réponse
+                const correctOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${correctIndex}"]`);
+                correctOption.classList.add('correct-answer');
+                const correctText = window.shuffledAnswersMap[qIndex][correctIndex].text;
+                feedback.className = 'question-feedback incorrect';
+                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctText;
+            }
+            
+            feedback.style.display = 'block';
+            userAnswers[qIndex] = answerIndex;
+            
+            // Vérifier si toutes les questions sont répondues
+            if (window.answeredQuestions.size === dailyQuizData.questions.length) {
+                setTimeout(() => finishQuiz(), 1000);
+            }
+        }
+        
+        // Terminer le quiz automatiquement
+        async function finishQuiz() {
+            clearInterval(timerInterval);
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            
+            await saveDailyScore(window.dailyScore, totalTime);
+            showResults(window.dailyScore, totalTime);
         }
 
         // Mettre à jour le chronomètre
@@ -842,33 +922,6 @@
             const seconds = elapsed % 60;
             document.getElementById('timer-value').textContent = 
                 `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        // Soumettre le quiz
-        async function submitQuiz() {
-            // Vérifier que toutes les questions ont une réponse
-            if (Object.keys(userAnswers).length < dailyQuizData.questions.length) {
-                alert('⚠️ Veuillez répondre à toutes les questions !');
-                return;
-            }
-
-            // Arrêter le chronomètre
-            clearInterval(timerInterval);
-            const totalTime = Math.floor((Date.now() - startTime) / 1000);
-
-            // Calculer le score
-            let score = 0;
-            dailyQuizData.questions.forEach((q, index) => {
-                if (userAnswers[index] === q.correct) {
-                    score++;
-                }
-            });
-
-            // Sauvegarder le score
-            await saveDailyScore(score, totalTime);
-
-            // Afficher les résultats
-            showResults(score, totalTime);
         }
 
         // Sauvegarder le score dans Firestore

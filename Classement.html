@@ -326,7 +326,7 @@
         async function loadClassement() {
             try {
                 if (currentFilter === 'xp') {
-                    allLeaderboard = await FirebaseScores.getXPLeaderboard(50);
+                    allLeaderboard = await FirebaseScores.getLeaderboardByXP(50);
                 } else {
                     const matiere = currentFilter === 'global' ? null : currentFilter;
                     allLeaderboard = await FirebaseScores.getLeaderboard(matiere);

@@ -161,6 +161,16 @@
             border: 1px solid #f5c6cb;
         }
 
+        .answer-option.correct-answer {
+            background: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+
+        .answer-option.wrong-answer {
+            background: #f8d7da !important;
+            border-color: #dc3545 !important;
+        }
+
         .global-timer {
             position: fixed;
             top: 100px;
@@ -473,7 +483,7 @@
         const mode = urlParams.get('mode') || 'classic';
 
         let answeredQuestions = new Set();
-        let currentScoare = 0;
+        let currentScore = 0;
         let quizStartTime = null;
         let timerInterval = null;
 
@@ -543,19 +553,30 @@
                 const container = document.getElementById('quiz-container');
                 container.innerHTML = '';
 
+                // Stocker les bonnes réponses pour chaque question
+                window.correctAnswersMap = [];
+                
                 selectedQuestions.forEach((q, index) => {
+                    // Mélanger les réponses aléatoirement
+                    const shuffledAnswers = q.reponses.map((rep, i) => ({ text: rep, originalIndex: i }));
+                    for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
+                    }
+                    // Trouver le nouvel index de la bonne réponse et le stocker
+                    const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
+                    window.correctAnswersMap[index] = newCorrectIndex;
+                    
                     const questionDiv = document.createElement('div');
                     questionDiv.className = 'question-card';
                     questionDiv.innerHTML = `
                         <span class="question-number">Question ${index + 1}</span>
                         <div class="question-text">${q.question}</div>
-                        ${q.reponses.map((rep, i) => `
-                            <div class="answer-option" onclick="selectAnswer(${index}, ${i})">
-                                <input type="radio" id="q${index}_r${i}" name="q${index}" value="${i}">
-                                <label for="q${index}_r${i}">${rep}</label>
+                        ${shuffledAnswers.map((ans, i) => `
+                            <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
+                                ${ans.text}
                             </div>
                         `).join('')}
-                        <button class="btn-valider" onclick="validerQuestion(${index}, ${q.correct})">Valider</button>
                         <div id="feedback${index}" class="reponse-feedback"></div>
                     `;
                     container.appendChild(questionDiv);
@@ -603,52 +624,46 @@
             }
         }
 
-        function selectAnswer(qIndex, answerIndex) {
-            const radio = document.getElementById(`q${qIndex}_r${answerIndex}`);
-            if (radio && !radio.disabled) {
-                radio.checked = true;
-                document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
-                    r.closest('.answer-option').classList.remove('selected');
-                });
-                radio.closest('.answer-option').classList.add('selected');
-            }
-        }
-
-        function validerQuestion(qIndex, correctAnswer) {
-            const selected = document.querySelector(`input[name="q${qIndex}"]:checked`);
-            const feedback = document.getElementById(`feedback${qIndex}`);
-
-            if (!selected) {
-                feedback.className = 'reponse-feedback incorrect';
-                feedback.textContent = '⚠️ Veuillez sélectionner une réponse';
-                feedback.style.display = 'block';
-                return;
-            }
-
+        function validateAnswer(qIndex, answerIndex) {
+            // Vérifier si déjà répondu
             if (answeredQuestions.has(qIndex)) return;
-
-            const isCorrect = parseInt(selected.value) === correctAnswer;
+            
+            const selectedOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${answerIndex}"]`);
+            if (!selectedOption) return;
+            
+            // Sélectionner visuellement
+            document.querySelectorAll(`.answer-option[data-qindex="${qIndex}"]`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            selectedOption.classList.add('selected');
+            
+            // Valider immédiatement
+            const feedback = document.getElementById(`feedback${qIndex}`);
+            const correctAnswer = window.correctAnswersMap[qIndex];
+            const isCorrect = answerIndex === correctAnswer;
 
             if (isCorrect) {
                 currentScore++;
                 document.getElementById('current-score').textContent = currentScore;
                 feedback.className = 'reponse-feedback correct';
                 feedback.textContent = '✅ Bravo ! Bonne réponse !';
+                selectedOption.classList.add('correct-answer');
             } else {
                 feedback.className = 'reponse-feedback incorrect';
-                const correctText = document.querySelector(`input[name="q${qIndex}"][value="${correctAnswer}"]`)
-                    .nextElementSibling.textContent;
-                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctText;
+                const correctOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${correctAnswer}"]`);
+                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctOption.textContent.trim();
+                selectedOption.classList.add('wrong-answer');
+                // Montrer la bonne réponse
+                correctOption.classList.add('correct-answer');
             }
 
             feedback.style.display = 'block';
             answeredQuestions.add(qIndex);
 
             // Désactiver les options
-            document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(r => {
-                r.disabled = true;
-                r.closest('.answer-option').style.opacity = '0.6';
-                r.closest('.answer-option').style.cursor = 'not-allowed';
+            document.querySelectorAll(`.answer-option[data-qindex="${qIndex}"]`).forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                opt.style.cursor = 'not-allowed';
             });
 
             // Quiz terminé ?

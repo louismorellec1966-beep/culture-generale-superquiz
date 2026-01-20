@@ -638,14 +638,22 @@ function showQuestion() {
     // Réinitialiser le statut de l'adversaire
     document.getElementById('opponent-answer-status').textContent = '';
     
+    // Mélanger les réponses aléatoirement
+    const shuffledAnswers = question.reponses.map((answer, i) => ({ text: answer, originalIndex: i }));
+    for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
+    }
+    // Stocker le mapping pour la validation
+    gameState.currentShuffledAnswers = shuffledAnswers;
+    
     // Afficher les réponses
     const answersGrid = document.getElementById('answers-grid');
     const letters = ['A', 'B', 'C', 'D'];
     
-    answersGrid.innerHTML = question.reponses.map((answer, index) => `
+    answersGrid.innerHTML = shuffledAnswers.map((ans, index) => `
         <button class="answer-btn" onclick="selectAnswer(${index})" data-index="${index}">
-            <span class="answer-letter">${letters[index]}</span>
-            ${answer}
+            ${ans.text}
         </button>
     `).join('');
     
@@ -723,7 +731,12 @@ function selectAnswer(index) {
     clearInterval(gameState.timer);
     
     const question = gameState.questions[gameState.currentQuestionIndex];
-    const isCorrect = index === question.correct;
+    // Trouver l'index original de la réponse sélectionnée via le mapping
+    const originalSelectedIndex = gameState.currentShuffledAnswers[index].originalIndex;
+    const isCorrect = originalSelectedIndex === question.correct;
+    
+    // Trouver l'index affiché de la bonne réponse
+    const correctDisplayIndex = gameState.currentShuffledAnswers.findIndex(a => a.originalIndex === question.correct);
     const responseTime = Date.now() - gameState.questionStartTime;
     
     // Enregistrer la réponse
@@ -741,8 +754,8 @@ function selectAnswer(index) {
         gameState.playerLives--;
     }
     
-    // Afficher le feedback
-    showAnswerFeedback(index, isCorrect, question.correct);
+    // Afficher le feedback (avec l'index affiché de la bonne réponse)
+    showAnswerFeedback(index, isCorrect, correctDisplayIndex);
     
     // Si jeu en temps réel, envoyer au serveur
     if (window.rtdb && gameState.matchId) {
@@ -772,7 +785,9 @@ function handleTimeout() {
     });
     
     const question = gameState.questions[gameState.currentQuestionIndex];
-    showAnswerFeedback(-1, false, question.correct);
+    // Trouver l'index affiché de la bonne réponse
+    const correctDisplayIndex = gameState.currentShuffledAnswers.findIndex(a => a.originalIndex === question.correct);
+    showAnswerFeedback(-1, false, correctDisplayIndex);
     
     // Si jeu en temps réel, envoyer le timeout au serveur
     if (window.rtdb && gameState.matchId) {

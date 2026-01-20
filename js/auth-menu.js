@@ -23,14 +23,16 @@ function initAuthMenu() {
         authItem.id = 'auth-menu-item';
 
         if (user) {
-            // Utilisateur connecté - Récupérer le pseudo depuis Firestore
+            // Utilisateur connecté - Récupérer le pseudo et l'avatar depuis Firestore
             const db = firebase.firestore();
             db.collection('profiles').doc(user.uid).get()
                 .then(doc => {
-                    const pseudo = doc.exists ? (doc.data().pseudo || user.email.split('@')[0]) : user.email.split('@')[0];
+                    const data = doc.exists ? doc.data() : {};
+                    const pseudo = data.pseudo || user.email.split('@')[0];
+                    const avatar = data.avatar?.value || '👤';
                     authItem.innerHTML = `
                         <a href="#" onclick="logout(event)" title="Déconnexion" style="color: #2ecc71;">
-                            👤 ${pseudo} <span style="font-size: 0.8em;">(Déco)</span>
+                            ${avatar} ${pseudo} <span style="font-size: 0.8em;">(Déco)</span>
                         </a>
                     `;
                 })

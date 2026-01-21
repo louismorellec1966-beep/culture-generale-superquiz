@@ -81,18 +81,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Attendre que Firebase soit chargé
 function waitForFirebase() {
     return new Promise((resolve) => {
+        let resolved = false;
+        
         const check = setInterval(() => {
             if (typeof firebase !== 'undefined' && firebase.auth && firebase.firestore) {
                 clearInterval(check);
-                console.log('✅ Firebase prêt pour le multijoueur');
-                resolve();
+                if (!resolved) {
+                    resolved = true;
+                    console.log('✅ Firebase prêt pour le multijoueur');
+                    resolve();
+                }
             }
         }, 100);
         
         setTimeout(() => {
             clearInterval(check);
-            console.warn('⚠️ Timeout Firebase');
-            resolve();
+            if (!resolved) {
+                resolved = true;
+                console.warn('⚠️ Timeout Firebase - Chargement forcé');
+                resolve();
+            }
         }, 10000);
     });
 }

@@ -264,18 +264,27 @@ const FirebaseScores = {
             
             console.log('📥 Profils récupérés:', snapshot.docs.length);
 
+            // Fonction helper pour extraire l'avatar
+            const getAvatarValue = (avatar) => {
+                if (!avatar) return '👤';
+                if (typeof avatar === 'string') return avatar;
+                if (typeof avatar === 'object' && avatar.value) return avatar.value;
+                return '👤';
+            };
+
             // Filtrer et trier côté client
             const profiles = snapshot.docs
                 .map(doc => {
                     const data = doc.data();
                     return {
-                        odexid: doc.id,
+                        uid: doc.id,
                         pseudo: data.pseudo || 'Joueur',
-                        avatar: data.avatar?.value || data.avatar || '👤',
+                        avatar: getAvatarValue(data.avatar),
                         niveau: data.niveau || 1,
                         experiencePoints: data.experiencePoints || 0,
                         elo: data.elo || 1000,
                         totalQuiz: data.stats?.totalQuiz || 0,
+                        quizCount: data.stats?.totalQuiz || 0,
                         tauxReussite: data.stats?.tauxReussite || 0,
                         badges: data.badges || [],
                         afficherProfil: data.preferences?.afficherProfil !== false
@@ -308,13 +317,21 @@ const FirebaseScores = {
             
             const snapshot = await db.collection('profiles').get();
 
+            // Fonction helper pour extraire l'avatar
+            const getAvatarValue = (avatar) => {
+                if (!avatar) return '👤';
+                if (typeof avatar === 'string') return avatar;
+                if (typeof avatar === 'object' && avatar.value) return avatar.value;
+                return '👤';
+            };
+
             const profiles = snapshot.docs
                 .map(doc => {
                     const data = doc.data();
                     return {
-                        odexid: doc.id,
+                        uid: doc.id,
                         pseudo: data.pseudo || 'Joueur',
-                        avatar: data.avatar?.value || data.avatar || '👤',
+                        avatar: getAvatarValue(data.avatar),
                         elo: data.elo || 1000,
                         multiplayerStats: data.multiplayerStats || { wins: 0, losses: 0 },
                         afficherProfil: data.preferences?.afficherProfil !== false

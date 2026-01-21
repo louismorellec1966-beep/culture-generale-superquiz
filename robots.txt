@@ -1,18 +1,4 @@
-<!-- ========== robots.txt ========== -->
-<!-- Placez ce contenu dans un fichier robots.txt à la racine -->
-
 User-agent: *
 Allow: /
-Disallow: /js/
-Disallow: /CSS/
-Disallow: /Images/bretagne.jpg
 
-# Sitemap
-Sitemap: https://votresite.com/sitemap.xml
-
-# Protection contre les scrapers agressifs
-User-agent: AhrefsBot
-Crawl-delay: 10
-
-User-agent: SemrushBot
-Crawl-delay: 10
+Sitemap: https://cultureludo.com/sitemap.xml

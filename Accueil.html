@@ -78,41 +78,129 @@
 </head>
 
 <body>
-    <nav aria-label="Navigation principale">
-        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
-            <span class="hamburger"></span>
-            <span class="hamburger"></span>
-            <span class="hamburger"></span>
-        </button>
-
+    <!-- Navigation Desktop -->
+    <nav class="nav-desktop" aria-label="Navigation principale">
+        <a href="Accueil.html" class="nav-logo">🧠 CultureLudo</a>
+        
         <ul class="menu">
-            <li><a href="Accueil.html" aria-current="page">Accueil</a></li>
+            <li><a href="Accueil.html" aria-current="page">🏠 Accueil</a></li>
+            
+            <!-- Groupe JOUER -->
             <li class="dropdown">
-                <a href="Quiz.html">Quiz</a>
-                <ul class="submenu">
-                    <li><a href="Histoire.html">Histoire</a></li>
-                    <li><a href="Géographie.html">Géographie</a></li>
-                    <li><a href="Science.html">Science</a></li>
-                    <li><a href="Littérature.html">Littérature</a></li>
-                    <li><a href="Sport.html">Sport</a></li>
-                    <li><a href="Musique.html">Musique</a></li>
-                    <li><a href="Art.html">Art</a></li>
-                    <li><a href="Culture.html">Culture</a></li>
-                    <li><a href="Cinéma.html">Cinéma</a></li>
-                    <li><a href="Gastronomie.html">Gastronomie</a></li>
-                    <li><a href="Politique.html">Politique</a></li>
-                    <li><a href="Philosophie.html">Philosophie</a></li>
+                <a href="#">🎮 Jouer</a>
+                <ul class="submenu submenu-grid">
+                    <li class="submenu-section">
+                        <span class="submenu-title">Modes de jeu</span>
+                        <a href="Quiz.html">🎯 Quiz Classique</a>
+                        <a href="quiz-du-jour.html">📅 Quiz du Jour</a>
+                        <a href="mode-survie.html">💀 Mode Survie</a>
+                        <a href="multiplayer.html">⚔️ Multijoueur</a>
+                    </li>
+                    <li class="submenu-section">
+                        <span class="submenu-title">Catégories</span>
+                        <div class="submenu-categories">
+                            <a href="Histoire.html">📜 Histoire</a>
+                            <a href="Géographie.html">🌍 Géographie</a>
+                            <a href="Science.html">🔬 Science</a>
+                            <a href="Littérature.html">📚 Littérature</a>
+                            <a href="Sport.html">⚽ Sport</a>
+                            <a href="Musique.html">🎵 Musique</a>
+                            <a href="Art.html">🎨 Art</a>
+                            <a href="Culture.html">🎭 Culture</a>
+                            <a href="Cinéma.html">🎬 Cinéma</a>
+                            <a href="Gastronomie.html">🍽️ Gastronomie</a>
+                            <a href="Politique.html">🏛️ Politique</a>
+                            <a href="Philosophie.html">💭 Philosophie</a>
+                        </div>
+                    </li>
                 </ul>
             </li>
-            <li><a href="Scores.html">Scores</a></li>
-            <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
-            <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
-            <li><a href="multiplayer.html">⚔️ Multijoueur</a></li>
-            <li><a href="Profil.html">👤 Profil</a></li>
-            <li><a href="Social.html">👥 Social</a></li>
-            <li><a href="Contact.html">Contact</a></li>
+            
+            <!-- Groupe MON ESPACE -->
+            <li class="dropdown">
+                <a href="#">👤 Mon Espace</a>
+                <ul class="submenu">
+                    <li><a href="Profil.html">👤 Mon Profil</a></li>
+                    <li><a href="Scores.html">🏆 Mes Scores</a></li>
+                    <li><a href="Classement.html">📊 Classement</a></li>
+                    <li><a href="Social.html">👥 Amis</a></li>
+                </ul>
+            </li>
+            
+            <li><a href="Contact.html">📧 Contact</a></li>
         </ul>
+        
+        <div id="auth-nav-btn"></div>
     </nav>
+
+    <!-- Navigation Mobile (barre en bas) -->
+    <nav class="nav-mobile" aria-label="Navigation mobile">
+        <a href="Accueil.html" class="nav-mobile-item active">
+            <span class="nav-mobile-icon">🏠</span>
+            <span class="nav-mobile-label">Accueil</span>
+        </a>
+        <a href="Quiz.html" class="nav-mobile-item">
+            <span class="nav-mobile-icon">🎮</span>
+            <span class="nav-mobile-label">Jouer</span>
+        </a>
+        <a href="quiz-du-jour.html" class="nav-mobile-item nav-mobile-featured">
+            <span class="nav-mobile-icon">📅</span>
+            <span class="nav-mobile-label">Quiz du Jour</span>
+        </a>
+        <a href="Profil.html" class="nav-mobile-item">
+            <span class="nav-mobile-icon">👤</span>
+            <span class="nav-mobile-label">Profil</span>
+        </a>
+        <button class="nav-mobile-item" id="mobile-menu-btn">
+            <span class="nav-mobile-icon">☰</span>
+            <span class="nav-mobile-label">Plus</span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile étendu -->
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+        <div class="mobile-menu-content">
+            <button class="mobile-menu-close" id="mobile-menu-close">✕</button>
+            <div class="mobile-menu-sections">
+                <div class="mobile-menu-section">
+                    <h3>🎮 Modes de Jeu</h3>
+                    <a href="Quiz.html">🎯 Quiz Classique</a>
+                    <a href="quiz-du-jour.html">📅 Quiz du Jour</a>
+                    <a href="mode-survie.html">💀 Mode Survie</a>
+                    <a href="multiplayer.html">⚔️ Multijoueur</a>
+                </div>
+                <div class="mobile-menu-section">
+                    <h3>📚 Catégories</h3>
+                    <div class="mobile-categories-grid">
+                        <a href="Histoire.html">📜 Histoire</a>
+                        <a href="Géographie.html">🌍 Géo</a>
+                        <a href="Science.html">🔬 Science</a>
+                        <a href="Littérature.html">📚 Littérature</a>
+                        <a href="Sport.html">⚽ Sport</a>
+                        <a href="Musique.html">🎵 Musique</a>
+                        <a href="Art.html">🎨 Art</a>
+                        <a href="Culture.html">🎭 Culture</a>
+                        <a href="Cinéma.html">🎬 Cinéma</a>
+                        <a href="Gastronomie.html">🍽️ Gastro</a>
+                        <a href="Politique.html">🏛️ Politique</a>
+                        <a href="Philosophie.html">💭 Philo</a>
+                    </div>
+                </div>
+                <div class="mobile-menu-section">
+                    <h3>👤 Mon Espace</h3>
+                    <a href="Profil.html">👤 Mon Profil</a>
+                    <a href="Scores.html">🏆 Mes Scores</a>
+                    <a href="Classement.html">📊 Classement</a>
+                    <a href="Social.html">👥 Amis</a>
+                </div>
+                <div class="mobile-menu-section">
+                    <h3>ℹ️ Autres</h3>
+                    <a href="Contact.html">📧 Contact</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="quiz-highlight"
         style="background: linear-gradient(135deg, #3498db, #2ecc71); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
         <h2 style="margin: 0;">📅 Quiz du Jour</h2>
@@ -248,6 +336,32 @@
                 }
             }
         }
+
+        // Gestion du menu mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+            const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+            if (mobileMenuBtn && mobileMenuOverlay) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenuOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                mobileMenuClose.addEventListener('click', () => {
+                    mobileMenuOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+
+                mobileMenuOverlay.addEventListener('click', (e) => {
+                    if (e.target === mobileMenuOverlay) {
+                        mobileMenuOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+        });
     </script>
 </body>
 

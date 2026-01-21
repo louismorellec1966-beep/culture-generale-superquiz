@@ -3,9 +3,9 @@
 # =============================================
 
 # Configuration - À MODIFIER avec vos informations Hostinger
-$FTP_HOST = "ftp.votredomaine.com"      # Trouvable dans hPanel > Fichiers > Comptes FTP
-$FTP_USER = "votre_utilisateur_ftp"      # Votre identifiant FTP
-$FTP_PASS = "votre_mot_de_passe_ftp"     # Votre mot de passe FTP
+$FTP_HOST = "ftp://147.93.54.141"      # Trouvable dans hPanel > Fichiers > Comptes FTP
+$FTP_USER = "u180189556"      # Votre identifiant FTP
+$FTP_PASS = "06190Lfmpmval2206!"     # Votre mot de passe FTP
 $REMOTE_PATH = "/public_html"            # Dossier distant (généralement /public_html)
 $LOCAL_PATH = "c:\Users\louis\Desktop\Culture G site"
 

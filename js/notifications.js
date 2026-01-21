@@ -3,10 +3,14 @@
 const PushNotifications = {
     // Clé publique VAPID (à remplacer par la vôtre)
     // Générez-la sur https://vapidkeys.com/ ou via Firebase Cloud Messaging
-    VAPID_PUBLIC_KEY: 'YOUR_VAPID_PUBLIC_KEY_HERE',
+    VAPID_PUBLIC_KEY: '',
 
     // Vérifier si les notifications sont supportées
     isSupported: function() {
+        // Désactivé tant que la clé VAPID n'est pas configurée
+        if (!this.VAPID_PUBLIC_KEY || this.VAPID_PUBLIC_KEY === '' || this.VAPID_PUBLIC_KEY === 'YOUR_VAPID_PUBLIC_KEY_HERE') {
+            return false;
+        }
         return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
     },
 

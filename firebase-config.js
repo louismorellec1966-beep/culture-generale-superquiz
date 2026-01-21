@@ -144,8 +144,12 @@ const FirebaseAuth = {
             'auth/weak-password': 'Mot de passe trop faible (min. 6 caractères)',
             'auth/user-not-found': 'Email ou mot de passe incorrect',
             'auth/wrong-password': 'Email ou mot de passe incorrect',
+            'auth/invalid-login-credentials': 'Email ou mot de passe incorrect',
+            'auth/invalid-credential': 'Email ou mot de passe incorrect',
             'auth/too-many-requests': 'Trop de tentatives. Réessayez plus tard.',
-            'auth/network-request-failed': 'Erreur réseau. Vérifiez votre connexion.'
+            'auth/network-request-failed': 'Erreur réseau. Vérifiez votre connexion.',
+            'auth/user-disabled': 'Ce compte a été désactivé',
+            'auth/operation-not-allowed': 'Opération non autorisée'
         };
         return messages[code] || 'Une erreur est survenue';
     }

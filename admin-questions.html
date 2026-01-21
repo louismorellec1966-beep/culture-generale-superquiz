@@ -772,6 +772,52 @@
         }
 
         // ========== IMPORT EN MASSE ==========
+        
+        // Liste des matières valides
+        const validMatieres = ['histoire', 'geographie', 'science', 'litterature', 'sport', 'art', 'musique', 'cinema', 'culture', 'politique'];
+        
+        // Fonction pour normaliser une matière
+        function normalizeMatiere(matiere) {
+            if (!matiere) return null;
+            
+            // Convertir en minuscules et supprimer les accents
+            const normalized = matiere.toString().toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .trim();
+            
+            // Mapping des variations possibles
+            const matiereMapping = {
+                'histoire': 'histoire',
+                'history': 'histoire',
+                'geographie': 'geographie',
+                'géographie': 'geographie',
+                'geography': 'geographie',
+                'geo': 'geographie',
+                'science': 'science',
+                'sciences': 'science',
+                'litterature': 'litterature',
+                'littérature': 'litterature',
+                'literature': 'litterature',
+                'sport': 'sport',
+                'sports': 'sport',
+                'art': 'art',
+                'arts': 'art',
+                'musique': 'musique',
+                'music': 'musique',
+                'cinema': 'cinema',
+                'cinéma': 'cinema',
+                'film': 'cinema',
+                'films': 'cinema',
+                'culture': 'culture',
+                'culture generale': 'culture',
+                'culture générale': 'culture',
+                'politique': 'politique',
+                'politics': 'politique'
+            };
+            
+            return matiereMapping[normalized] || normalized;
+        }
+        
         async function importBulk() {
             const messageDiv = document.getElementById('message-bulk');
             const jsonInput = document.getElementById('json-input').value;
@@ -786,19 +832,99 @@
                 }
 
                 let imported = 0;
-                for (const q of questions) {
-                    await db.collection('questionBank').add({
-                        ...q,
+                let warnings = [];
+                let errors = [];
+                
+                for (let i = 0; i < questions.length; i++) {
+                    const q = questions[i];
+                    
+                    // Vérifier les champs obligatoires
+                    if (!q.question) {
+                        errors.push(`Question ${i + 1}: Pas de texte de question`);
+                        continue;
+                    }
+                    if (!q.reponses || !Array.isArray(q.reponses) || q.reponses.length < 2) {
+                        errors.push(`Question ${i + 1}: Réponses manquantes ou invalides`);
+                        continue;
+                    }
+                    if (q.correct === undefined || q.correct === null) {
+                        errors.push(`Question ${i + 1}: Index de la bonne réponse manquant`);
+                        continue;
+                    }
+                    
+                    // Normaliser la matière
+                    let matiere = normalizeMatiere(q.matiere || q.theme || q.category || q.subject);
+                    
+                    if (!matiere) {
+                        errors.push(`Question ${i + 1}: Aucune matière/thème spécifié`);
+                        continue;
+                    }
+                    
+                    // Vérifier si la matière est valide
+                    if (!validMatieres.includes(matiere)) {
+                        warnings.push(`Question ${i + 1}: Matière "${matiere}" non standard (importée quand même)`);
+                    }
+                    
+                    // Normaliser la difficulté
+                    let difficulty = (q.difficulty || q.difficulte || q.niveau || 'moyen').toString().toLowerCase();
+                    if (!['facile', 'moyen', 'difficile'].includes(difficulty)) {
+                        if (difficulty === 'easy' || difficulty === '1') difficulty = 'facile';
+                        else if (difficulty === 'medium' || difficulty === '2') difficulty = 'moyen';
+                        else if (difficulty === 'hard' || difficulty === '3') difficulty = 'difficile';
+                        else difficulty = 'moyen';
+                    }
+                    
+                    // Normaliser la catégorie
+                    let categorie = (q.categorie || q.category || q.subcategory || '').toString().toLowerCase()
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+                    
+                    // Créer l'objet question normalisé
+                    const questionData = {
+                        question: q.question,
+                        reponses: q.reponses,
+                        correct: parseInt(q.correct),
+                        matiere: matiere,
+                        categorie: categorie || 'general',
+                        difficulty: difficulty,
+                        tags: q.tags || [],
                         addedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    };
+                    
+                    await db.collection('questionBank').add(questionData);
                     imported++;
                 }
 
-                messageDiv.innerHTML = `<div class="alert alert-success">✅ ${imported} questions importées avec succès !</div>`;
-                document.getElementById('json-input').value = '';
+                // Construire le message de résultat
+                let resultHTML = '';
+                
+                if (imported > 0) {
+                    resultHTML += `<div class="alert alert-success">✅ ${imported} question${imported > 1 ? 's' : ''} importée${imported > 1 ? 's' : ''} avec succès !</div>`;
+                }
+                
+                if (warnings.length > 0) {
+                    resultHTML += `<div class="alert alert-warning" style="background: #fff3cd; border-color: #ffc107; color: #856404; margin-top: 10px;">
+                        ⚠️ <strong>Avertissements (${warnings.length}):</strong><br>
+                        ${warnings.slice(0, 5).join('<br>')}
+                        ${warnings.length > 5 ? `<br>... et ${warnings.length - 5} autres` : ''}
+                    </div>`;
+                }
+                
+                if (errors.length > 0) {
+                    resultHTML += `<div class="alert alert-error" style="margin-top: 10px;">
+                        ❌ <strong>Erreurs (${errors.length} questions ignorées):</strong><br>
+                        ${errors.slice(0, 5).join('<br>')}
+                        ${errors.length > 5 ? `<br>... et ${errors.length - 5} autres` : ''}
+                    </div>`;
+                }
+                
+                messageDiv.innerHTML = resultHTML;
+                
+                if (imported > 0) {
+                    document.getElementById('json-input').value = '';
+                }
                 
             } catch (error) {
-                messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+                messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur JSON : ${error.message}</div>`;
             }
         }
 

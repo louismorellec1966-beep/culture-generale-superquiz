@@ -46,6 +46,23 @@ self.addEventListener('activate', event => {
 
 // Interception des requêtes (stratégie Network First)
 self.addEventListener('fetch', event => {
+    const url = new URL(event.request.url);
+    
+    // Ignorer les requêtes externes (Firebase, Google Analytics, etc.)
+    const externalDomains = [
+        'firebaseio.com',
+        'googleapis.com',
+        'gstatic.com',
+        'googletagmanager.com',
+        'google-analytics.com',
+        'firebasedatabase.app',
+        'identitytoolkit.googleapis.com'
+    ];
+    
+    if (externalDomains.some(domain => url.hostname.includes(domain))) {
+        return; // Laisser passer sans intercepter
+    }
+    
     event.respondWith(
         fetch(event.request)
             .then(response => {

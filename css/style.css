@@ -224,7 +224,6 @@ nav.hidden {
 .submenu a:hover,
 .submenu a:focus {
     background-color: var(--primary-color);
-    padding-left: 25px;
     outline: none;
 }
 
@@ -825,16 +824,17 @@ a:focus {
     position: absolute;
     top: 100%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(-10px);
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
     padding: 20px;
     min-width: 200px;
     list-style: none;
+    pointer-events: none;
 }
 
 .nav-desktop .submenu-grid {
@@ -843,10 +843,12 @@ a:focus {
     min-width: 500px;
 }
 
-.nav-desktop .dropdown:hover .submenu {
+.nav-desktop .dropdown:hover .submenu,
+.nav-desktop .dropdown:focus-within .submenu {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
 }
 
 .submenu-section {
@@ -871,14 +873,13 @@ a:focus {
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 8px;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease;
     font-size: 0.95em;
 }
 
 .submenu-section a:hover {
     background: var(--primary-color);
     color: var(--white);
-    transform: translateX(5px);
 }
 
 .submenu-categories {

@@ -45,6 +45,65 @@
             font-size: 2em;
             margin-bottom: 5px;
         }
+        
+        .auth-status {
+            margin-top: 10px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+        
+        .auth-status.connected {
+            background: rgba(46, 204, 113, 0.3);
+            border: 1px solid #2ecc71;
+        }
+        
+        .auth-status.disconnected {
+            background: rgba(231, 76, 60, 0.3);
+            border: 1px solid #e74c3c;
+        }
+        
+        .login-required-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .login-required-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+        }
+        
+        .login-required-box h2 {
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        
+        .login-required-box p {
+            margin-bottom: 20px;
+            color: #7f8c8d;
+        }
+        
+        .login-required-box a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
 
         .tabs {
             display: flex;
@@ -411,11 +470,23 @@
     </style>
 </head>
 <body>
+    <!-- Overlay si non connecté -->
+    <div id="login-required-overlay" class="login-required-overlay" style="display: none;">
+        <div class="login-required-box">
+            <h2>🔐 Connexion requise</h2>
+            <p>Vous devez être connecté avec un compte administrateur pour accéder à cette page.</p>
+            <a href="Auth.html">Se connecter</a>
+        </div>
+    </div>
+
     <div class="container">
         <!-- En-tête -->
         <div class="header">
             <h1>🛠️ Administration - Gestion des Questions</h1>
             <p style="color: #bdc3c7; margin-top: 10px;">Ajouter, modifier et supprimer des questions</p>
+            <div id="auth-status" class="auth-status disconnected">
+                ⏳ Vérification de la connexion...
+            </div>
         </div>
 
         <!-- Onglets -->
@@ -685,6 +756,11 @@
             sport: { football: 'Football', basketball: 'Basketball', tennis: 'Tennis', athletisme: 'Athlétisme', natation: 'Natation', 'jeux-olympiques': 'Jeux Olympiques' }
         };
 
+        // Liste des emails administrateurs autorisés
+        const ADMIN_EMAILS = ['louismorellec1966@gmail.com'];
+        
+        let currentUser = null;
+
         // Initialisation
         window.addEventListener('load', async () => {
             // Attendre que Firebase soit chargé
@@ -705,7 +781,48 @@
                     resolve();
                 }, 10000);
             });
+            
+            // Vérifier l'authentification
+            checkAuth();
         });
+        
+        // Vérifier l'état de connexion
+        function checkAuth() {
+            const authStatus = document.getElementById('auth-status');
+            const overlay = document.getElementById('login-required-overlay');
+            
+            if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function') {
+                authStatus.className = 'auth-status disconnected';
+                authStatus.innerHTML = '❌ Firebase non disponible';
+                overlay.style.display = 'flex';
+                return;
+            }
+            
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    currentUser = user;
+                    const isAdmin = ADMIN_EMAILS.includes(user.email);
+                    
+                    if (isAdmin) {
+                        authStatus.className = 'auth-status connected';
+                        authStatus.innerHTML = `✅ Connecté : ${user.email} (Admin)`;
+                        overlay.style.display = 'none';
+                        console.log('✅ Admin connecté:', user.email);
+                    } else {
+                        authStatus.className = 'auth-status disconnected';
+                        authStatus.innerHTML = `⚠️ ${user.email} - Non autorisé`;
+                        overlay.style.display = 'flex';
+                        console.warn('⚠️ Utilisateur non admin:', user.email);
+                    }
+                } else {
+                    currentUser = null;
+                    authStatus.className = 'auth-status disconnected';
+                    authStatus.innerHTML = '❌ Non connecté';
+                    overlay.style.display = 'flex';
+                    console.log('❌ Utilisateur non connecté');
+                }
+            });
+        }
 
         // Mettre à jour les catégories
         function updateCategories(prefix) {

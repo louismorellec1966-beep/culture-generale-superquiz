@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SuperQuiz - Choisissez votre mode de jeu préféré">
+    <title>SuperQuiz - Jouer</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="js/menu.js" defer></script>
+    
+    <style>
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-size: 2.8em;
+            margin: 0 0 15px 0;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .page-header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .modes-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .mode-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .mode-card.classic {
+            --card-color-1: #3498db;
+            --card-color-2: #2ecc71;
+        }
+        
+        .mode-card.daily {
+            --card-color-1: #f39c12;
+            --card-color-2: #e74c3c;
+        }
+        
+        .mode-card.survival {
+            --card-color-1: #e74c3c;
+            --card-color-2: #c0392b;
+        }
+        
+        .mode-card.multiplayer {
+            --card-color-1: #9b59b6;
+            --card-color-2: #667eea;
+        }
+        
+        .mode-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .mode-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .mode-description {
+            color: #7f8c8d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+        
+        .mode-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 25px 0;
+            text-align: left;
+        }
+        
+        .mode-features li {
+            padding: 8px 0;
+            color: #555;
+            font-size: 0.9em;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .mode-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .mode-features li::before {
+            content: '✓';
+            color: #2ecc71;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .mode-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--card-color-1), var(--card-color-2));
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .mode-card:hover .mode-btn {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Section catégories */
+        .categories-section {
+            background: #f8f9fa;
+            padding: 50px 20px;
+            margin-top: 40px;
+        }
+        
+        .categories-section h2 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        
+        .categories-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .category-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .category-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .category-link span:first-child {
+            font-size: 1.5em;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2em;
+            }
+            
+            .modes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>🎮 Choisissez votre mode de jeu</h1>
+        <p>Sélectionnez le mode qui correspond à votre envie du moment !</p>
+    </div>
+    
+    <div class="modes-container">
+        <div class="modes-grid">
+            <!-- Mode Quiz Classique -->
+            <a href="Quiz.html" class="mode-card classic">
+                <span class="mode-icon">🎯</span>
+                <div class="mode-title">Quiz Classique</div>
+                <div class="mode-description">
+                    Testez vos connaissances dans 12 catégories différentes à votre rythme.
+                </div>
+                <ul class="mode-features">
+                    <li>12 catégories disponibles</li>
+                    <li>Pas de limite de temps</li>
+                    <li>Parfait pour apprendre</li>
+                    <li>Difficulté progressive</li>
+                </ul>
+                <span class="mode-btn">Jouer →</span>
+            </a>
+            
+            <!-- Mode Quiz du Jour -->
+            <a href="quiz-du-jour.html" class="mode-card daily">
+                <span class="mode-icon">📅</span>
+                <div class="mode-title">Quiz du Jour</div>
+                <div class="mode-description">
+                    Un nouveau quiz chaque jour avec un thème différent. Ne manquez pas le défi quotidien !
+                </div>
+                <ul class="mode-features">
+                    <li>Nouveau quiz chaque jour</li>
+                    <li>Thème surprise quotidien</li>
+                    <li>Récompenses journalières</li>
+                    <li>Comparez vos scores</li>
+                </ul>
+                <span class="mode-btn">Jouer →</span>
+            </a>
+            
+            <!-- Mode Survie -->
+            <a href="mode-survie.html" class="mode-card survival">
+                <span class="mode-icon">💀</span>
+                <div class="mode-title">Mode Survie</div>
+                <div class="mode-description">
+                    Combien de questions pouvez-vous enchaîner sans erreur ? Testez vos limites !
+                </div>
+                <ul class="mode-features">
+                    <li>Questions illimitées</li>
+                    <li>Une erreur = Game Over</li>
+                    <li>Difficulté croissante</li>
+                    <li>Classement des survivants</li>
+                </ul>
+                <span class="mode-btn">Survivre →</span>
+            </a>
+            
+            <!-- Mode Multijoueur -->
+            <a href="multiplayer.html" class="mode-card multiplayer">
+                <span class="mode-icon">⚔️</span>
+                <div class="mode-title">Multijoueur</div>
+                <div class="mode-description">
+                    Affrontez d'autres joueurs en temps réel et grimpez dans le classement ELO !
+                </div>
+                <ul class="mode-features">
+                    <li>Duels en temps réel</li>
+                    <li>Système de classement ELO</li>
+                    <li>Matchmaking équilibré</li>
+                    <li>Défiez vos amis</li>
+                </ul>
+                <span class="mode-btn">Défier →</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Section catégories rapides -->
+    <div class="categories-section">
+        <h2>📚 Accès rapide aux catégories</h2>
+        <div class="categories-grid">
+            <a href="Histoire.html" class="category-link">
+                <span>📜</span> <span>Histoire</span>
+            </a>
+            <a href="Géographie.html" class="category-link">
+                <span>🌍</span> <span>Géographie</span>
+            </a>
+            <a href="Science.html" class="category-link">
+                <span>🔬</span> <span>Science</span>
+            </a>
+            <a href="Littérature.html" class="category-link">
+                <span>📚</span> <span>Littérature</span>
+            </a>
+            <a href="Sport.html" class="category-link">
+                <span>⚽</span> <span>Sport</span>
+            </a>
+            <a href="Musique.html" class="category-link">
+                <span>🎵</span> <span>Musique</span>
+            </a>
+            <a href="Art.html" class="category-link">
+                <span>🎨</span> <span>Art</span>
+            </a>
+            <a href="Culture.html" class="category-link">
+                <span>🎭</span> <span>Culture</span>
+            </a>
+            <a href="Cinéma.html" class="category-link">
+                <span>🎬</span> <span>Cinéma</span>
+            </a>
+            <a href="Gastronomie.html" class="category-link">
+                <span>🍽️</span> <span>Gastronomie</span>
+            </a>
+            <a href="Politique.html" class="category-link">
+                <span>🏛️</span> <span>Politique</span>
+            </a>
+            <a href="Philosophie.html" class="category-link">
+                <span>💭</span> <span>Philosophie</span>
+            </a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    </footer>
+</body>
+</html>

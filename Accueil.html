@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="fr">
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<!-- Configuration Firebase -->
-<script src="firebase-config.js"></script>
-<script src="js/auth-menu.js" defer></script>
-<script src="js/profile-system.js" defer></script>
-<script src="js/daily-rewards.js" defer></script>
-<script src="js/notifications.js" defer></script>
-
 <head>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="js/menu.js" defer></script>
+    <script src="js/profile-system.js" defer></script>
+    <script src="js/daily-rewards.js" defer></script>
+    <script src="js/notifications.js" defer></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
     <script>
@@ -78,129 +75,6 @@
 </head>
 
 <body>
-    <!-- Navigation Desktop -->
-    <nav class="nav-desktop" aria-label="Navigation principale">
-        <a href="Accueil.html" class="nav-logo">🧠 CultureLudo</a>
-        
-        <ul class="menu">
-            <li><a href="Accueil.html" aria-current="page">🏠 Accueil</a></li>
-            
-            <!-- Groupe JOUER -->
-            <li class="dropdown">
-                <a href="#">🎮 Jouer</a>
-                <ul class="submenu submenu-grid">
-                    <li class="submenu-section">
-                        <span class="submenu-title">Modes de jeu</span>
-                        <a href="Quiz.html">🎯 Quiz Classique</a>
-                        <a href="quiz-du-jour.html">📅 Quiz du Jour</a>
-                        <a href="mode-survie.html">💀 Mode Survie</a>
-                        <a href="multiplayer.html">⚔️ Multijoueur</a>
-                    </li>
-                    <li class="submenu-section">
-                        <span class="submenu-title">Catégories</span>
-                        <div class="submenu-categories">
-                            <a href="Histoire.html">📜 Histoire</a>
-                            <a href="Géographie.html">🌍 Géographie</a>
-                            <a href="Science.html">🔬 Science</a>
-                            <a href="Littérature.html">📚 Littérature</a>
-                            <a href="Sport.html">⚽ Sport</a>
-                            <a href="Musique.html">🎵 Musique</a>
-                            <a href="Art.html">🎨 Art</a>
-                            <a href="Culture.html">🎭 Culture</a>
-                            <a href="Cinéma.html">🎬 Cinéma</a>
-                            <a href="Gastronomie.html">🍽️ Gastronomie</a>
-                            <a href="Politique.html">🏛️ Politique</a>
-                            <a href="Philosophie.html">💭 Philosophie</a>
-                        </div>
-                    </li>
-                </ul>
-            </li>
-            
-            <!-- Groupe MON ESPACE -->
-            <li class="dropdown">
-                <a href="#">👤 Mon Espace</a>
-                <ul class="submenu">
-                    <li><a href="Profil.html">👤 Mon Profil</a></li>
-                    <li><a href="Scores.html">🏆 Mes Scores</a></li>
-                    <li><a href="Classement.html">📊 Classement</a></li>
-                    <li><a href="Social.html">👥 Amis</a></li>
-                </ul>
-            </li>
-            
-            <li><a href="Contact.html">📧 Contact</a></li>
-        </ul>
-        
-        <div id="auth-nav-btn"></div>
-    </nav>
-
-    <!-- Navigation Mobile (barre en bas) -->
-    <nav class="nav-mobile" aria-label="Navigation mobile">
-        <a href="Accueil.html" class="nav-mobile-item active">
-            <span class="nav-mobile-icon">🏠</span>
-            <span class="nav-mobile-label">Accueil</span>
-        </a>
-        <a href="Quiz.html" class="nav-mobile-item">
-            <span class="nav-mobile-icon">🎮</span>
-            <span class="nav-mobile-label">Jouer</span>
-        </a>
-        <a href="quiz-du-jour.html" class="nav-mobile-item nav-mobile-featured">
-            <span class="nav-mobile-icon">📅</span>
-            <span class="nav-mobile-label">Quiz du Jour</span>
-        </a>
-        <a href="Profil.html" class="nav-mobile-item">
-            <span class="nav-mobile-icon">👤</span>
-            <span class="nav-mobile-label">Profil</span>
-        </a>
-        <button class="nav-mobile-item" id="mobile-menu-btn">
-            <span class="nav-mobile-icon">☰</span>
-            <span class="nav-mobile-label">Plus</span>
-        </button>
-    </nav>
-
-    <!-- Menu mobile étendu -->
-    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
-        <div class="mobile-menu-content">
-            <button class="mobile-menu-close" id="mobile-menu-close">✕</button>
-            <div class="mobile-menu-sections">
-                <div class="mobile-menu-section">
-                    <h3>🎮 Modes de Jeu</h3>
-                    <a href="Quiz.html">🎯 Quiz Classique</a>
-                    <a href="quiz-du-jour.html">📅 Quiz du Jour</a>
-                    <a href="mode-survie.html">💀 Mode Survie</a>
-                    <a href="multiplayer.html">⚔️ Multijoueur</a>
-                </div>
-                <div class="mobile-menu-section">
-                    <h3>📚 Catégories</h3>
-                    <div class="mobile-categories-grid">
-                        <a href="Histoire.html">📜 Histoire</a>
-                        <a href="Géographie.html">🌍 Géo</a>
-                        <a href="Science.html">🔬 Science</a>
-                        <a href="Littérature.html">📚 Littérature</a>
-                        <a href="Sport.html">⚽ Sport</a>
-                        <a href="Musique.html">🎵 Musique</a>
-                        <a href="Art.html">🎨 Art</a>
-                        <a href="Culture.html">🎭 Culture</a>
-                        <a href="Cinéma.html">🎬 Cinéma</a>
-                        <a href="Gastronomie.html">🍽️ Gastro</a>
-                        <a href="Politique.html">🏛️ Politique</a>
-                        <a href="Philosophie.html">💭 Philo</a>
-                    </div>
-                </div>
-                <div class="mobile-menu-section">
-                    <h3>👤 Mon Espace</h3>
-                    <a href="Profil.html">👤 Mon Profil</a>
-                    <a href="Scores.html">🏆 Mes Scores</a>
-                    <a href="Classement.html">📊 Classement</a>
-                    <a href="Social.html">👥 Amis</a>
-                </div>
-                <div class="mobile-menu-section">
-                    <h3>ℹ️ Autres</h3>
-                    <a href="Contact.html">📧 Contact</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="quiz-highlight"
         style="background: linear-gradient(135deg, #3498db, #2ecc71); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
         <h2 style="margin: 0;">📅 Quiz du Jour</h2>

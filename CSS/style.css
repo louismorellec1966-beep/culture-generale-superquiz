@@ -979,12 +979,16 @@ a:focus {
     z-index: 2000;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all 0.3s ease;
+    display: none;
 }
 
 .mobile-menu-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
+    display: block;
 }
 
 .mobile-menu-content {
@@ -1077,11 +1081,15 @@ a:focus {
 /* Responsive */
 @media (max-width: 900px) {
     .nav-desktop {
-        display: none;
+        display: none !important;
     }
     
     .nav-mobile {
-        display: flex;
+        display: flex !important;
+    }
+    
+    .mobile-menu-overlay.active {
+        display: block !important;
     }
     
     body {
@@ -1091,9 +1099,23 @@ a:focus {
 }
 
 @media (min-width: 901px) {
-    .nav-mobile,
+    .nav-mobile {
+        display: none !important;
+    }
+    
     .mobile-menu-overlay {
         display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    
+    .mobile-menu-overlay.active {
+        display: none !important;
+    }
+    
+    .nav-desktop {
+        display: flex !important;
     }
     
     body {

@@ -3,18 +3,19 @@
 
 <head>
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quiz d'histoire - Choisissez votre période : Antiquité, Moyen Âge, Histoire de l'Art, Guerres Mondiales">
+    <meta name="description"
+        content="Quiz d'histoire - Choisissez votre période : Antiquité, Moyen Âge, Histoire de l'Art, Guerres Mondiales">
     <meta name="keywords" content="quiz histoire, france, culture générale, antiquité, moyen âge">
     <title>SuperQuiz.com - Histoire</title>
     <link rel="preload" href="CSS/style.css" as="style">
@@ -26,46 +27,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
-    <script src="js/auth-menu.js" defer></script>
+    <script src="js/menu.js" defer></script>
 </head>
 
 <body>
-    <nav aria-label="Navigation principale">
-        <button id="toggle-menu" aria-label="Ouvrir le menu" aria-expanded="false">
-            <span class="hamburger"></span>
-            <span class="hamburger"></span>
-            <span class="hamburger"></span>
-        </button>
-        
-        <ul class="menu">
-            <li><a href="Accueil.html">Accueil</a></li>
-            <li class="dropdown">
-                <a href="Quiz.html">Quiz</a>
-                <ul class="submenu">
-                    <li><a href="Histoire.html" aria-current="page">Histoire</a></li>
-                    <li><a href="Géographie.html">Géographie</a></li>
-                    <li><a href="Science.html">Science</a></li>
-                    <li><a href="Littérature.html">Littérature</a></li>
-                    <li><a href="Sport.html">Sport</a></li>
-                    <li><a href="Musique.html">Musique</a></li>
-                    <li><a href="Art.html">Art</a></li>
-                    <li><a href="Culture.html">Culture</a></li>
-                    <li><a href="Cinéma.html">Cinéma</a></li>
-                    <li><a href="Gastronomie.html">Gastronomie</a></li>
-                    <li><a href="Politique.html">Politique</a></li>
-                    <li><a href="Philosophie.html">Philosophie</a></li>
-                </ul>
-            </li>
-            <li><a href="Classement.html">🏆 Classement</a></li>
-            <li><a href="Scores.html">Scores</a></li>
-            <li><a href="quiz-du-jour.html">📅 Quiz du Jour</a></li>
-            <li><a href="mode-survie.html">🎮 Mode Survie</a></li>
-            <li><a href="multiplayer.html">⚔️ Multijoueur</a></li>
-            <li><a href="Profil.html">👤 Profil</a></li>
-            <li><a href="Social.html">👥 Social</a></li>
-            <li><a href="Contact.html">Contact</a></li>
-        </ul>
-    </nav>
 
     <header>
         <div class="h1">
@@ -106,7 +71,7 @@
                 </a>
                 <a href="mode-selection.html?matiere=histoire&categorie=préhistoire" class="category-card">
                     <h3>🏛️ Préhistoire</h3>
-                    <p>Dinosaures</p>  
+                    <p>Dinosaures</p>
                 </a>
             </div>
         </div>
@@ -115,7 +80,7 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-<script>
+    <script>
         // Gestion du menu d'authentification Firebase
         FirebaseAuth.onAuthStateChanged(user => {
             const nav = document.querySelector('.menu');
@@ -155,6 +120,7 @@
         }
     </script>
 </body>
+
 </html>
 </body>
 

@@ -1,24 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="js/menu.js" defer></script>
-    <script src="js/profile-system.js" defer></script>
-    <script src="js/daily-rewards.js" defer></script>
-    <script src="js/notifications.js" defer></script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'G-G3YEKJLDRT');
-    </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,14 +8,34 @@
         content="superquiz - Testez vos connaissances en culture générale avec nos quiz d'histoire, géographie, science et littérature">
     <meta name="keywords" content="quiz, culture générale, histoire, géographie, science, littérature, test">
     <title>superquiz - Accueil</title>
+    
+    <!-- CSS en priorité -->
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
     <link rel="apple-touch-icon" href="images/logo-192.png">
-    <link rel="preload" href="css/style.css" as="style">
-    <link rel="stylesheet" href="css/style.css" type="text/css">
-    <link rel="preload" href="js/script.js" as="script">
-    <script src="js/script.js" defer></script>
+    
+    <!-- Firebase SDK - chargé en defer -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+    <script defer src="js/menu.js"></script>
+    <script defer src="js/profile-system.js"></script>
+    <script defer src="js/daily-rewards.js"></script>
+    <script defer src="js/notifications.js"></script>
+    <script defer src="js/script.js"></script>
+    
+    <!-- Google Analytics - async -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <style>
         .welcome-box {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

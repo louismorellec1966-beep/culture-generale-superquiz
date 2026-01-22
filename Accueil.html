@@ -3,16 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="superquiz - Testez vos connaissances en culture générale">
-    <title>superquiz - Accueil</title>
-    
-    <!-- CSS critique inline pour affichage immédiat -->
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding-top: 65px; }
-        .nav-desktop { position: fixed; top: 0; left: 0; width: 100%; height: 65px; background: linear-gradient(135deg, #2c3e50, #1a252f); z-index: 1000; display: flex; align-items: center; padding: 0 30px; box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
-        .nav-logo { font-size: 1.5em; font-weight: bold; color: white; text-decoration: none; }
-        .mobile-menu-overlay { display: none; }
-    </style>
+    <meta name="description" content="CultureLudo - Le quiz de culture générale fun et addictif. Testez vos connaissances, défiez vos amis et grimpez dans le classement !">
+    <title>CultureLudo - Quiz de Culture Générale</title>
     
     <!-- CSS complet -->
     <link rel="stylesheet" href="css/style.css">
@@ -29,56 +21,530 @@
         gtag('js', new Date());
         gtag('config', 'G-G3YEKJLDRT');
     </script>
+    
     <style>
-        .welcome-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px auto;
-            max-width: 800px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding-top: 70px;
+        }
+
+        /* Hero Section */
+        .hero {
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 60px 20px 40px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .welcome-box h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.8em;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
         }
 
-        .welcome-box p {
-            margin: 10px 0;
-            font-size: 1.1em;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
         }
 
-        .btn-cta {
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(102, 126, 234, 0.5);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            color: #a0aec0;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Quiz du Jour */
+        .daily-quiz-section {
+            max-width: 900px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .daily-quiz-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        .daily-quiz-card::before {
+            content: '📅';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 120px;
+            opacity: 0.1;
+        }
+
+        .daily-badge {
             display: inline-block;
-            padding: 12px 30px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .daily-quiz-card h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .daily-theme {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+
+        .btn-play {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
             background: white;
             color: #667eea;
+            padding: 15px 40px;
+            border-radius: 50px;
             text-decoration: none;
-            border-radius: 8px;
-            margin-top: 15px;
             font-weight: bold;
-            transition: transform 0.3s;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
 
-        .btn-cta:hover {
+        .btn-play:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        /* Grille des modes de jeu */
+        .game-modes {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #fff;
+        }
+
+        .modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .mode-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            color: white;
+            display: block;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .mode-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .mode-card p {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .mode-card.featured {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            border-color: rgba(102, 126, 234, 0.5);
+        }
+
+        /* Catégories */
+        .categories-section {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .categories-scroll {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #667eea transparent;
+        }
+
+        .category-chip {
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-chip:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            transform: scale(1.05);
+        }
+
+        /* Section utilisateur */
+        .user-section {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .user-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-card h2 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .user-card p {
+            color: #a0aec0;
+            margin-bottom: 25px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 14px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 12px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* Features */
+        .features-section {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-item h4 {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .feature-item p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .home-footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #718096;
+        }
+
+        .home-footer a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 15px;
+        }
+
+        .home-footer a:hover {
+            color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .hero-stats { gap: 25px; }
+            .stat-number { font-size: 2rem; }
+            .daily-quiz-card { padding: 30px 20px; }
+            .daily-quiz-card h2 { font-size: 1.5rem; }
+            .section-title { font-size: 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2rem; }
+            .hero-stats { flex-direction: column; gap: 20px; }
+            .btn-group { flex-direction: column; }
         }
     </style>
 </head>
 
 <body>
-    <div class="quiz-highlight"
-        style="background: linear-gradient(135deg, #3498db, #2ecc71); color: white; padding: 30px; border-radius: 15px; margin: 20px 0; text-align: center;">
-        <h2 style="margin: 0;">📅 Quiz du Jour</h2>
-        <p id="daily-theme-home" style="font-size: 1.2em; margin: 15px 0;">Chargement...</p>
-        <a href="quiz-du-jour.html"
-            style="display: inline-block; background: white; color: #3498db; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 10px;">
-            Jouer maintenant 🎯
-        </a>
-    </div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>🧠 CultureLudo</h1>
+            <p class="hero-subtitle">Devenez incollable en culture générale !</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-number">1000+</div>
+                    <div class="stat-label">Questions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Catégories</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Fun</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz du Jour -->
+    <section class="daily-quiz-section">
+        <div class="daily-quiz-card">
+            <span class="daily-badge">⭐ Nouveau chaque jour</span>
+            <h2>Quiz du Jour</h2>
+            <p class="daily-theme" id="daily-theme-home">Chargement du thème...</p>
+            <a href="quiz-du-jour.html" class="btn-play">
+                Jouer maintenant
+                <span>🎯</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Modes de jeu -->
+    <section class="game-modes">
+        <h2 class="section-title">Choisissez votre mode de jeu</h2>
+        <div class="modes-grid">
+            <a href="Quiz.html" class="mode-card featured">
+                <span class="mode-icon">🎮</span>
+                <h3>Quiz Classique</h3>
+                <p>Choisissez une catégorie et testez vos connaissances à votre rythme</p>
+            </a>
+            <a href="multiplayer.html" class="mode-card">
+                <span class="mode-icon">⚔️</span>
+                <h3>Mode Duel</h3>
+                <p>Affrontez un ami en temps réel et prouvez que vous êtes le meilleur !</p>
+            </a>
+            <a href="mode-survie.html" class="mode-card">
+                <span class="mode-icon">💀</span>
+                <h3>Mode Survie</h3>
+                <p>Combien de questions pouvez-vous enchaîner sans vous tromper ?</p>
+            </a>
+            <a href="Classement.html" class="mode-card">
+                <span class="mode-icon">🏆</span>
+                <h3>Classement</h3>
+                <p>Consultez le tableau des scores et visez la première place !</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Catégories -->
+    <section class="categories-section">
+        <h2 class="section-title">Explorez les catégories</h2>
+        <div class="categories-scroll">
+            <a href="Histoire.html" class="category-chip">📜 Histoire</a>
+            <a href="Géographie.html" class="category-chip">🌍 Géographie</a>
+            <a href="Science.html" class="category-chip">🔬 Sciences</a>
+            <a href="Art.html" class="category-chip">🎨 Art</a>
+            <a href="Musique.html" class="category-chip">🎵 Musique</a>
+            <a href="Cinéma.html" class="category-chip">🎬 Cinéma</a>
+            <a href="Littérature.html" class="category-chip">📚 Littérature</a>
+            <a href="Sport.html" class="category-chip">⚽ Sport</a>
+            <a href="Gastronomie.html" class="category-chip">🍽️ Gastronomie</a>
+            <a href="Philosophie.html" class="category-chip">💭 Philosophie</a>
+            <a href="Politique.html" class="category-chip">🏛️ Politique</a>
+        </div>
+    </section>
+
+    <!-- Section Utilisateur -->
+    <section class="user-section">
+        <div class="user-card" id="user-welcome">
+            <h2>🚀 Prêt à jouer ?</h2>
+            <p>Créez un compte gratuit pour sauvegarder vos scores, suivre vos progrès et défier vos amis !</p>
+            <div class="btn-group">
+                <a href="Auth.html" class="btn-primary">Créer un compte</a>
+                <a href="Quiz.html" class="btn-secondary">Jouer sans compte</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <h4>100% Mobile</h4>
+                <p>Jouez partout, sur tous vos appareils</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🔄</div>
+                <h4>Mis à jour</h4>
+                <p>Nouvelles questions régulièrement</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🏅</div>
+                <h4>Progression</h4>
+                <p>Suivez vos stats et améliorez-vous</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎯</div>
+                <h4>Quiz du jour</h4>
+                <p>Un nouveau défi quotidien</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="home-footer">
+        <p>
+            <a href="Contact.html">Contact</a>
+            <a href="Mentions-Legales.html">Mentions légales</a>
+            <a href="Politique-Confidentialite.html">Confidentialité</a>
+        </p>
+        <p style="margin-top: 15px;">© 2024 CultureLudo - Tous droits réservés</p>
+    </footer>
 
     <script>
         // Afficher le thème du jour
@@ -86,124 +552,47 @@
             if (typeof firebase === 'undefined') return;
 
             const today = new Date().toISOString().split('T')[0];
-            const quizDoc = await firebase.firestore()
-                .collection('dailyQuiz')
-                .doc(today)
-                .get();
+            try {
+                const quizDoc = await firebase.firestore()
+                    .collection('dailyQuiz')
+                    .doc(today)
+                    .get();
 
-            if (quizDoc.exists) {
+                if (quizDoc.exists) {
+                    document.getElementById('daily-theme-home').textContent =
+                        `Thème du jour : ${quizDoc.data().theme}`;
+                } else {
+                    document.getElementById('daily-theme-home').textContent =
+                        `Un nouveau quiz vous attend !`;
+                }
+            } catch (e) {
                 document.getElementById('daily-theme-home').textContent =
-                    `Thème du jour : ${quizDoc.data().theme}`;
+                    `Un nouveau quiz vous attend !`;
             }
         });
-    </script>
 
-    <header>
-        <div class="h1">
-            <h1>SUPERQUIZ</h1>
-        </div>
-
-        <div class="phrase-de-bienvenue">
-            <p>BIENVENUE DANS CE NOUVEAU SITE DE CULTURE GÉNÉRALE</p>
-        </div>
-
-        <div id="user-welcome"></div>
-
-        <div class="updates-info">
-            <h2>Mises à jour du site</h2>
-            <p>✨ <strong>Nouveau :</strong> Système de comptes utilisateurs ! Connectez-vous pour sauvegarder vos scores
-                et suivre vos progrès.</p>
-            <p>Publication du site dans sa version Alpha avec 5 menus dont 5 sous-menus présents dans Quiz afin d'avoir
-                une variété de matières où
-                l'utilisateur peut trouver des questions en rapport avec le sous-menu choisi.</p>
-            <p class="update-divider">.............................</p>
-            <p class="update-divider">.............................</p>
-        </div>
-    </header>
-
-    <main>
-        <figure>
-            <img src="images/Bretagne.jpg" alt="Paysage de Bretagne avec ses côtes pittoresques" width="100"
-                height="100" loading="lazy" />
-            <figcaption>La Bretagne est une région de l'ouest de la France connue pour ses côtes pittoresques et son
-                riche
-                patrimoine culturel.</figcaption>
-        </figure>
-    </main>
-
-    <footer>
-        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
-    </footer>
-
-    <script>
         // Afficher un message de bienvenue personnalisé si connecté
         function displayWelcome() {
             const user = FirebaseAuth.getCurrentUser();
+            const welcomeDiv = document.getElementById('user-welcome');
 
             if (user) {
-                const welcomeDiv = document.getElementById('user-welcome');
                 welcomeDiv.innerHTML = `
-                    <div class="welcome-box">
-                        <h2>👋 Bonjour ${user.name} !</h2>
-                        <p>Ravi de vous revoir. Prêt à tester vos connaissances ?</p>
-                        <a href="Quiz.html" class="btn-cta">Commencer un quiz</a>
-                        <a href="Scores.html" class="btn-cta">Voir mes scores</a>
+                    <h2>👋 Content de te revoir, ${user.name} !</h2>
+                    <p>Prêt pour un nouveau défi ? Ton prochain record t'attend !</p>
+                    <div class="btn-group">
+                        <a href="Quiz.html" class="btn-primary">Jouer maintenant</a>
+                        <a href="MonEspace.html" class="btn-secondary">Mon espace</a>
                     </div>
                 `;
-                return;
             }
-
-            // Utilisateur non connecté
-            const welcomeDiv = document.getElementById('user-welcome');
-            welcomeDiv.innerHTML = `
-                <div class="welcome-box">
-                    <h2>🎯 Nouveau sur SuperQuiz ?</h2>
-                    <p>Créez un compte pour sauvegarder vos scores et suivre vos progrès !</p>
-                    <a href="Auth.html" class="btn-cta">S'inscrire gratuitement</a>
-                    <a href="Quiz.html" class="btn-cta">Essayer sans compte</a>
-                </div>
-            `;
         }
 
         // Gestion du menu d'authentification Firebase
-        FirebaseAuth.onAuthStateChanged(user => {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-
-            // Mettre à jour le message de bienvenue
-            displayWelcome();
-        });
-
-        // Fonction de déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
+        if (typeof FirebaseAuth !== 'undefined') {
+            FirebaseAuth.onAuthStateChanged(user => {
+                displayWelcome();
+            });
         }
 
         // Gestion du menu mobile
@@ -218,10 +607,12 @@
                     document.body.style.overflow = 'hidden';
                 });
 
-                mobileMenuClose.addEventListener('click', () => {
-                    mobileMenuOverlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                });
+                if (mobileMenuClose) {
+                    mobileMenuClose.addEventListener('click', () => {
+                        mobileMenuOverlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                }
 
                 mobileMenuOverlay.addEventListener('click', (e) => {
                     if (e.target === mobileMenuOverlay) {

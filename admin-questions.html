@@ -255,6 +255,53 @@
             font-weight: bold;
         }
 
+        /* Bulk Actions */
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .bulk-actions.has-selection {
+            border-color: #3498db;
+            background: #e8f4fd;
+        }
+
+        .bulk-actions .selected-count {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-right: auto;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #3498db;
+        }
+
+        .question-checkbox {
+            margin-right: 15px;
+        }
+
+        .question-item.selected {
+            background: #e8f4fd;
+            border-left-color: #3498db !important;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+        }
+
         .questions-list {
             max-height: 600px;
             overflow-y: auto;
@@ -613,6 +660,13 @@
                     <option value="science">Science</option>
                     <option value="litterature">Littérature</option>
                     <option value="sport">Sport</option>
+                    <option value="art">Art</option>
+                    <option value="musique">Musique</option>
+                    <option value="cinema">Cinéma</option>
+                    <option value="culture">Culture Générale</option>
+                    <option value="politique">Politique</option>
+                    <option value="gastronomie">Gastronomie</option>
+                    <option value="philosophie">Philosophie</option>
                 </select>
 
                 <select id="filter-categorie" onchange="loadQuestions()">
@@ -629,6 +683,17 @@
                 <button onclick="loadQuestions()" class="btn btn-secondary btn-small">🔄 Rafraîchir</button>
                 
                 <span class="questions-count" id="questions-count">0 questions</span>
+            </div>
+
+            <!-- Actions en masse -->
+            <div class="bulk-actions" id="bulk-actions">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="select-all" onchange="toggleSelectAll()">
+                    <label for="select-all">Tout sélectionner</label>
+                </div>
+                <span class="selected-count" id="selected-count">0 sélectionnée(s)</span>
+                <button onclick="bulkDelete()" class="btn btn-danger btn-small" id="btn-bulk-delete" disabled>🗑️ Supprimer la sélection</button>
+                <button onclick="openBulkEditModal()" class="btn btn-primary btn-small" id="btn-bulk-edit" disabled>✏️ Modifier la sélection</button>
             </div>
 
             <div id="questions-list" class="questions-list">
@@ -727,9 +792,88 @@
         </div>
     </div>
 
+    <!-- Modal de modification en masse -->
+    <div class="modal-overlay" id="bulk-edit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Modifier en Masse</h2>
+                <button class="modal-close" onclick="closeBulkEditModal()">×</button>
+            </div>
+            
+            <div id="message-bulk-edit"></div>
+            
+            <p style="margin-bottom: 20px; color: #7f8c8d;">
+                <span id="bulk-edit-count">0</span> question(s) sélectionnée(s). 
+                Seuls les champs modifiés seront appliqués.
+            </p>
+            
+            <form id="form-bulk-edit" onsubmit="saveBulkEdit(event)">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="bulk-change-matiere" onchange="toggleBulkField('matiere')">
+                        🎯 Changer le Thème
+                    </label>
+                    <select id="bulk-matiere" disabled onchange="updateCategories('bulk')">
+                        <option value="">-- Ne pas modifier --</option>
+                        <option value="histoire">Histoire</option>
+                        <option value="geographie">Géographie</option>
+                        <option value="science">Science</option>
+                        <option value="litterature">Littérature</option>
+                        <option value="sport">Sport</option>
+                        <option value="art">Art</option>
+                        <option value="musique">Musique</option>
+                        <option value="cinema">Cinéma</option>
+                        <option value="culture">Culture Générale</option>
+                        <option value="politique">Politique</option>
+                        <option value="gastronomie">Gastronomie</option>
+                        <option value="philosophie">Philosophie</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="bulk-change-categorie" onchange="toggleBulkField('categorie')">
+                        📚 Changer la Catégorie
+                    </label>
+                    <select id="bulk-categorie" disabled>
+                        <option value="">-- Ne pas modifier --</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="bulk-change-difficulty" onchange="toggleBulkField('difficulty')">
+                        📊 Changer la Difficulté
+                    </label>
+                    <select id="bulk-difficulty" disabled>
+                        <option value="">-- Ne pas modifier --</option>
+                        <option value="facile">🟢 Facile</option>
+                        <option value="moyen">🟡 Moyen</option>
+                        <option value="difficile">🔴 Difficile</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="bulk-change-tags" onchange="toggleBulkField('tags')">
+                        🏷️ Ajouter des Tags (s'ajouteront aux existants)
+                    </label>
+                    <input type="text" id="bulk-tags" placeholder="tag1, tag2, tag3..." disabled>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button type="submit" class="btn btn-success">💾 Appliquer les modifications</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeBulkEditModal()">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
         // Variable globale pour stocker toutes les questions
         let allQuestions = [];
+        // Set pour stocker les IDs des questions sélectionnées
+        let selectedQuestions = new Set();
 
         const CATEGORIES = {
             histoire: {
@@ -753,7 +897,14 @@
                 physique: 'Physique', chimie: 'Chimie', biologie: 'Biologie', astronomie: 'Astronomie', mathematiques: 'Mathématiques', technologie: 'Technologie'
             },
             litterature: { classiques: 'Classiques Français', poesie: 'Poésie', theatre: 'Théâtre', romans: 'Romans du XXe siècle', mondiale: 'Littérature Mondiale', contemporaine: 'Littérature Contemporaine' },
-            sport: { football: 'Football', basketball: 'Basketball', tennis: 'Tennis', athletisme: 'Athlétisme', natation: 'Natation', 'jeux-olympiques': 'Jeux Olympiques' }
+            sport: { football: 'Football', basketball: 'Basketball', tennis: 'Tennis', athletisme: 'Athlétisme', natation: 'Natation', 'jeux-olympiques': 'Jeux Olympiques' },
+            art: { peinture: 'Peinture', sculpture: 'Sculpture', architecture: 'Architecture', moderne: 'Art Moderne', contemporain: 'Art Contemporain', general: 'Général' },
+            musique: { classique: 'Classique', rock: 'Rock', jazz: 'Jazz', pop: 'Pop', variete: 'Variété Française', general: 'Général' },
+            cinema: { francais: 'Cinéma Français', americain: 'Cinéma Américain', realisateurs: 'Réalisateurs', acteurs: 'Acteurs', general: 'Général' },
+            culture: { general: 'Culture Générale', actualites: 'Actualités', traditions: 'Traditions' },
+            politique: { france: 'Politique Française', internationale: 'Politique Internationale', institutions: 'Institutions', general: 'Général' },
+            gastronomie: { francaise: 'Cuisine Française', mondiale: 'Cuisine Mondiale', vins: 'Vins & Spiritueux', general: 'Général' },
+            philosophie: { ancienne: 'Philosophie Ancienne', moderne: 'Philosophie Moderne', concepts: 'Grands Concepts', general: 'Général' }
         };
 
         // Liste des emails administrateurs autorisés
@@ -1084,17 +1235,30 @@
                     return;
                 }
 
-                // Afficher les questions
+                // Stocker les questions pour la sélection
+                allQuestions = filtered;
+                
+                // Réinitialiser la sélection
+                selectedQuestions.clear();
+                updateBulkActions();
+
+                // Afficher les questions avec checkboxes
                 container.innerHTML = filtered.map(q => `
-                    <div class="question-item ${q.difficulty || ''}">
+                    <div class="question-item ${q.difficulty || ''}" id="question-${q.id}">
                         <div class="question-header">
-                            <div>
-                                <div class="question-meta">
-                                    📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'} | 
-                                    ${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || 'Non défini')} |
-                                    🆔 ${q.id.substring(0, 8)}...
+                            <div style="display: flex; align-items: flex-start;">
+                                <input type="checkbox" class="question-checkbox" 
+                                       id="check-${q.id}" 
+                                       onchange="toggleQuestionSelection('${q.id}')"
+                                       style="width: 20px; height: 20px; margin-right: 15px; margin-top: 5px; cursor: pointer;">
+                                <div>
+                                    <div class="question-meta">
+                                        📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'} | 
+                                        ${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || 'Non défini')} |
+                                        🆔 ${q.id.substring(0, 8)}...
+                                    </div>
+                                    <div class="question-text-display">${q.question}</div>
                                 </div>
-                                <div class="question-text-display">${q.question}</div>
                             </div>
                             <div class="question-actions">
                                 <button class="btn btn-primary btn-small" onclick="openEditModal('${q.id}')">✏️ Modifier</button>
@@ -1303,6 +1467,231 @@
             } catch (error) {
                 console.error('Erreur loadStats:', error);
                 statsGrid.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        // ========== SÉLECTION MULTIPLE ==========
+        function toggleQuestionSelection(id) {
+            const checkbox = document.getElementById(`check-${id}`);
+            const questionDiv = document.getElementById(`question-${id}`);
+            
+            if (checkbox.checked) {
+                selectedQuestions.add(id);
+                questionDiv.classList.add('selected');
+            } else {
+                selectedQuestions.delete(id);
+                questionDiv.classList.remove('selected');
+            }
+            
+            updateBulkActions();
+        }
+        
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const checkboxes = document.querySelectorAll('.question-checkbox');
+            
+            checkboxes.forEach(cb => {
+                const id = cb.id.replace('check-', '');
+                cb.checked = selectAllCheckbox.checked;
+                
+                const questionDiv = document.getElementById(`question-${id}`);
+                if (selectAllCheckbox.checked) {
+                    selectedQuestions.add(id);
+                    if (questionDiv) questionDiv.classList.add('selected');
+                } else {
+                    selectedQuestions.delete(id);
+                    if (questionDiv) questionDiv.classList.remove('selected');
+                }
+            });
+            
+            updateBulkActions();
+        }
+        
+        function updateBulkActions() {
+            const count = selectedQuestions.size;
+            document.getElementById('selected-count').textContent = `${count} sélectionnée(s)`;
+            
+            const btnDelete = document.getElementById('btn-bulk-delete');
+            const btnEdit = document.getElementById('btn-bulk-edit');
+            const bulkActionsDiv = document.getElementById('bulk-actions');
+            
+            btnDelete.disabled = count === 0;
+            btnEdit.disabled = count === 0;
+            
+            if (count > 0) {
+                bulkActionsDiv.classList.add('has-selection');
+            } else {
+                bulkActionsDiv.classList.remove('has-selection');
+            }
+            
+            // Mettre à jour le checkbox "Tout sélectionner"
+            const selectAllCheckbox = document.getElementById('select-all');
+            const totalCheckboxes = document.querySelectorAll('.question-checkbox').length;
+            selectAllCheckbox.checked = totalCheckboxes > 0 && count === totalCheckboxes;
+            selectAllCheckbox.indeterminate = count > 0 && count < totalCheckboxes;
+        }
+        
+        // ========== SUPPRESSION EN MASSE ==========
+        async function bulkDelete() {
+            const count = selectedQuestions.size;
+            if (count === 0) return;
+            
+            const confirmation = confirm(`⚠️ ATTENTION !\n\nVous êtes sur le point de supprimer ${count} question(s).\n\nCette action est IRRÉVERSIBLE.\n\nÊtes-vous sûr de vouloir continuer ?`);
+            
+            if (!confirmation) return;
+            
+            // Double confirmation pour éviter les erreurs
+            const doubleConfirm = confirm(`🔴 DERNIÈRE CONFIRMATION\n\nSupprimer définitivement ${count} question(s) ?\n\nCliquez sur OK pour confirmer.`);
+            
+            if (!doubleConfirm) return;
+            
+            try {
+                let deleted = 0;
+                let errors = 0;
+                
+                for (const id of selectedQuestions) {
+                    try {
+                        await db.collection('questionBank').doc(id).delete();
+                        deleted++;
+                    } catch (e) {
+                        console.error(`Erreur suppression ${id}:`, e);
+                        errors++;
+                    }
+                }
+                
+                selectedQuestions.clear();
+                document.getElementById('select-all').checked = false;
+                
+                if (errors > 0) {
+                    alert(`✅ ${deleted} question(s) supprimée(s)\n❌ ${errors} erreur(s)`);
+                } else {
+                    alert(`✅ ${deleted} question(s) supprimée(s) avec succès !`);
+                }
+                
+                loadQuestions();
+                
+            } catch (error) {
+                alert('❌ Erreur : ' + error.message);
+            }
+        }
+        
+        // ========== MODIFICATION EN MASSE ==========
+        function openBulkEditModal() {
+            if (selectedQuestions.size === 0) return;
+            
+            document.getElementById('bulk-edit-count').textContent = selectedQuestions.size;
+            
+            // Réinitialiser le formulaire
+            document.getElementById('bulk-change-matiere').checked = false;
+            document.getElementById('bulk-change-categorie').checked = false;
+            document.getElementById('bulk-change-difficulty').checked = false;
+            document.getElementById('bulk-change-tags').checked = false;
+            
+            document.getElementById('bulk-matiere').value = '';
+            document.getElementById('bulk-matiere').disabled = true;
+            document.getElementById('bulk-categorie').value = '';
+            document.getElementById('bulk-categorie').disabled = true;
+            document.getElementById('bulk-difficulty').value = '';
+            document.getElementById('bulk-difficulty').disabled = true;
+            document.getElementById('bulk-tags').value = '';
+            document.getElementById('bulk-tags').disabled = true;
+            
+            document.getElementById('message-bulk-edit').innerHTML = '';
+            document.getElementById('bulk-edit-modal').classList.add('active');
+        }
+        
+        function closeBulkEditModal() {
+            document.getElementById('bulk-edit-modal').classList.remove('active');
+        }
+        
+        function toggleBulkField(field) {
+            const checkbox = document.getElementById(`bulk-change-${field}`);
+            const input = document.getElementById(`bulk-${field}`);
+            input.disabled = !checkbox.checked;
+            
+            if (!checkbox.checked) {
+                input.value = '';
+            }
+        }
+        
+        async function saveBulkEdit(e) {
+            e.preventDefault();
+            
+            const messageDiv = document.getElementById('message-bulk-edit');
+            const count = selectedQuestions.size;
+            
+            // Construire l'objet de mise à jour
+            const updates = {};
+            
+            if (document.getElementById('bulk-change-matiere').checked) {
+                const matiere = document.getElementById('bulk-matiere').value;
+                if (matiere) updates.matiere = matiere;
+            }
+            
+            if (document.getElementById('bulk-change-categorie').checked) {
+                const categorie = document.getElementById('bulk-categorie').value;
+                if (categorie) updates.categorie = categorie;
+            }
+            
+            if (document.getElementById('bulk-change-difficulty').checked) {
+                const difficulty = document.getElementById('bulk-difficulty').value;
+                if (difficulty) updates.difficulty = difficulty;
+            }
+            
+            const addTags = document.getElementById('bulk-change-tags').checked;
+            const newTags = document.getElementById('bulk-tags').value
+                .split(',')
+                .map(t => t.trim())
+                .filter(t => t);
+            
+            // Vérifier qu'il y a quelque chose à modifier
+            if (Object.keys(updates).length === 0 && (!addTags || newTags.length === 0)) {
+                messageDiv.innerHTML = '<div class="alert alert-error">⚠️ Veuillez sélectionner au moins un champ à modifier.</div>';
+                return;
+            }
+            
+            updates.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+            
+            try {
+                let updated = 0;
+                let errors = 0;
+                
+                for (const id of selectedQuestions) {
+                    try {
+                        // Si on doit ajouter des tags, récupérer les tags existants
+                        if (addTags && newTags.length > 0) {
+                            const doc = await db.collection('questionBank').doc(id).get();
+                            if (doc.exists) {
+                                const existingTags = doc.data().tags || [];
+                                // Fusionner les tags sans doublons
+                                updates.tags = [...new Set([...existingTags, ...newTags])];
+                            }
+                        }
+                        
+                        await db.collection('questionBank').doc(id).update(updates);
+                        updated++;
+                    } catch (e) {
+                        console.error(`Erreur mise à jour ${id}:`, e);
+                        errors++;
+                    }
+                }
+                
+                if (errors > 0) {
+                    messageDiv.innerHTML = `<div class="alert alert-success">✅ ${updated} question(s) modifiée(s)</div>
+                                            <div class="alert alert-error">❌ ${errors} erreur(s)</div>`;
+                } else {
+                    messageDiv.innerHTML = `<div class="alert alert-success">✅ ${updated} question(s) modifiée(s) avec succès !</div>`;
+                }
+                
+                setTimeout(() => {
+                    closeBulkEditModal();
+                    selectedQuestions.clear();
+                    document.getElementById('select-all').checked = false;
+                    loadQuestions();
+                }, 1500);
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
             }
         }
 

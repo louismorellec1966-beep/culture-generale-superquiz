@@ -635,7 +635,16 @@ function showQuestion() {
     // Réinitialiser l'état
     gameState.hasAnswered = false;
     gameState.opponentAnsweredCurrent = false;
-    gameState.questionStartTime = Date.now();
+    
+    // Annuler tous les timers précédents
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+        gameState.timer = null;
+    }
+    if (gameState.safetyTimer) {
+        clearTimeout(gameState.safetyTimer);
+        gameState.safetyTimer = null;
+    }
     
     console.log(`📝 Question ${gameState.currentQuestionIndex + 1}/${gameState.questions.length}`);
     
@@ -655,10 +664,8 @@ function showQuestion() {
     // Stocker le mapping pour la validation
     gameState.currentShuffledAnswers = shuffledAnswers;
     
-    // Afficher les réponses
+    // Afficher les réponses (SANS classe disabled)
     const answersGrid = document.getElementById('answers-grid');
-    const letters = ['A', 'B', 'C', 'D'];
-    
     answersGrid.innerHTML = shuffledAnswers.map((ans, index) => `
         <button class="answer-btn" onclick="selectAnswer(${index})" data-index="${index}">
             ${ans.text}
@@ -672,14 +679,19 @@ function showQuestion() {
     const progress = ((gameState.currentQuestionIndex) / gameState.questions.length) * 100;
     document.getElementById('question-progress').style.width = `${progress}%`;
     
-    // Démarrer le timer
-    startQuestionTimer();
+    // Attendre un court instant puis démarrer le timer (pour éviter les clics accidentels)
+    gameState.questionStartTime = Date.now();
     
-    // Timeout de sécurité si l'adversaire ne répond pas (20 secondes après le timer normal)
+    // Démarrer le timer après un petit délai
+    setTimeout(() => {
+        startQuestionTimer();
+    }, 300);
+    
+    // Timeout de sécurité si l'adversaire ne répond pas
     if (window.rtdb && gameState.matchId) {
         const safetyTimeout = (gameState.gameMode === 'duel' 
             ? MULTIPLAYER_CONFIG.DUEL_TIME_PER_QUESTION 
-            : MULTIPLAYER_CONFIG.QUICK_TIME_PER_QUESTION) + 5;
+            : MULTIPLAYER_CONFIG.QUICK_TIME_PER_QUESTION) + 10;
         
         gameState.safetyTimer = setTimeout(() => {
             if (gameState.hasAnswered && !gameState.opponentAnsweredCurrent) {
@@ -697,6 +709,12 @@ function showQuestion() {
 
 // Timer de question
 function startQuestionTimer() {
+    // S'assurer qu'aucun timer n'est actif
+    if (gameState.timer) {
+        clearInterval(gameState.timer);
+        gameState.timer = null;
+    }
+    
     const timeLimit = gameState.gameMode === 'duel' 
         ? MULTIPLAYER_CONFIG.DUEL_TIME_PER_QUESTION 
         : MULTIPLAYER_CONFIG.QUICK_TIME_PER_QUESTION;
@@ -704,15 +722,22 @@ function startQuestionTimer() {
     let timeLeft = timeLimit;
     const timerEl = document.getElementById('duel-timer');
     
+    if (!timerEl) {
+        console.error('Element timer non trouvé');
+        return;
+    }
+    
     timerEl.textContent = timeLeft;
     timerEl.classList.remove('warning', 'danger');
     
-    // Annuler le timer de sécurité précédent s'il existe
-    if (gameState.safetyTimer) {
-        clearTimeout(gameState.safetyTimer);
-    }
-    
     gameState.timer = setInterval(() => {
+        // Vérifier si on a déjà répondu
+        if (gameState.hasAnswered) {
+            clearInterval(gameState.timer);
+            gameState.timer = null;
+            return;
+        }
+        
         timeLeft--;
         timerEl.textContent = timeLeft;
         
@@ -724,6 +749,7 @@ function startQuestionTimer() {
         
         if (timeLeft <= 0) {
             clearInterval(gameState.timer);
+            gameState.timer = null;
             if (!gameState.hasAnswered) {
                 handleTimeout();
             }

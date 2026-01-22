@@ -11,49 +11,49 @@
     "lang": "fr-FR",
     "icons": [
         {
-            "src": "/Images/logo-72.png",
+            "src": "/images/logo-72.png",
             "sizes": "72x72",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-96.png",
+            "src": "/images/logo-96.png",
             "sizes": "96x96",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-128.png",
+            "src": "/images/logo-128.png",
             "sizes": "128x128",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-144.png",
+            "src": "/images/logo-144.png",
             "sizes": "144x144",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-152.png",
+            "src": "/images/logo-152.png",
             "sizes": "152x152",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-192.png",
+            "src": "/images/logo-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-384.png",
+            "src": "/images/logo-384.png",
             "sizes": "384x384",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/Images/logo-512.png",
+            "src": "/images/logo-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
@@ -62,7 +62,7 @@
     "categories": ["education", "games", "entertainment"],
     "screenshots": [
         {
-            "src": "/Images/screenshot-1.png",
+            "src": "/images/screenshot-1.png",
             "sizes": "1280x720",
             "type": "image/png",
             "label": "Page d'accueil SuperQuiz"
@@ -74,21 +74,21 @@
             "short_name": "Quiz Jour",
             "description": "Accéder au quiz quotidien",
             "url": "/quiz-du-jour.html",
-            "icons": [{ "src": "/Images/icon-quiz.png", "sizes": "96x96" }]
+            "icons": [{ "src": "/images/icon-quiz.png", "sizes": "96x96" }]
         },
         {
             "name": "Mon Profil",
             "short_name": "Profil",
             "description": "Voir mon profil et statistiques",
             "url": "/Profil.html",
-            "icons": [{ "src": "/Images/icon-profile.png", "sizes": "96x96" }]
+            "icons": [{ "src": "/images/icon-profile.png", "sizes": "96x96" }]
         },
         {
             "name": "Classement",
             "short_name": "Classement",
             "description": "Voir le classement général",
             "url": "/Classement.html",
-            "icons": [{ "src": "/Images/icon-leaderboard.png", "sizes": "96x96" }]
+            "icons": [{ "src": "/images/icon-leaderboard.png", "sizes": "96x96" }]
         }
     ],
     "related_applications": [],

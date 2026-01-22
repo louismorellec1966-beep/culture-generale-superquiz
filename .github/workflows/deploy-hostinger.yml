@@ -1,0 +1,34 @@
+name: 🚀 Déploiement vers Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Permet de lancer manuellement depuis GitHub
+
+jobs:
+  deploy:
+    name: 📤 Upload vers Hostinger
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: 📤 Déployer via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /domains/cultureludo.com/public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/.github/**
+            **/deploy.ps1
+            **/deploy.bat
+            **/_netrc
+            **/*.log
+            **/.env

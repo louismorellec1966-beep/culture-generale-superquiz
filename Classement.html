@@ -416,41 +416,15 @@
             await loadClassement();
         }
 
-        async function logout(e) {
-            e.preventDefault();
-            if (confirm('Déconnexion ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    window.location.href = 'Accueil.html';
-                } catch (e) {
-                    alert('Erreur déconnexion');
-                }
-            }
-        }
-
         window.addEventListener('load', () => {
-            if (typeof FirebaseAuth === 'undefined') {
+            if (typeof firebase === 'undefined' || !firebase.auth) {
                 setTimeout(() => location.reload(), 2000);
                 return;
             }
 
-            FirebaseAuth.onAuthStateChanged(user => {
+            firebase.auth().onAuthStateChanged(user => {
                 if (user) currentUser = user;
                 loadClassement();
-
-                // Menu auth
-                const nav = document.querySelector('.menu');
-                if (!nav) return;
-                const exist = document.getElementById('auth-menu-item');
-                if (exist) exist.remove();
-                const auth = document.createElement('li');
-                auth.id = 'auth-menu-item';
-                if (user) {
-                    auth.innerHTML = `<a href="#" onclick="logout(event)" style="color:#2ecc71">👤 ${user.name}</a>`;
-                } else {
-                    auth.innerHTML = '<a href="Auth.html" style="color:#e74c3c">🔐 Connexion</a>';
-                }
-                nav.appendChild(auth);
             });
         });
     </script>

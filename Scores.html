@@ -380,22 +380,9 @@
             }
         }
 
-        // Déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
-        }
-
         // Attendre que Firebase soit chargé
         window.addEventListener('load', () => {
-            if (typeof FirebaseAuth === 'undefined') {
+            if (typeof firebase === 'undefined' || !firebase.auth) {
                 console.log('⏳ Firebase en cours de chargement...');
                 setTimeout(() => window.location.reload(), 1000);
                 return;
@@ -404,7 +391,7 @@
             console.log('🔥 Firebase chargé, vérification auth...');
             
             // Initialisation avec Firebase
-            FirebaseAuth.onAuthStateChanged(user => {
+            firebase.auth().onAuthStateChanged(user => {
                 console.log('👤 État auth:', user ? user.email : 'non connecté');
                 
                 if (user) {
@@ -413,28 +400,6 @@
                 } else {
                     showNotConnected();
                 }
-                
-                // Mettre à jour le menu
-                const nav = document.querySelector('.menu');
-                if (!nav) return;
-
-                const existingAuthItem = document.getElementById('auth-menu-item');
-                if (existingAuthItem) existingAuthItem.remove();
-
-                const authItem = document.createElement('li');
-                authItem.id = 'auth-menu-item';
-
-                if (user) {
-                    authItem.innerHTML = `
-                        <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                            👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                        </a>
-                    `;
-                } else {
-                    authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-                }
-
-                nav.appendChild(authItem);
             });
         });
     </script>

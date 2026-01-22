@@ -72,15 +72,5 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-    <script>
-        // Gestion du menu d'authentification Firebase
-        if (typeof FirebaseAuth !== 'undefined') {
-            FirebaseAuth.onAuthStateChanged(user => {
-                const nav = document.querySelector('.menu');
-                if (!nav) return;
-                // (Logique d'auth gérée par auth-menu.js ou script.js si présent)
-            });
-        }
-    </script>
 </body>
 </html>

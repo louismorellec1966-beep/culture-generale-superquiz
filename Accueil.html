@@ -571,30 +571,6 @@
             }
         });
 
-        // Afficher un message de bienvenue personnalisé si connecté
-        function displayWelcome() {
-            const user = FirebaseAuth.getCurrentUser();
-            const welcomeDiv = document.getElementById('user-welcome');
-
-            if (user) {
-                welcomeDiv.innerHTML = `
-                    <h2>👋 Content de te revoir, ${user.name} !</h2>
-                    <p>Prêt pour un nouveau défi ? Ton prochain record t'attend !</p>
-                    <div class="btn-group">
-                        <a href="Quiz.html" class="btn-primary">Jouer maintenant</a>
-                        <a href="MonEspace.html" class="btn-secondary">Mon espace</a>
-                    </div>
-                `;
-            }
-        }
-
-        // Gestion du menu d'authentification Firebase
-        if (typeof FirebaseAuth !== 'undefined') {
-            FirebaseAuth.onAuthStateChanged(user => {
-                displayWelcome();
-            });
-        }
-
         // Gestion du menu mobile
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');

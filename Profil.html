@@ -676,19 +676,18 @@
         });
 
         function initProfile() {
-            if (typeof FirebaseAuth === 'undefined') {
+            if (typeof firebase === 'undefined' || !firebase.auth) {
                 setTimeout(initProfile, 200);
                 return;
             }
 
-            FirebaseAuth.onAuthStateChanged(async (user) => {
+            firebase.auth().onAuthStateChanged(async (user) => {
                 if (user) {
                     currentUser = user;
                     await loadProfile(user.uid);
                 } else {
                     showNotConnected();
                 }
-                updateAuthMenu(user);
             });
         }
 
@@ -992,41 +991,6 @@
                     <a href="Auth.html" class="btn-primary">Se connecter</a>
                 </div>
             `;
-        }
-
-        function updateAuthMenu(user) {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        }
-
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
         }
 
         // Fermer les modaux en cliquant à l'extérieur

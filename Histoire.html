@@ -80,48 +80,5 @@
     <footer>
         <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
     </footer>
-    <script>
-        // Gestion du menu d'authentification Firebase
-        FirebaseAuth.onAuthStateChanged(user => {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71;">
-                        👤 ${user.name} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        });
-
-        // Fonction de déconnexion
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    alert('Déconnexion réussie !');
-                    window.location.href = 'Accueil.html';
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
-        }
-    </script>
 </body>
-
-</html>
-</body>
-
 </html>

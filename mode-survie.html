@@ -542,9 +542,8 @@
         window.addEventListener('load', async () => {
             await waitForFirebase();
             
-            FirebaseAuth.onAuthStateChanged(async (user) => {
+            firebase.auth().onAuthStateChanged(async (user) => {
                 currentUser = user;
-                updateAuthMenu(user);
                 
                 if (user) {
                     await loadPersonalRecord();
@@ -560,7 +559,7 @@
         function waitForFirebase() {
             return new Promise((resolve) => {
                 const check = setInterval(() => {
-                    if (typeof FirebaseAuth !== 'undefined' && typeof firebase !== 'undefined') {
+                    if (typeof firebase !== 'undefined' && firebase.auth) {
                         clearInterval(check);
                         resolve();
                     }
@@ -924,41 +923,6 @@
         // Utilitaires
         function capitalizeFirst(str) {
             return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function updateAuthMenu(user) {
-            const nav = document.querySelector('.menu');
-            if (!nav) return;
-
-            const existingAuthItem = document.getElementById('auth-menu-item');
-            if (existingAuthItem) existingAuthItem.remove();
-
-            const authItem = document.createElement('li');
-            authItem.id = 'auth-menu-item';
-
-            if (user) {
-                authItem.innerHTML = `
-                    <a href="#" onclick="logout(event)" style="color: #2ecc71; text-decoration: none;">
-                        👤 ${user.displayName || 'Joueur'} <span style="font-size: 0.8em;">(Déco)</span>
-                    </a>
-                `;
-            } else {
-                authItem.innerHTML = '<a href="Auth.html" style="color: #e74c3c; text-decoration: none;">🔐 Connexion</a>';
-            }
-
-            nav.appendChild(authItem);
-        }
-
-        async function logout(event) {
-            event.preventDefault();
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                try {
-                    await FirebaseAuth.logout();
-                    location.reload();
-                } catch (error) {
-                    alert('Erreur lors de la déconnexion');
-                }
-            }
         }
     </script>
 </body>

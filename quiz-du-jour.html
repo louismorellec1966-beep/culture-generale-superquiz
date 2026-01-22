@@ -740,7 +740,14 @@
                 const quizData = {
                     date: date,
                     theme: theme,
-                    questions: questions.map(({answers, ...rest}) => rest), // Nettoyer l'ancien champ 'answers'
+                    questions: questions.map(q => ({
+                        question: q.question,
+                        reponses: q.reponses || q.answers,
+                        correct: q.correct,
+                        difficulty: q.difficulty,
+                        matiere: q.matiere,
+                        categorie: q.categorie
+                    })),
                     createdAt: new Date()
                 };
 
@@ -799,8 +806,14 @@
             window.dailyScore = 0;
 
             dailyQuizData.questions.forEach((q, index) => {
+                // Utiliser reponses (ou answers pour compatibilité)
+                const answers = q.reponses || q.answers;
+                if (!answers || !Array.isArray(answers)) {
+                    console.error(`Question ${index + 1}: pas de réponses trouvées`, q);
+                    return;
+                }
                 // Mélanger les réponses aléatoirement
-                const shuffledAnswers = q.answers.map((answer, i) => ({ text: answer, originalIndex: i }));
+                const shuffledAnswers = answers.map((answer, i) => ({ text: answer, originalIndex: i }));
                 for (let i = shuffledAnswers.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];

@@ -837,6 +837,25 @@ a:focus {
     pointer-events: none;
 }
 
+/* Liens du sous-menu nav-desktop */
+.nav-desktop .submenu a {
+    color: #333;
+    display: block;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.nav-desktop .submenu a:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.nav-desktop .submenu li {
+    border-bottom: none;
+}
+
 .nav-desktop .submenu-grid {
     display: flex;
     gap: 30px;

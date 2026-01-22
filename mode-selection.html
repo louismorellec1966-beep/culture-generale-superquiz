@@ -198,10 +198,96 @@
             text-decoration: none;
             font-size: 1.1em;
         }
-        
+
+        /* Sélection de difficulté */
+        .difficulty-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .difficulty-selection h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.3em;
+        }
+
+        .difficulty-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-card {
+            background: #f8f9fa;
+            border: 3px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .difficulty-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .difficulty-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            box-shadow: 0 3px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .difficulty-card[data-difficulty="facile"].selected {
+            border-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+        }
+
+        .difficulty-card[data-difficulty="moyen"].selected {
+            border-color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+        }
+
+        .difficulty-card[data-difficulty="difficile"].selected {
+            border-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .difficulty-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .difficulty-name {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .difficulty-desc {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
         @media (max-width: 768px) {
             .modes-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .difficulty-options {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .difficulty-card {
+                width: 100%;
+                max-width: 250px;
             }
         }
     </style>
@@ -216,6 +302,33 @@
 
             <div class="quiz-info" id="quiz-info">
                 <h2>Chargement...</h2>
+            </div>
+
+            <!-- Sélection de difficulté -->
+            <div class="difficulty-selection">
+                <h3>📊 Choisis ta difficulté</h3>
+                <div class="difficulty-options">
+                    <div class="difficulty-card selected" data-difficulty="all" onclick="selectDifficulty('all')">
+                        <div class="difficulty-icon">🎲</div>
+                        <div class="difficulty-name">Toutes</div>
+                        <div class="difficulty-desc">Mix de toutes les difficultés</div>
+                    </div>
+                    <div class="difficulty-card" data-difficulty="facile" onclick="selectDifficulty('facile')">
+                        <div class="difficulty-icon">🟢</div>
+                        <div class="difficulty-name">Facile</div>
+                        <div class="difficulty-desc">Questions accessibles</div>
+                    </div>
+                    <div class="difficulty-card" data-difficulty="moyen" onclick="selectDifficulty('moyen')">
+                        <div class="difficulty-icon">🟡</div>
+                        <div class="difficulty-name">Moyen</div>
+                        <div class="difficulty-desc">Un peu plus corsé</div>
+                    </div>
+                    <div class="difficulty-card" data-difficulty="difficile" onclick="selectDifficulty('difficile')">
+                        <div class="difficulty-icon">🔴</div>
+                        <div class="difficulty-name">Difficile</div>
+                        <div class="difficulty-desc">Pour les experts !</div>
+                    </div>
+                </div>
             </div>
 
             <div class="modes-grid">
@@ -275,6 +388,20 @@
         const urlParams = new URLSearchParams(window.location.search);
         const matiere = urlParams.get('matiere');
         const categorie = urlParams.get('categorie');
+        
+        // Difficulté sélectionnée (par défaut : toutes)
+        let selectedDifficulty = 'all';
+
+        // Fonction pour sélectionner la difficulté
+        function selectDifficulty(difficulty) {
+            selectedDifficulty = difficulty;
+            
+            // Mettre à jour l'affichage
+            document.querySelectorAll('.difficulty-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.querySelector(`.difficulty-card[data-difficulty="${difficulty}"]`).classList.add('selected');
+        }
 
         // Noms des catégories pour l'affichage
         const categoriesNoms = {
@@ -360,10 +487,14 @@
                 return;
             }
 
-            console.log(`✅ Mode sélectionné : ${mode}`);
+            console.log(`✅ Mode sélectionné : ${mode}, Difficulté : ${selectedDifficulty}`);
 
-            // Rediriger vers le quiz avec le mode sélectionné
-            window.location.href = `quiz-dynamique.html?matiere=${matiere}&categorie=${categorie}&mode=${mode}`;
+            // Rediriger vers le quiz avec le mode et la difficulté sélectionnés
+            let url = `quiz-dynamique.html?matiere=${matiere}&categorie=${categorie}&mode=${mode}`;
+            if (selectedDifficulty !== 'all') {
+                url += `&difficulty=${selectedDifficulty}`;
+            }
+            window.location.href = url;
         }
 
         // Initialisation

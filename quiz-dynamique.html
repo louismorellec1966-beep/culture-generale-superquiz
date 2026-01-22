@@ -210,6 +210,26 @@
             background: #e74c3c;
         }
 
+        .difficulty-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .difficulty-badge.facile {
+            background: #2ecc71;
+        }
+
+        .difficulty-badge.moyen {
+            background: #f39c12;
+        }
+
+        .difficulty-badge.difficile {
+            background: #e74c3c;
+        }
+
         .error-message {
             text-align: center;
             padding: 50px;
@@ -445,6 +465,7 @@
         const matiere = urlParams.get('matiere');
         const categorie = urlParams.get('categorie');
         const mode = urlParams.get('mode') || 'classic';
+        const difficulty = urlParams.get('difficulty') || null; // null = toutes difficultés
 
         let answeredQuestions = new Set();
         let currentScore = 0;
@@ -474,13 +495,21 @@
                     throw new Error('Firebase non initialisé');
                 }
 
-                const questionsSnapshot = await db.collection('questionBank')
+                // Construire la requête avec ou sans filtre de difficulté
+                let query = db.collection('questionBank')
                     .where('matiere', '==', matiere)
-                    .where('categorie', '==', categorie)
-                    .get();
+                    .where('categorie', '==', categorie);
+                
+                // Ajouter le filtre de difficulté si spécifié
+                if (difficulty) {
+                    query = query.where('difficulty', '==', difficulty);
+                }
+
+                const questionsSnapshot = await query.get();
 
                 if (questionsSnapshot.empty) {
-                    throw new Error(`Aucune question trouvée pour ${matiere} / ${categorie}.`);
+                    const difficultyText = difficulty ? ` en difficulté "${difficulty}"` : '';
+                    throw new Error(`Aucune question trouvée pour ${matiere} / ${categorie}${difficultyText}.`);
                 }
 
                 const allQuestions = questionsSnapshot.docs.map(doc => {
@@ -502,11 +531,20 @@
                 const shuffledQuestions = [...allQuestions].sort(() => 0.5 - Math.random());
                 const selectedQuestions = shuffledQuestions.slice(0, 10);
 
-                // Titre avec badge de mode
+                // Titre avec badge de mode et difficulté
                 const modeBadge = mode === 'challenge'
                     ? '<span class="mode-badge challenge">🔥 DÉFI</span>'
                     : '<span class="mode-badge classic">🎯 CLASSIQUE</span>';
-                document.getElementById('quiz-title').innerHTML = titreQuiz + modeBadge;
+                
+                // Badge de difficulté
+                let difficultyBadge = '';
+                if (difficulty) {
+                    const difficultyEmojis = { facile: '🟢', moyen: '🟡', difficile: '🔴' };
+                    const difficultyNames = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' };
+                    difficultyBadge = `<span class="difficulty-badge ${difficulty}">${difficultyEmojis[difficulty]} ${difficultyNames[difficulty]}</span>`;
+                }
+                
+                document.getElementById('quiz-title').innerHTML = titreQuiz + modeBadge + difficultyBadge;
 
                 // Breadcrumb
                 const matiereNom = matiere.charAt(0).toUpperCase() + matiere.slice(1);

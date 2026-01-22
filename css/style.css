@@ -823,14 +823,13 @@ a:focus {
 .nav-desktop .submenu {
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
+    left: 0;
     background: var(--white);
     border-radius: 12px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
     padding: 20px;
     min-width: 200px;
     list-style: none;
@@ -866,7 +865,6 @@ a:focus {
 .nav-desktop .dropdown:focus-within .submenu {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
     pointer-events: auto;
 }
 

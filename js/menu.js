@@ -61,7 +61,7 @@ function initMenu() {
             <li><a href="Contact.html" ${currentPage === 'Contact.html' ? 'aria-current="page"' : ''}>📧 Contact</a></li>
         </ul>
         
-        <div id="auth-nav-btn"></div>
+        <div id="auth-nav-btn"><a href="Auth.html">🔐 Connexion</a></div>
     `;
 
     // Créer le menu mobile (barre en bas)

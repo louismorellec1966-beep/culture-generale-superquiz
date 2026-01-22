@@ -897,6 +897,8 @@ a:focus {
 #auth-nav-btn {
     display: flex;
     align-items: center;
+    min-width: 130px;
+    justify-content: flex-end;
 }
 
 #auth-nav-btn a {
@@ -906,12 +908,12 @@ a:focus {
     text-decoration: none;
     border-radius: 25px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
+    white-space: nowrap;
 }
 
 #auth-nav-btn a:hover {
     background: var(--primary-dark);
-    transform: scale(1.05);
 }
 
 /* Navigation Mobile - Barre en bas */

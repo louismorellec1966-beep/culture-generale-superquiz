@@ -15,20 +15,14 @@ jobs:
       - name: 📥 Récupérer le code
         uses: actions/checkout@v4
 
-      - name: 📤 Déployer via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: 📤 Déployer via SFTP
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /domains/cultureludo.com/public_html/
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.github/**
-            **/deploy.ps1
-            **/deploy.bat
-            **/_netrc
-            **/*.log
-            **/.env
+          port: 22
+          local_path: './*'
+          remote_path: '/domains/cultureludo.com/public_html/'
+          sftpArgs: '-o StrictHostKeyChecking=no'
+          delete_remote_files: false

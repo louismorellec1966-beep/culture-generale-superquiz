@@ -26,6 +26,8 @@ function initMenu() {
                         <a href="quiz-du-jour.html" ${currentPage === 'quiz-du-jour.html' ? 'class="active"' : ''}>📅 Quiz du Jour</a>
                         <a href="mode-survie.html" ${currentPage === 'mode-survie.html' ? 'class="active"' : ''}>💀 Mode Survie</a>
                         <a href="multiplayer.html" ${currentPage === 'multiplayer.html' ? 'class="active"' : ''}>⚔️ Multijoueur</a>
+                        <a href="tournois.html" ${currentPage === 'tournois.html' ? 'class="active"' : ''}>🏆 Tournois</a>
+                        <a href="quiz-perso.html" ${currentPage === 'quiz-perso.html' ? 'class="active"' : ''}>🎨 Quiz Perso</a>
                     </li>
                     <li class="submenu-section">
                         <span class="submenu-title">Catégories</span>
@@ -55,6 +57,9 @@ function initMenu() {
                     <li><a href="Scores.html" ${currentPage === 'Scores.html' ? 'class="active"' : ''}>🏆 Mes Scores</a></li>
                     <li><a href="Classement.html" ${currentPage === 'Classement.html' ? 'class="active"' : ''}>📊 Classement</a></li>
                     <li><a href="Social.html" ${currentPage === 'Social.html' ? 'class="active"' : ''}>👥 Amis</a></li>
+                    <li><a href="clubs.html" ${currentPage === 'clubs.html' ? 'class="active"' : ''}>🏟️ Clubs</a></li>
+                    <li><a href="revision.html" ${currentPage === 'revision.html' ? 'class="active"' : ''}>📖 Révisions</a></li>
+                    <li><a href="parametres.html" ${currentPage === 'parametres.html' ? 'class="active"' : ''}>⚙️ Paramètres</a></li>
                 </ul>
             </li>
             

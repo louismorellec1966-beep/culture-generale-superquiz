@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mode Révision - CultureLudo</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="icon" href="Images/favicon.ico">
+    <style>
+        .revision-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .revision-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .revision-header h1 {
+            color: var(--accent-color, #5e35b1);
+            margin-bottom: 10px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--accent-color, #5e35b1);
+        }
+
+        .stat-card .label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+
+        .filter-section {
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid var(--border-color, #ddd);
+            background: var(--bg-secondary, #f8f9fa);
+            font-size: 1em;
+        }
+
+        .question-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .question-card {
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--error-color, #dc3545);
+        }
+
+        .question-card.mastered {
+            border-left-color: var(--success-color, #28a745);
+        }
+
+        .question-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85em;
+        }
+
+        .question-meta span {
+            background: var(--bg-secondary, #f8f9fa);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .answers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .answer-item {
+            padding: 10px 15px;
+            border-radius: 8px;
+            background: var(--bg-secondary, #f8f9fa);
+            border: 2px solid transparent;
+        }
+
+        .answer-item.correct {
+            background: rgba(40, 167, 69, 0.15);
+            border-color: var(--success-color, #28a745);
+            color: var(--success-color, #28a745);
+        }
+
+        .answer-item.user-wrong {
+            background: rgba(220, 53, 69, 0.15);
+            border-color: var(--error-color, #dc3545);
+            text-decoration: line-through;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color, #5e35b1);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success-color, #28a745);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color, #ddd);
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, rgba(94, 53, 177, 0.1), rgba(94, 53, 177, 0.05));
+            border: 2px solid var(--accent-color, #5e35b1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .explanation-box h4 {
+            color: var(--accent-color, #5e35b1);
+            margin: 0 0 10px;
+        }
+
+        .practice-mode {
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .practice-mode h2 {
+            margin-bottom: 20px;
+        }
+
+        .practice-btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, var(--accent-color, #5e35b1), #7c4dff);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .practice-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-card, #fff);
+            border-radius: 12px;
+        }
+
+        .empty-state .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .attempt-history {
+            font-size: 0.85em;
+            color: var(--text-secondary, #6c757d);
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .filter-row {
+                flex-direction: column;
+            }
+            
+            .filter-group {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="revision-container">
+        <header class="revision-header">
+            <h1>📚 Mode Révision</h1>
+            <p>Revois les questions que tu as ratées pour progresser !</p>
+        </header>
+
+        <div id="statsContainer" class="stats-summary">
+            <!-- Stats chargées dynamiquement -->
+        </div>
+
+        <div id="practiceSection" class="practice-mode" style="display: none;">
+            <h2>🎯 Entraînement ciblé</h2>
+            <p>Révise uniquement les questions que tu as le plus de mal à répondre</p>
+            <button class="practice-btn" onclick="startPracticeQuiz()">
+                Lancer un quiz de révision
+            </button>
+        </div>
+
+        <div class="filter-section">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Matière</label>
+                    <select id="filterMatiere" onchange="filterQuestions()">
+                        <option value="all">Toutes</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Difficulté</label>
+                    <select id="filterDifficulty" onchange="filterQuestions()">
+                        <option value="all">Toutes</option>
+                        <option value="facile">Facile</option>
+                        <option value="moyen">Moyen</option>
+                        <option value="difficile">Difficile</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Statut</label>
+                    <select id="filterStatus" onchange="filterQuestions()">
+                        <option value="all">Tous</option>
+                        <option value="weak">❌ À revoir</option>
+                        <option value="mastered">✅ Maîtrisé</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Trier par</label>
+                    <select id="sortBy" onchange="filterQuestions()">
+                        <option value="recent">Plus récent</option>
+                        <option value="mistakes">Plus d'erreurs</option>
+                        <option value="matiere">Matière</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="questionList" class="question-list">
+            <!-- Questions chargées dynamiquement -->
+        </div>
+
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="emoji">🎉</div>
+            <h2>Bravo !</h2>
+            <p>Tu n'as aucune question à réviser pour le moment.</p>
+            <p>Continue à jouer pour enrichir ta liste de révision !</p>
+            <a href="mode-selection.html" class="btn btn-primary" style="display: inline-block; margin-top: 20px; text-decoration: none;">
+                Jouer un quiz
+            </a>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="js/themes-system.js"></script>
+    <script>
+        let allMissedQuestions = [];
+        let filteredQuestions = [];
+        const userId = null; // Sera défini après auth
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', async () => {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    await loadMissedQuestions(user.uid);
+                } else {
+                    window.location.href = 'Auth.html?redirect=revision.html';
+                }
+            });
+        });
+
+        // Charger les questions ratées
+        async function loadMissedQuestions(uid) {
+            try {
+                const snapshot = await db.collection('profiles').doc(uid)
+                    .collection('missedQuestions')
+                    .orderBy('lastMissedAt', 'desc')
+                    .get();
+
+                allMissedQuestions = [];
+                const matieres = new Set();
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    allMissedQuestions.push({
+                        id: doc.id,
+                        ...data
+                    });
+                    if (data.matiere) matieres.add(data.matiere);
+                });
+
+                // Remplir le filtre des matières
+                const matiereSelect = document.getElementById('filterMatiere');
+                matieres.forEach(m => {
+                    const option = document.createElement('option');
+                    option.value = m;
+                    option.textContent = m.charAt(0).toUpperCase() + m.slice(1);
+                    matiereSelect.appendChild(option);
+                });
+
+                // Afficher les stats
+                renderStats();
+
+                // Afficher les questions
+                filterQuestions();
+
+            } catch (error) {
+                console.error('Erreur chargement questions:', error);
+            }
+        }
+
+        // Afficher les statistiques
+        function renderStats() {
+            const total = allMissedQuestions.length;
+            const mastered = allMissedQuestions.filter(q => q.masteredAt).length;
+            const toReview = total - mastered;
+            const totalAttempts = allMissedQuestions.reduce((sum, q) => sum + (q.attempts || 0), 0);
+
+            document.getElementById('statsContainer').innerHTML = `
+                <div class="stat-card">
+                    <div class="value">${total}</div>
+                    <div class="label">Questions enregistrées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" style="color: var(--error-color, #dc3545);">${toReview}</div>
+                    <div class="label">À revoir</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value" style="color: var(--success-color, #28a745);">${mastered}</div>
+                    <div class="label">Maîtrisées</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">${totalAttempts}</div>
+                    <div class="label">Tentatives totales</div>
+                </div>
+            `;
+
+            // Afficher la section pratique si questions à revoir
+            document.getElementById('practiceSection').style.display = toReview > 0 ? 'block' : 'none';
+        }
+
+        // Filtrer et afficher les questions
+        function filterQuestions() {
+            const matiere = document.getElementById('filterMatiere').value;
+            const difficulty = document.getElementById('filterDifficulty').value;
+            const status = document.getElementById('filterStatus').value;
+            const sortBy = document.getElementById('sortBy').value;
+
+            filteredQuestions = allMissedQuestions.filter(q => {
+                if (matiere !== 'all' && q.matiere !== matiere) return false;
+                if (difficulty !== 'all' && q.difficulty !== difficulty) return false;
+                if (status === 'weak' && q.masteredAt) return false;
+                if (status === 'mastered' && !q.masteredAt) return false;
+                return true;
+            });
+
+            // Trier
+            switch (sortBy) {
+                case 'recent':
+                    filteredQuestions.sort((a, b) => {
+                        const dateA = a.lastMissedAt?.toDate?.() || new Date(a.lastMissedAt);
+                        const dateB = b.lastMissedAt?.toDate?.() || new Date(b.lastMissedAt);
+                        return dateB - dateA;
+                    });
+                    break;
+                case 'mistakes':
+                    filteredQuestions.sort((a, b) => (b.missCount || 0) - (a.missCount || 0));
+                    break;
+                case 'matiere':
+                    filteredQuestions.sort((a, b) => (a.matiere || '').localeCompare(b.matiere || ''));
+                    break;
+            }
+
+            renderQuestions();
+        }
+
+        // Afficher les questions
+        function renderQuestions() {
+            const container = document.getElementById('questionList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (filteredQuestions.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            container.innerHTML = filteredQuestions.map(q => {
+                const isMastered = !!q.masteredAt;
+                const answersHtml = (q.reponses || []).map((rep, idx) => {
+                    let classes = 'answer-item';
+                    if (idx === q.correctIndex) classes += ' correct';
+                    if (idx === q.userAnswerIndex && idx !== q.correctIndex) classes += ' user-wrong';
+                    return `<div class="${classes}">${rep}</div>`;
+                }).join('');
+
+                const lastMissed = q.lastMissedAt?.toDate?.() || new Date(q.lastMissedAt);
+                const dateStr = lastMissed.toLocaleDateString('fr-FR');
+
+                return `
+                    <div class="question-card ${isMastered ? 'mastered' : ''}">
+                        <div class="question-meta">
+                            <span>📚 ${q.matiere || 'Général'}</span>
+                            <span>📂 ${q.categorie || '-'}</span>
+                            <span>⭐ ${q.difficulty || 'moyen'}</span>
+                            <span>❌ ${q.missCount || 1} erreur(s)</span>
+                            ${isMastered ? '<span style="background: #28a74522; color: #28a745;">✅ Maîtrisé</span>' : ''}
+                        </div>
+                        
+                        <div class="question-text">${q.question}</div>
+                        
+                        <div class="answers-grid">${answersHtml}</div>
+                        
+                        ${q.explanation ? `
+                            <div class="explanation-box">
+                                <h4>💡 Explication</h4>
+                                <p>${q.explanation}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="attempt-history">
+                            Dernière erreur: ${dateStr} | Tentatives: ${q.attempts || 1}
+                        </div>
+                        
+                        <div class="question-actions">
+                            ${!isMastered ? `
+                                <button class="btn btn-success" onclick="markAsMastered('${q.id}')">
+                                    ✅ Marquer comme maîtrisé
+                                </button>
+                            ` : `
+                                <button class="btn btn-outline" onclick="unmarkMastered('${q.id}')">
+                                    Remettre à revoir
+                                </button>
+                            `}
+                            <button class="btn btn-outline" onclick="practiceOne('${q.id}')">
+                                🎯 S'entraîner
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Marquer comme maîtrisé
+        async function markAsMastered(questionId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            try {
+                await db.collection('profiles').doc(user.uid)
+                    .collection('missedQuestions').doc(questionId)
+                    .update({
+                        masteredAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                // Mettre à jour localement
+                const q = allMissedQuestions.find(q => q.id === questionId);
+                if (q) q.masteredAt = new Date();
+
+                renderStats();
+                filterQuestions();
+
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Retirer le statut maîtrisé
+        async function unmarkMastered(questionId) {
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            try {
+                await db.collection('profiles').doc(user.uid)
+                    .collection('missedQuestions').doc(questionId)
+                    .update({
+                        masteredAt: firebase.firestore.FieldValue.delete()
+                    });
+
+                const q = allMissedQuestions.find(q => q.id === questionId);
+                if (q) delete q.masteredAt;
+
+                renderStats();
+                filterQuestions();
+
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Lancer un quiz de révision
+        function startPracticeQuiz() {
+            const questionsToReview = allMissedQuestions.filter(q => !q.masteredAt);
+            
+            if (questionsToReview.length === 0) {
+                alert('Aucune question à réviser !');
+                return;
+            }
+
+            // Stocker les IDs des questions à réviser
+            const questionIds = questionsToReview.slice(0, 10).map(q => q.originalQuestionId || q.id);
+            sessionStorage.setItem('revisionQuestionIds', JSON.stringify(questionIds));
+            sessionStorage.setItem('revisionMode', 'true');
+
+            window.location.href = 'quiz-dynamique.html?mode=revision';
+        }
+
+        // S'entraîner sur une question spécifique
+        function practiceOne(questionId) {
+            const q = allMissedQuestions.find(q => q.id === questionId);
+            if (!q) return;
+
+            sessionStorage.setItem('revisionQuestionIds', JSON.stringify([q.originalQuestionId || questionId]));
+            sessionStorage.setItem('revisionMode', 'true');
+
+            window.location.href = 'quiz-dynamique.html?mode=revision';
+        }
+    </script>
+</body>
+</html>

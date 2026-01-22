@@ -472,10 +472,25 @@
                 <h3>Mode Survie</h3>
                 <p>Combien de questions pouvez-vous enchaîner sans vous tromper ?</p>
             </a>
-            <a href="Classement.html" class="mode-card">
+            <a href="tournois.html" class="mode-card">
                 <span class="mode-icon">🏆</span>
-                <h3>Classement</h3>
-                <p>Consultez le tableau des scores et visez la première place !</p>
+                <h3>Tournois</h3>
+                <p>Participez aux compétitions hebdomadaires et gagnez des récompenses !</p>
+            </a>
+            <a href="clubs.html" class="mode-card">
+                <span class="mode-icon">🏰</span>
+                <h3>Clubs</h3>
+                <p>Rejoignez un club et progressez en équipe avec d'autres joueurs !</p>
+            </a>
+            <a href="revision.html" class="mode-card">
+                <span class="mode-icon">📚</span>
+                <h3>Révision</h3>
+                <p>Revoyez les questions que vous avez ratées et progressez !</p>
+            </a>
+            <a href="quiz-perso.html" class="mode-card">
+                <span class="mode-icon">🎨</span>
+                <h3>Quiz Perso</h3>
+                <p>Créez vos propres quiz et jouez à ceux de la communauté !</p>
             </a>
         </div>
     </section>
@@ -546,6 +561,15 @@
         <p style="margin-top: 15px;">© 2024 CultureLudo - Tous droits réservés</p>
     </footer>
 
+    <!-- Firebase et scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="js/streaks-system.js"></script>
+    <script src="js/seasons-system.js"></script>
+    <script src="js/themes-system.js"></script>
+
     <script>
         // Afficher le thème du jour
         window.addEventListener('load', async () => {
@@ -569,7 +593,87 @@
                 document.getElementById('daily-theme-home').textContent =
                     `Un nouveau quiz vous attend !`;
             }
+
+            // Mettre à jour la section utilisateur si connecté
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    await updateUserSection(user);
+                }
+            });
         });
+
+        // Mettre à jour la section utilisateur connecté
+        async function updateUserSection(user) {
+            const userCard = document.getElementById('user-welcome');
+            
+            try {
+                const profileDoc = await db.collection('profiles').doc(user.uid).get();
+                const profile = profileDoc.data() || {};
+
+                // Widget streak
+                let streakWidget = '';
+                if (typeof StreaksSystem !== 'undefined') {
+                    const streakInfo = await StreaksSystem.getStreakInfo(user.uid);
+                    if (streakInfo && streakInfo.currentStreak > 0) {
+                        const flameLevel = StreaksSystem.getFlameLevel(streakInfo.currentStreak);
+                        streakWidget = `
+                            <div style="
+                                background: linear-gradient(135deg, #ff6b35, #f7931e);
+                                padding: 15px 25px;
+                                border-radius: 12px;
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 10px;
+                                margin-bottom: 20px;
+                            ">
+                                <span style="font-size: 1.5em;">${flameLevel}</span>
+                                <span style="font-weight: bold;">Série de ${streakInfo.currentStreak} jour${streakInfo.currentStreak > 1 ? 's' : ''} !</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                // Widget saison
+                let seasonWidget = '';
+                if (typeof SeasonsSystem !== 'undefined') {
+                    const season = SeasonsSystem.getCurrentSeason();
+                    const userRank = await SeasonsSystem.getUserSeasonRank(user.uid);
+                    
+                    seasonWidget = `
+                        <div style="
+                            background: ${season.color}22;
+                            border: 2px solid ${season.color};
+                            padding: 15px 25px;
+                            border-radius: 12px;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 10px;
+                            margin-bottom: 20px;
+                        ">
+                            <span style="font-size: 1.5em;">${season.emoji}</span>
+                            <span>Saison ${season.name}</span>
+                            ${userRank ? `<span style="font-weight: bold;">• #${userRank.position} (${userRank.points} pts)</span>` : ''}
+                        </div>
+                    `;
+                }
+
+                userCard.innerHTML = `
+                    <h2>👋 Bienvenue, ${profile.username || user.displayName || 'Joueur'} !</h2>
+                    ${streakWidget}
+                    ${seasonWidget}
+                    <p style="margin: 15px 0;">
+                        Niveau ${profile.niveau || 1} • ${profile.xp || 0} XP • ${profile.quizJoues || 0} quiz joués
+                    </p>
+                    <div class="btn-group">
+                        <a href="Quiz.html" class="btn-primary">Jouer maintenant</a>
+                        <a href="Profil.html" class="btn-secondary">Mon profil</a>
+                        <a href="parametres.html" class="btn-secondary">⚙️ Paramètres</a>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Erreur mise à jour section utilisateur:', error);
+            }
+        }
 
         // Gestion du menu mobile
         document.addEventListener('DOMContentLoaded', function() {

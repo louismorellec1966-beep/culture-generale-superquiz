@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres - CultureLudo</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="icon" href="Images/favicon.ico">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: var(--accent-color, #5e35b1);
+            margin-bottom: 10px;
+        }
+
+        .settings-section {
+            background: var(--bg-card, #fff);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .settings-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 20px;
+            font-size: 1.3em;
+            color: var(--accent-color, #5e35b1);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color, #eee);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h3 {
+            margin: 0 0 5px;
+            font-size: 1em;
+        }
+
+        .setting-info p {
+            margin: 0;
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color, #ccc);
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--accent-color, #5e35b1);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .theme-option {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .theme-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            border: 3px solid transparent;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .theme-preview:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-option.active .theme-preview {
+            border-color: var(--accent-color, #5e35b1);
+            box-shadow: 0 0 15px var(--accent-color, #5e35b1)44;
+        }
+
+        .theme-preview-header {
+            height: 30%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-preview-body {
+            flex: 1;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .theme-preview-line {
+            height: 6px;
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+
+        .theme-name {
+            margin-top: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .theme-badge {
+            display: inline-block;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        select.setting-select {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: 10px;
+            background: var(--bg-secondary, #f8f9fa);
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .danger-zone {
+            background: rgba(220, 53, 69, 0.05);
+            border: 2px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .danger-zone h2 {
+            color: var(--error-color, #dc3545);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color, #5e35b1);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error-color, #dc3545);
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-color, #ddd);
+        }
+
+        .notification-prefs {
+            display: grid;
+            gap: 15px;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--bg-secondary, #f8f9fa);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .account-avatar {
+            width: 70px;
+            height: 70px;
+            background: var(--accent-color, #5e35b1)22;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .account-details h3 {
+            margin: 0 0 5px;
+        }
+
+        .account-details p {
+            margin: 0;
+            font-size: 0.9em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <header class="page-header">
+            <h1>⚙️ Paramètres</h1>
+            <p>Personnalise ton expérience</p>
+        </header>
+
+        <!-- Compte -->
+        <section class="settings-section">
+            <h2>👤 Compte</h2>
+            <div id="accountInfo" class="account-info">
+                <div class="account-avatar">😊</div>
+                <div class="account-details">
+                    <h3>Chargement...</h3>
+                    <p>email@example.com</p>
+                </div>
+            </div>
+            <a href="Profil.html" class="btn btn-outline" style="text-decoration: none;">
+                Modifier mon profil
+            </a>
+        </section>
+
+        <!-- Apparence -->
+        <section class="settings-section">
+            <h2>🎨 Apparence</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Mode sombre rapide</h3>
+                    <p>Bascule entre le mode clair et sombre</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <h3 style="margin: 25px 0 15px;">Thèmes disponibles</h3>
+            <div id="themeGrid" class="theme-grid">
+                <!-- Thèmes chargés dynamiquement -->
+            </div>
+        </section>
+
+        <!-- Notifications -->
+        <section class="settings-section">
+            <h2>🔔 Notifications</h2>
+            
+            <div class="notification-prefs">
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Rappel quotidien</h3>
+                        <p>Rappel pour maintenir ta série</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifDaily" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Défis d'amis</h3>
+                        <p>Quand un ami te défie</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifChallenge" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Tournois</h3>
+                        <p>Nouveaux tournois et résultats</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifTournament" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Activité du club</h3>
+                        <p>Nouveaux membres et performances</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="notifClub" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Préférences de jeu -->
+        <section class="settings-section">
+            <h2>🎮 Préférences de jeu</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Difficulté par défaut</h3>
+                    <p>Niveau de difficulté préféré</p>
+                </div>
+                <select class="setting-select" id="defaultDifficulty">
+                    <option value="all">Toutes</option>
+                    <option value="facile">Facile</option>
+                    <option value="moyen">Moyen</option>
+                    <option value="difficile">Difficile</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Nombre de questions</h3>
+                    <p>Par quiz</p>
+                </div>
+                <select class="setting-select" id="defaultQuestionCount">
+                    <option value="5">5 questions</option>
+                    <option value="10" selected>10 questions</option>
+                    <option value="15">15 questions</option>
+                    <option value="20">20 questions</option>
+                </select>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Effets sonores</h3>
+                    <p>Sons lors des bonnes/mauvaises réponses</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundEffects">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Afficher les fiches culture</h3>
+                    <p>Mini-articles après chaque question</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showCultureCards" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Zone dangereuse -->
+        <section class="settings-section danger-zone">
+            <h2>⚠️ Zone dangereuse</h2>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Réinitialiser les statistiques</h3>
+                    <p>Remet tes scores et XP à zéro</p>
+                </div>
+                <button class="btn btn-danger" onclick="resetStats()">
+                    Réinitialiser
+                </button>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-info">
+                    <h3>Supprimer mon compte</h3>
+                    <p>Supprime définitivement toutes tes données</p>
+                </div>
+                <button class="btn btn-danger" onclick="deleteAccount()">
+                    Supprimer
+                </button>
+            </div>
+        </section>
+
+        <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="saveSettings()">
+            💾 Sauvegarder les paramètres
+        </button>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="js/themes-system.js"></script>
+    <script>
+        let currentUserId = null;
+        let userSettings = {};
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Charger les thèmes
+            renderThemeGrid();
+
+            // Mettre à jour le toggle dark mode
+            const currentTheme = ThemesSystem.getCurrentTheme();
+            document.getElementById('darkModeToggle').checked = currentTheme !== 'light';
+
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    await loadUserSettings();
+                    updateAccountInfo(user);
+                }
+            });
+        });
+
+        // Afficher les infos du compte
+        function updateAccountInfo(user) {
+            const container = document.getElementById('accountInfo');
+            container.innerHTML = `
+                <div class="account-avatar">${user.photoURL ? `<img src="${user.photoURL}" style="width:100%;height:100%;border-radius:50%;">` : '😊'}</div>
+                <div class="account-details">
+                    <h3>${user.displayName || 'Utilisateur'}</h3>
+                    <p>${user.email}</p>
+                </div>
+            `;
+        }
+
+        // Charger les paramètres utilisateur
+        async function loadUserSettings() {
+            try {
+                const doc = await db.collection('profiles').doc(currentUserId).get();
+                if (doc.exists) {
+                    userSettings = doc.data().settings || {};
+
+                    // Appliquer les paramètres
+                    if (userSettings.defaultDifficulty) {
+                        document.getElementById('defaultDifficulty').value = userSettings.defaultDifficulty;
+                    }
+                    if (userSettings.defaultQuestionCount) {
+                        document.getElementById('defaultQuestionCount').value = userSettings.defaultQuestionCount;
+                    }
+                    document.getElementById('soundEffects').checked = userSettings.soundEffects !== false;
+                    document.getElementById('showCultureCards').checked = userSettings.showCultureCards !== false;
+
+                    // Notifications
+                    document.getElementById('notifDaily').checked = userSettings.notifDaily !== false;
+                    document.getElementById('notifChallenge').checked = userSettings.notifChallenge !== false;
+                    document.getElementById('notifTournament').checked = userSettings.notifTournament !== false;
+                    document.getElementById('notifClub').checked = userSettings.notifClub !== false;
+                }
+            } catch (error) {
+                console.error('Erreur chargement paramètres:', error);
+            }
+        }
+
+        // Sauvegarder les paramètres
+        async function saveSettings() {
+            if (!currentUserId) {
+                alert('Connecte-toi pour sauvegarder tes paramètres');
+                return;
+            }
+
+            const settings = {
+                defaultDifficulty: document.getElementById('defaultDifficulty').value,
+                defaultQuestionCount: document.getElementById('defaultQuestionCount').value,
+                soundEffects: document.getElementById('soundEffects').checked,
+                showCultureCards: document.getElementById('showCultureCards').checked,
+                notifDaily: document.getElementById('notifDaily').checked,
+                notifChallenge: document.getElementById('notifChallenge').checked,
+                notifTournament: document.getElementById('notifTournament').checked,
+                notifClub: document.getElementById('notifClub').checked
+            };
+
+            try {
+                await db.collection('profiles').doc(currentUserId).update({
+                    settings: settings
+                });
+
+                // Sauvegarder aussi en local
+                localStorage.setItem('cultureludo_settings', JSON.stringify(settings));
+
+                alert('Paramètres sauvegardés ! ✅');
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la sauvegarde');
+            }
+        }
+
+        // Afficher la grille des thèmes
+        function renderThemeGrid() {
+            const container = document.getElementById('themeGrid');
+            const currentTheme = ThemesSystem.getCurrentTheme();
+
+            container.innerHTML = Object.entries(ThemesSystem.THEMES).map(([themeId, theme]) => {
+                const isActive = currentTheme === themeId;
+                const colors = theme.colors;
+
+                return `
+                    <div class="theme-option ${isActive ? 'active' : ''}" onclick="applyTheme('${themeId}')">
+                        <div class="theme-preview" style="background: ${colors['--bg-primary']};">
+                            <div class="theme-preview-header" style="background: ${colors['--accent-color']};">
+                                <span style="font-size: 1.5em;">${theme.emoji}</span>
+                            </div>
+                            <div class="theme-preview-body">
+                                <div class="theme-preview-line" style="background: ${colors['--text-primary']}; width: 80%;"></div>
+                                <div class="theme-preview-line" style="background: ${colors['--text-secondary']}; width: 60%;"></div>
+                                <div class="theme-preview-line" style="background: ${colors['--accent-color']}; width: 40%;"></div>
+                            </div>
+                        </div>
+                        <div class="theme-name">
+                            ${theme.name}
+                            ${theme.premium ? '<span class="theme-badge" style="background: #ffd700; color: #000;">👑 Premium</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Appliquer un thème
+        function applyTheme(themeId) {
+            ThemesSystem.applyTheme(themeId);
+            renderThemeGrid();
+            document.getElementById('darkModeToggle').checked = themeId !== 'light';
+        }
+
+        // Toggle dark mode
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeToggle').checked;
+            applyTheme(isDark ? 'dark' : 'light');
+        }
+
+        // Réinitialiser les stats
+        async function resetStats() {
+            if (!currentUserId) return;
+
+            if (!confirm('Es-tu sûr de vouloir réinitialiser toutes tes statistiques ? Cette action est irréversible.')) {
+                return;
+            }
+
+            if (!confirm('DERNIÈRE CHANCE: Toutes tes statistiques, XP, et niveau seront perdus. Continuer ?')) {
+                return;
+            }
+
+            try {
+                await db.collection('profiles').doc(currentUserId).update({
+                    xp: 0,
+                    level: 1,
+                    stats: {},
+                    currentStreak: 0,
+                    longestStreak: 0
+                });
+
+                alert('Statistiques réinitialisées');
+                location.reload();
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la réinitialisation');
+            }
+        }
+
+        // Supprimer le compte
+        async function deleteAccount() {
+            if (!currentUserId) return;
+
+            if (!confirm('Es-tu sûr de vouloir supprimer ton compte ? Toutes tes données seront perdues définitivement.')) {
+                return;
+            }
+
+            const confirmText = prompt('Pour confirmer, tape "SUPPRIMER" :');
+            if (confirmText !== 'SUPPRIMER') {
+                alert('Suppression annulée');
+                return;
+            }
+
+            try {
+                // Supprimer le profil
+                await db.collection('profiles').doc(currentUserId).delete();
+
+                // Supprimer l'utilisateur Firebase Auth
+                await firebase.auth().currentUser.delete();
+
+                alert('Compte supprimé. Au revoir !');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Erreur:', error);
+                if (error.code === 'auth/requires-recent-login') {
+                    alert('Pour des raisons de sécurité, reconnecte-toi avant de supprimer ton compte.');
+                    firebase.auth().signOut().then(() => {
+                        window.location.href = 'Auth.html?redirect=parametres.html&action=delete';
+                    });
+                } else {
+                    alert('Erreur lors de la suppression');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
-    "name": "SuperQuiz - Culture Générale",
-    "short_name": "SuperQuiz",
-    "description": "Testez vos connaissances avec des quiz de culture générale !",
+    "name": "CultureLudo - Quiz Culture Générale",
+    "short_name": "CultureLudo",
+    "description": "Testez vos connaissances avec des quiz de culture générale ! Tournois, clubs, révisions et plus encore.",
     "start_url": "/Accueil.html",
     "display": "standalone",
     "background_color": "#667eea",
@@ -9,6 +9,7 @@
     "orientation": "portrait-primary",
     "scope": "/",
     "lang": "fr-FR",
+    "id": "cultureludo-pwa",
     "icons": [
         {
             "src": "/images/logo-72.png",
@@ -65,7 +66,15 @@
             "src": "/images/screenshot-1.png",
             "sizes": "1280x720",
             "type": "image/png",
-            "label": "Page d'accueil SuperQuiz"
+            "label": "Page d'accueil CultureLudo",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/images/screenshot-mobile.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "label": "Quiz mobile",
+            "form_factor": "narrow"
         }
     ],
     "shortcuts": [
@@ -75,6 +84,13 @@
             "description": "Accéder au quiz quotidien",
             "url": "/quiz-du-jour.html",
             "icons": [{ "src": "/images/icon-quiz.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Tournois",
+            "short_name": "Tournois",
+            "description": "Participer aux tournois",
+            "url": "/tournois.html",
+            "icons": [{ "src": "/images/icon-tournament.png", "sizes": "96x96" }]
         },
         {
             "name": "Mon Profil",
@@ -89,8 +105,19 @@
             "description": "Voir le classement général",
             "url": "/Classement.html",
             "icons": [{ "src": "/images/icon-leaderboard.png", "sizes": "96x96" }]
+        },
+        {
+            "name": "Révisions",
+            "short_name": "Révisions",
+            "description": "Réviser les questions ratées",
+            "url": "/revision.html",
+            "icons": [{ "src": "/images/icon-revision.png", "sizes": "96x96" }]
         }
     ],
     "related_applications": [],
-    "prefer_related_applications": false
+    "prefer_related_applications": false,
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    }
 }

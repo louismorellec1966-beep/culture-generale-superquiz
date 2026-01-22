@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clubs - CultureLudo</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="icon" href="Images/favicon.ico">
+    <style>
+        .clubs-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: var(--accent-color, #5e35b1);
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: 25px;
+            background: var(--bg-card, #fff);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent-color, #5e35b1);
+            color: white;
+            border-color: var(--accent-color, #5e35b1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: 25px;
+            font-size: 1em;
+            background: var(--bg-card, #fff);
+        }
+
+        .search-box button {
+            padding: 12px 25px;
+            background: var(--accent-color, #5e35b1);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .my-club-section {
+            background: linear-gradient(135deg, var(--accent-color, #5e35b1), #7c4dff);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .my-club-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .my-club-avatar {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+        }
+
+        .my-club-info h2 {
+            margin: 0 0 5px;
+        }
+
+        .my-club-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .clubs-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .ranking-list {
+            background: var(--bg-card, #fff);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color, #ddd);
+            transition: background 0.2s;
+        }
+
+        .ranking-item:hover {
+            background: var(--bg-secondary, #f8f9fa);
+        }
+
+        .ranking-position {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .ranking-position.top-3 {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border-radius: 50%;
+            color: #000;
+        }
+
+        .create-club-form {
+            background: var(--bg-card, #fff);
+            border-radius: 16px;
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: 10px;
+            font-size: 1em;
+            background: var(--bg-secondary, #f8f9fa);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .emoji-option {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            border: 2px solid var(--border-color, #ddd);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .emoji-option:hover,
+        .emoji-option.selected {
+            border-color: var(--accent-color, #5e35b1);
+            background: var(--accent-color, #5e35b1)22;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color, #5e35b1);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error-color, #dc3545);
+            color: white;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .members-list {
+            margin-top: 20px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .member-role {
+            margin-left: auto;
+            font-size: 0.85em;
+            padding: 3px 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-card, #fff);
+            border-radius: 16px;
+        }
+
+        .empty-state .emoji {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .club-feed {
+            margin-top: 20px;
+        }
+
+        .feed-item {
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="clubs-container">
+        <header class="page-header">
+            <h1>🏰 Clubs</h1>
+            <p>Rejoins un club et progresse en équipe !</p>
+        </header>
+
+        <!-- Section Mon Club -->
+        <div id="myClubSection" style="display: none;">
+            <!-- Chargé dynamiquement -->
+        </div>
+
+        <!-- Onglets pour ceux sans club -->
+        <div id="noClubSection">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('ranking')">
+                    🏆 Classement
+                </button>
+                <button class="tab-btn" onclick="switchTab('search')">
+                    🔍 Rechercher
+                </button>
+                <button class="tab-btn" onclick="switchTab('create')">
+                    ➕ Créer
+                </button>
+            </div>
+
+            <!-- Classement -->
+            <div id="tab-ranking" class="tab-content active">
+                <div class="ranking-list" id="clubsRanking">
+                    <div class="empty-state">
+                        <div class="emoji">⏳</div>
+                        <p>Chargement...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recherche -->
+            <div id="tab-search" class="tab-content">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Rechercher un club..." onkeypress="if(event.key==='Enter') searchClubs()">
+                    <button onclick="searchClubs()">🔍 Rechercher</button>
+                </div>
+                <div id="searchResults" class="clubs-grid">
+                    <div class="empty-state">
+                        <div class="emoji">🔍</div>
+                        <p>Recherche un club par son nom</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Créer -->
+            <div id="tab-create" class="tab-content">
+                <div class="create-club-form">
+                    <h2 style="margin-bottom: 25px;">Créer ton club</h2>
+                    
+                    <div class="form-group">
+                        <label>Nom du club</label>
+                        <input type="text" id="clubName" maxlength="30" placeholder="Les Champions de la Culture">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="clubDescription" maxlength="200" placeholder="Une description de ton club..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Emblème</label>
+                        <div class="emoji-picker">
+                            <span class="emoji-option selected" onclick="selectEmoji('🏰')">🏰</span>
+                            <span class="emoji-option" onclick="selectEmoji('⚔️')">⚔️</span>
+                            <span class="emoji-option" onclick="selectEmoji('🦁')">🦁</span>
+                            <span class="emoji-option" onclick="selectEmoji('🦅')">🦅</span>
+                            <span class="emoji-option" onclick="selectEmoji('🐉')">🐉</span>
+                            <span class="emoji-option" onclick="selectEmoji('🌟')">🌟</span>
+                            <span class="emoji-option" onclick="selectEmoji('🔥')">🔥</span>
+                            <span class="emoji-option" onclick="selectEmoji('💎')">💎</span>
+                            <span class="emoji-option" onclick="selectEmoji('🎯')">🎯</span>
+                            <span class="emoji-option" onclick="selectEmoji('🚀')">🚀</span>
+                            <span class="emoji-option" onclick="selectEmoji('👑')">👑</span>
+                            <span class="emoji-option" onclick="selectEmoji('🏆')">🏆</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Visibilité</label>
+                        <select id="clubVisibility">
+                            <option value="true">🌐 Public - Tout le monde peut rejoindre</option>
+                            <option value="false">🔒 Privé - Sur invitation uniquement</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary btn-block" onclick="createClub()">
+                        Créer le club 🎉
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="js/clubs-system.js"></script>
+    <script src="js/themes-system.js"></script>
+    <script>
+        let currentUserId = null;
+        let selectedEmoji = '🏰';
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', async () => {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUserId = user.uid;
+                    await checkUserClub();
+                    await loadClubsRanking();
+                } else {
+                    currentUserId = null;
+                    document.getElementById('noClubSection').innerHTML = `
+                        <div class="empty-state">
+                            <div class="emoji">🔒</div>
+                            <h2>Connexion requise</h2>
+                            <p>Connecte-toi pour rejoindre un club !</p>
+                            <a href="Auth.html?redirect=clubs.html" class="btn btn-primary" style="display: inline-block; margin-top: 20px; text-decoration: none;">
+                                Se connecter
+                            </a>
+                        </div>
+                    `;
+                }
+            });
+        });
+
+        // Vérifier si l'utilisateur a un club
+        async function checkUserClub() {
+            try {
+                const profileDoc = await db.collection('profiles').doc(currentUserId).get();
+                const profile = profileDoc.data();
+
+                if (profile?.clubId) {
+                    document.getElementById('noClubSection').style.display = 'none';
+                    document.getElementById('myClubSection').style.display = 'block';
+                    await loadMyClub(profile.clubId);
+                } else {
+                    document.getElementById('noClubSection').style.display = 'block';
+                    document.getElementById('myClubSection').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Charger mon club
+        async function loadMyClub(clubId) {
+            const club = await ClubsSystem.getClubDetails(clubId);
+            const feed = await ClubsSystem.getClubFeed(clubId, 10);
+
+            if (!club) return;
+
+            const myRole = club.members.find(m => m.odlerId === currentUserId)?.role || 'member';
+            const roleInfo = ClubsSystem.ROLES[myRole];
+
+            document.getElementById('myClubSection').innerHTML = `
+                <div class="my-club-section">
+                    <div class="my-club-header">
+                        <div class="my-club-avatar">${club.avatar || '🏰'}</div>
+                        <div class="my-club-info">
+                            <h2>${club.name}</h2>
+                            <p>${roleInfo.emoji} ${roleInfo.name} | ${club.memberCount} membres</p>
+                        </div>
+                    </div>
+
+                    <div class="my-club-stats">
+                        <div>
+                            <div class="stat-value">${(club.totalXP || 0).toLocaleString()}</div>
+                            <div class="stat-label">XP Total</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">${(club.weeklyXP || 0).toLocaleString()}</div>
+                            <div class="stat-label">XP Semaine</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">${club.stats?.quizCompleted || 0}</div>
+                            <div class="stat-label">Quiz joués</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">${club.stats?.perfectQuiz || 0}</div>
+                            <div class="stat-label">Quiz parfaits</div>
+                        </div>
+                    </div>
+
+                    <div class="members-list">
+                        <h3 style="margin: 20px 0 15px;">👥 Membres</h3>
+                        ${club.members.map(m => `
+                            <div class="member-item">
+                                <div class="member-avatar">${m.avatar || '😊'}</div>
+                                <div>
+                                    <strong>${m.username}</strong>
+                                </div>
+                                <span class="member-role">${ClubsSystem.ROLES[m.role]?.emoji || '👤'} ${ClubsSystem.ROLES[m.role]?.name || 'Membre'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${feed.length > 0 ? `
+                        <div class="club-feed">
+                            <h3 style="margin: 20px 0 15px;">📢 Activité récente</h3>
+                            ${feed.map(f => `
+                                <div class="feed-item">
+                                    ${f.type === 'quiz_completed' ? 
+                                        `🎮 <strong>${f.username}</strong> a terminé un quiz (+${f.xp} XP)${f.isPerfect ? ' 💯' : ''}` :
+                                        f.type === 'member_joined' ?
+                                        `👋 <strong>${f.username}</strong> a rejoint le club !` :
+                                        `${f.message || ''}`
+                                    }
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <button class="btn btn-danger" style="margin-top: 20px;" onclick="leaveClub()">
+                        Quitter le club
+                    </button>
+                </div>
+            `;
+        }
+
+        // Charger le classement
+        async function loadClubsRanking() {
+            const clubs = await ClubsSystem.getClubsRanking(20, 'weekly');
+            const container = document.getElementById('clubsRanking');
+
+            if (clubs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">🏰</div>
+                        <p>Aucun club classé pour le moment</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = clubs.map((club, index) => `
+                <div class="ranking-item" onclick="viewClub('${club.id}')">
+                    <div class="ranking-position ${index < 3 ? 'top-3' : ''}">
+                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+                    </div>
+                    <div style="
+                        width: 50px;
+                        height: 50px;
+                        background: var(--accent-color, #5e35b1)22;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 1.5em;
+                    ">${club.avatar || '🏰'}</div>
+                    <div style="flex: 1;">
+                        <strong>${club.name}</strong>
+                        <p style="margin: 3px 0 0; font-size: 0.85em; opacity: 0.7;">
+                            👥 ${club.memberCount} membres
+                        </p>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: bold; color: var(--accent-color, #5e35b1);">
+                            ${(club.weeklyXP || 0).toLocaleString()} XP
+                        </div>
+                        <div style="font-size: 0.8em; opacity: 0.7;">cette semaine</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Rechercher des clubs
+        async function searchClubs() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query.length < 2) {
+                alert('Entre au moins 2 caractères');
+                return;
+            }
+
+            const clubs = await ClubsSystem.searchClubs(query);
+            const container = document.getElementById('searchResults');
+
+            if (clubs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="emoji">😕</div>
+                        <p>Aucun club trouvé pour "${query}"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = clubs.map(club => 
+                ClubsSystem.renderClubCard(club, true, currentUserId)
+            ).join('');
+        }
+
+        // Changer d'onglet
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Sélectionner un emoji
+        function selectEmoji(emoji) {
+            selectedEmoji = emoji;
+            document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        // Créer un club
+        async function createClub() {
+            if (!currentUserId) {
+                alert('Connecte-toi pour créer un club');
+                return;
+            }
+
+            const name = document.getElementById('clubName').value.trim();
+            const description = document.getElementById('clubDescription').value.trim();
+            const isPublic = document.getElementById('clubVisibility').value === 'true';
+
+            if (!name) {
+                alert('Entre un nom pour ton club');
+                return;
+            }
+
+            const result = await ClubsSystem.createClub(currentUserId, {
+                name,
+                description,
+                avatar: selectedEmoji,
+                isPublic
+            });
+
+            if (result.success) {
+                alert('Club créé avec succès ! 🎉');
+                location.reload();
+            } else {
+                alert(result.error || 'Erreur lors de la création');
+            }
+        }
+
+        // Quitter le club
+        async function leaveClub() {
+            if (!confirm('Es-tu sûr de vouloir quitter ce club ?')) return;
+
+            const result = await ClubsSystem.leaveClub(currentUserId);
+            
+            if (result.success) {
+                alert('Tu as quitté le club');
+                location.reload();
+            } else {
+                alert(result.error || 'Erreur');
+            }
+        }
+
+        // Voir un club
+        function viewClub(clubId) {
+            // Pour l'instant, on peut juste rejoindre
+            // On pourrait ouvrir une modal avec les détails
+        }
+    </script>
+</body>
+</html>

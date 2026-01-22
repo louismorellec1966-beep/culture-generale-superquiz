@@ -23,6 +23,13 @@
     <script defer src="js/menu.js"></script>
     <script defer src="js/profile-system.js"></script>
     <script defer src="js/social-system.js"></script>
+    <script defer src="js/streaks-system.js"></script>
+    <script defer src="js/seasons-system.js"></script>
+    <script defer src="js/betting-system.js"></script>
+    <script defer src="js/culture-cards-system.js"></script>
+    <script defer src="js/clubs-system.js"></script>
+    <script defer src="js/titles-system.js"></script>
+    <script defer src="js/themes-system.js"></script>
 
     <style>
         .quiz-header {
@@ -427,6 +434,18 @@
                 🎊 Niveau supérieur ! Niveau <span id="new-level">2</span>
             </div>
 
+            <!-- Section streak -->
+            <div id="streak-section" style="display: none; margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 12px; color: white;">
+                <div style="font-size: 2em; margin-bottom: 5px;" id="streak-flame">🔥</div>
+                <div style="font-weight: bold;" id="streak-count">Série de X jours !</div>
+                <div style="font-size: 0.9em; opacity: 0.9;" id="streak-bonus"></div>
+            </div>
+
+            <!-- Section saison -->
+            <div id="season-section" style="display: none; margin: 15px 0; padding: 15px; background: var(--bg-secondary, #f8f9fa); border-radius: 12px;">
+                <div id="season-points" style="font-weight: bold;"></div>
+            </div>
+
             <div class="new-badges" id="new-badges-section"></div>
 
             <!-- Section partage et défis -->
@@ -678,6 +697,7 @@
             const total = parseInt(document.getElementById('total-questions').textContent);
             const quizTitle = document.getElementById('quiz-title').textContent.split('<')[0].trim();
             const tempsEnSecondes = Math.floor((Date.now() - quizStartTime) / 1000);
+            const isPerfect = score === total;
 
             // Vérifier connexion
             if (typeof firebase === 'undefined' || !firebase.auth) {
@@ -703,10 +723,103 @@
 
             try {
                 const result = await FirebaseScores.save(scoreData);
-                showResults(score, total, result.profileUpdate);
+                
+                // Mettre à jour la série (streak)
+                if (typeof StreaksSystem !== 'undefined') {
+                    await StreaksSystem.recordActivity(user.uid);
+                }
+
+                // Ajouter des points de saison
+                if (typeof SeasonsSystem !== 'undefined') {
+                    const seasonPoints = score * 10 + (isPerfect ? 50 : 0);
+                    await SeasonsSystem.addSeasonPoints(user.uid, seasonPoints, isPerfect);
+                }
+
+                // Ajouter des XP au club
+                if (typeof ClubsSystem !== 'undefined') {
+                    const xpForClub = result.profileUpdate?.xpGagne || score * 10;
+                    await ClubsSystem.addClubXP(user.uid, xpForClub, {
+                        isPerfect,
+                        totalQuestions: total,
+                        correctAnswers: score
+                    });
+                }
+
+                // Vérifier les nouveaux titres
+                if (typeof TitlesSystem !== 'undefined') {
+                    await TitlesSystem.checkUnlockedTitles(user.uid);
+                }
+
+                // Résoudre un pari si actif
+                const activeBet = sessionStorage.getItem('activeBet');
+                if (activeBet && typeof BettingSystem !== 'undefined') {
+                    const betInfo = JSON.parse(activeBet);
+                    const betResult = await BettingSystem.resolveBet(betInfo.betId, {
+                        correct: score,
+                        total: total,
+                        timeSeconds: tempsEnSecondes
+                    });
+                    sessionStorage.removeItem('activeBet');
+                    if (betResult) {
+                        result.betResult = betResult;
+                    }
+                }
+
+                // Sauvegarder les questions ratées pour la révision
+                await saveMissedQuestions(user.uid, score, total);
+
+                showResults(score, total, result.profileUpdate, result.betResult);
             } catch (error) {
                 console.error('Erreur sauvegarde:', error);
                 showResults(score, total, null);
+            }
+        }
+
+        // Sauvegarder les questions ratées
+        async function saveMissedQuestions(userId, score, total) {
+            if (score === total) return; // Pas de questions ratées
+
+            try {
+                const questionCards = document.querySelectorAll('.question-card');
+                
+                for (let i = 0; i < questionCards.length; i++) {
+                    const feedback = document.getElementById(`feedback${i}`);
+                    if (feedback && feedback.classList.contains('incorrect')) {
+                        const questionText = questionCards[i].querySelector('.question-text').textContent;
+                        const questionId = `${matiere}_${categorie}_${btoa(questionText).substring(0, 20)}`;
+                        
+                        const missedRef = db.collection('profiles').doc(userId)
+                            .collection('missedQuestions').doc(questionId);
+                        
+                        const existing = await missedRef.get();
+                        
+                        if (existing.exists) {
+                            await missedRef.update({
+                                missCount: firebase.firestore.FieldValue.increment(1),
+                                lastMissedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        } else {
+                            const answers = [];
+                            questionCards[i].querySelectorAll('.answer-option').forEach(opt => {
+                                answers.push(opt.textContent.trim());
+                            });
+                            
+                            await missedRef.set({
+                                question: questionText,
+                                reponses: answers,
+                                correctIndex: window.correctAnswersMap[i],
+                                matiere: matiere,
+                                categorie: categorie,
+                                difficulty: difficulty || 'moyen',
+                                missCount: 1,
+                                attempts: 1,
+                                lastMissedAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde questions ratées:', error);
             }
         }
 
@@ -715,7 +828,7 @@
         let lastQuizTotal = null;
         let lastQuizTime = null;
 
-        function showResults(score, total, profileUpdate) {
+        function showResults(score, total, profileUpdate, betResult = null) {
             const percentage = Math.round((score / total) * 100);
             const elapsedTime = Math.floor((Date.now() - quizStartTime) / 1000);
 
@@ -753,9 +866,41 @@
                     document.getElementById('new-badges-section').innerHTML =
                         '<p style="margin-bottom: 10px;">🎖️ Nouveaux badges :</p>' + badgesHtml;
                 }
+
+                // Afficher la série (streak)
+                showStreakInfo();
+                
+                // Afficher les points de saison
+                showSeasonInfo(score);
             } else {
                 document.getElementById('xp-section').innerHTML =
                     '<p style="color: #7f8c8d;">Connectez-vous pour gagner des XP !</p>';
+            }
+
+            // Résultat du pari
+            if (betResult) {
+                const betSection = document.createElement('div');
+                betSection.style.cssText = 'margin: 15px 0; padding: 15px; border-radius: 12px;';
+                
+                if (betResult.won) {
+                    betSection.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+                    betSection.style.color = 'white';
+                    betSection.innerHTML = `
+                        <div style="font-size: 2em;">🎰</div>
+                        <div style="font-weight: bold;">Pari gagné !</div>
+                        <div style="font-size: 1.3em;">+${betResult.winnings} XP</div>
+                    `;
+                } else {
+                    betSection.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+                    betSection.style.color = 'white';
+                    betSection.innerHTML = `
+                        <div style="font-size: 2em;">😢</div>
+                        <div style="font-weight: bold;">Pari perdu</div>
+                        <div style="font-size: 0.9em;">Retente ta chance !</div>
+                    `;
+                }
+                
+                document.getElementById('xp-section').after(betSection);
             }
 
             // Afficher le modal
@@ -764,6 +909,49 @@
             // Afficher le bouton de défi si connecté
             if (firebase.auth().currentUser) {
                 document.getElementById('challenge-friend-section').style.display = 'block';
+            }
+        }
+
+        // Afficher les infos de série
+        async function showStreakInfo() {
+            if (typeof StreaksSystem === 'undefined') return;
+            
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            try {
+                const streakInfo = await StreaksSystem.getStreakInfo(user.uid);
+                if (streakInfo && streakInfo.currentStreak > 0) {
+                    const flameLevel = StreaksSystem.getFlameLevel(streakInfo.currentStreak);
+                    const dailyBonus = StreaksSystem.getDailyBonus(streakInfo.currentStreak);
+                    
+                    document.getElementById('streak-section').style.display = 'block';
+                    document.getElementById('streak-flame').textContent = flameLevel;
+                    document.getElementById('streak-count').textContent = `Série de ${streakInfo.currentStreak} jour${streakInfo.currentStreak > 1 ? 's' : ''} !`;
+                    document.getElementById('streak-bonus').textContent = `+${dailyBonus} XP bonus quotidien`;
+                }
+            } catch (error) {
+                console.error('Erreur streak info:', error);
+            }
+        }
+
+        // Afficher les infos de saison
+        async function showSeasonInfo(score) {
+            if (typeof SeasonsSystem === 'undefined') return;
+            
+            const user = firebase.auth().currentUser;
+            if (!user) return;
+
+            try {
+                const season = SeasonsSystem.getCurrentSeason();
+                const seasonPoints = score * 10 + (score === parseInt(document.getElementById('total-questions').textContent) ? 50 : 0);
+                
+                document.getElementById('season-section').style.display = 'block';
+                document.getElementById('season-points').innerHTML = `
+                    ${season.emoji} <strong>Saison ${season.name}</strong> : +${seasonPoints} points
+                `;
+            } catch (error) {
+                console.error('Erreur season info:', error);
             }
         }
 

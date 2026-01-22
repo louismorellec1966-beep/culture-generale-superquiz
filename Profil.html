@@ -21,6 +21,10 @@
     <script defer src="firebase-config.js"></script>
     <script defer src="js/menu.js"></script>
     <script defer src="js/profile-system.js"></script>
+    <script defer src="js/streaks-system.js"></script>
+    <script defer src="js/titles-system.js"></script>
+    <script defer src="js/seasons-system.js"></script>
+    <script defer src="js/themes-system.js"></script>
     
     <style>
         .profile-container {
@@ -509,6 +513,209 @@
             margin-left: 10px;
         }
 
+        /* Section Streak & Saison */
+        .gamification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .gamification-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .gamification-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .gamification-card h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .streak-big {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .streak-flame {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .streak-count {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .streak-count span {
+            font-size: 0.5em;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+
+        .streak-rewards {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .streak-milestone {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+
+        .streak-milestone.achieved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .streak-milestone.next {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Season Card */
+        .season-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .season-emoji {
+            font-size: 2.5em;
+        }
+
+        .season-info h4 {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .season-info p {
+            margin: 5px 0 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .season-rank {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+        }
+
+        .rank-position {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .rank-points {
+            font-size: 1.2em;
+        }
+
+        /* Titles Section */
+        .titles-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .active-title {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .active-title-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .active-title-info span:first-child {
+            font-size: 1.5em;
+        }
+
+        .titles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .title-card {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .title-card.unlocked {
+            background: #f8f9fa;
+        }
+
+        .title-card.unlocked:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .title-card.locked {
+            background: #f8f9fa;
+            opacity: 0.5;
+            filter: grayscale(0.8);
+        }
+
+        .title-card.active {
+            border-color: #ffd700;
+            background: #fff9e6;
+        }
+
+        .title-emoji {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+        }
+
+        .title-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .title-rarity {
+            font-size: 0.75em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .title-rarity.common { background: #ecf0f1; color: #7f8c8d; }
+        .title-rarity.rare { background: #d4edda; color: #155724; }
+        .title-rarity.epic { background: #e2d5f7; color: #6f42c1; }
+        .title-rarity.legendary { background: #fff3cd; color: #856404; }
+        .title-rarity.mythic { background: linear-gradient(135deg, #ff6b6b, #ffd700); color: white; }
+
         /* Loading */
         .loading-container {
             text-align: center;
@@ -734,33 +941,51 @@
                 histoire: '📜',
                 geographie: '🗺️',
                 science: '🔬',
-                litterature: '📚'
+                litterature: '📚',
+                art: '🎨',
+                musique: '🎵',
+                cinema: '🎬',
+                sport: '⚽',
+                gastronomie: '🍽️',
+                philosophie: '🤔',
+                politique: '🏛️',
+                culture: '🌍'
             };
             const matiereNames = {
                 histoire: 'Histoire',
                 geographie: 'Géographie',
                 science: 'Science',
-                litterature: 'Littérature'
+                litterature: 'Littérature',
+                art: 'Art',
+                musique: 'Musique',
+                cinema: 'Cinéma',
+                sport: 'Sport',
+                gastronomie: 'Gastronomie',
+                philosophie: 'Philosophie',
+                politique: 'Politique',
+                culture: 'Culture Générale'
             };
 
             let matieresHTML = '';
             for (const [key, name] of Object.entries(matiereNames)) {
                 const data = matieres[key] || { quizCount: 0, tauxReussite: 0 };
-                const progressClass = data.tauxReussite >= 80 ? 'good' : data.tauxReussite >= 50 ? 'medium' : 'poor';
-                matieresHTML += `
-                    <div class="matiere-row">
-                        <div class="matiere-icon">${matiereIcons[key]}</div>
-                        <div class="matiere-info">
-                            <div class="matiere-name">${name}</div>
-                            <div class="matiere-detail">${data.quizCount} quiz • ${data.tauxReussite || 0}% de réussite</div>
-                        </div>
-                        <div class="matiere-progress">
-                            <div class="progress-bar-mini">
-                                <div class="progress-fill ${progressClass}" style="width: ${data.tauxReussite || 0}%"></div>
+                if (data.quizCount > 0) {
+                    const progressClass = data.tauxReussite >= 80 ? 'good' : data.tauxReussite >= 50 ? 'medium' : 'poor';
+                    matieresHTML += `
+                        <div class="matiere-row">
+                            <div class="matiere-icon">${matiereIcons[key] || '📘'}</div>
+                            <div class="matiere-info">
+                                <div class="matiere-name">${name}</div>
+                                <div class="matiere-detail">${data.quizCount} quiz • ${data.tauxReussite || 0}% de réussite</div>
+                            </div>
+                            <div class="matiere-progress">
+                                <div class="progress-bar-mini">
+                                    <div class="progress-fill ${progressClass}" style="width: ${data.tauxReussite || 0}%"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
 
             // Badges
@@ -777,6 +1002,9 @@
                     </div>
                 `;
             }).join('');
+
+            // Titre actif
+            const activeTitle = profile.activeTitle;
 
             container.innerHTML = `
                 <!-- En-tête du profil -->
@@ -807,6 +1035,33 @@
                         <div class="xp-bar-container">
                             <div class="xp-bar" style="width: ${xpProgress}%"></div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Streak & Saison -->
+                <div class="gamification-grid">
+                    <div class="gamification-card" id="streak-card">
+                        <h3>🔥 Série quotidienne</h3>
+                        <div class="streak-big">
+                            <div class="streak-flame" id="streak-flame">🔥</div>
+                            <div class="streak-count" id="streak-count">0 <span>jours</span></div>
+                            <div class="streak-rewards" id="streak-rewards"></div>
+                        </div>
+                    </div>
+                    <div class="gamification-card" id="season-card">
+                        <h3>🏆 Saison compétitive</h3>
+                        <div id="season-content">
+                            <p style="text-align: center; color: #7f8c8d;">Chargement...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Titres -->
+                <div class="titles-section" id="titles-section">
+                    <h2 class="section-title">👑 Titres</h2>
+                    <div id="active-title-container"></div>
+                    <div class="titles-grid" id="titles-grid">
+                        <p style="text-align: center; color: #7f8c8d;">Chargement des titres...</p>
                     </div>
                 </div>
 
@@ -861,15 +1116,11 @@
                 <!-- Préférences -->
                 <div class="preferences-section">
                     <h2 class="section-title">⚙️ Préférences</h2>
-                    <div class="preference-row">
-                        <span class="preference-label">🎨 Thème</span>
-                        <div class="preference-control">
-                            <select id="pref-theme" onchange="updatePreference('theme', this.value)">
-                                <option value="light" ${profile.preferences?.theme === 'light' ? 'selected' : ''}>Clair</option>
-                                <option value="dark" ${profile.preferences?.theme === 'dark' ? 'selected' : ''}>Sombre</option>
-                            </select>
-                        </div>
-                    </div>
+                    <p style="margin-bottom: 15px;">
+                        <a href="parametres.html" style="color: #3498db; text-decoration: none;">
+                            Accéder aux paramètres avancés (thèmes, notifications...) →
+                        </a>
+                    </p>
                     <div class="preference-row">
                         <span class="preference-label">📊 Difficulté préférée</span>
                         <div class="preference-control">
@@ -896,6 +1147,143 @@
 
             // Initialiser la grille d'avatars
             initAvatarGrid();
+            
+            // Charger les données de gamification
+            loadGamificationData();
+        }
+
+        // Charger les données de streak, saison et titres
+        async function loadGamificationData() {
+            if (!currentUser) return;
+
+            // Charger le streak
+            if (typeof StreaksSystem !== 'undefined') {
+                try {
+                    const streakInfo = await StreaksSystem.getStreakInfo(currentUser.uid);
+                    const flameLevel = StreaksSystem.getFlameLevel(streakInfo?.currentStreak || 0);
+                    
+                    document.getElementById('streak-flame').textContent = flameLevel;
+                    document.getElementById('streak-count').innerHTML = `${streakInfo?.currentStreak || 0} <span>jours</span>`;
+                    
+                    // Afficher les prochaines récompenses
+                    const milestones = [3, 7, 14, 30];
+                    const currentStreak = streakInfo?.currentStreak || 0;
+                    let rewardsHTML = '';
+                    
+                    milestones.forEach(m => {
+                        if (currentStreak >= m) {
+                            rewardsHTML += `<span class="streak-milestone achieved">✓ ${m}j</span>`;
+                        } else if (currentStreak < m && !rewardsHTML.includes('next')) {
+                            rewardsHTML += `<span class="streak-milestone next">→ ${m}j</span>`;
+                        }
+                    });
+                    
+                    document.getElementById('streak-rewards').innerHTML = rewardsHTML;
+                } catch (e) {
+                    console.error('Erreur chargement streak:', e);
+                }
+            }
+
+            // Charger la saison
+            if (typeof SeasonsSystem !== 'undefined') {
+                try {
+                    const season = SeasonsSystem.getCurrentSeason();
+                    const userRank = await SeasonsSystem.getUserSeasonRank(currentUser.uid);
+                    
+                    document.getElementById('season-content').innerHTML = `
+                        <div class="season-header">
+                            <div class="season-emoji">${season.emoji}</div>
+                            <div class="season-info">
+                                <h4>Saison ${season.name}</h4>
+                                <p>${season.description}</p>
+                            </div>
+                        </div>
+                        <div class="season-rank">
+                            <div>
+                                <small>Classement</small>
+                                <div class="rank-position">#${userRank?.position || '-'}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <small>Points saison</small>
+                                <div class="rank-points">${userRank?.points || 0} pts</div>
+                            </div>
+                        </div>
+                        <p style="text-align: center; margin-top: 15px;">
+                            <a href="Classement.html" style="color: #667eea; text-decoration: none;">
+                                Voir le classement complet →
+                            </a>
+                        </p>
+                    `;
+                } catch (e) {
+                    console.error('Erreur chargement saison:', e);
+                }
+            }
+
+            // Charger les titres
+            if (typeof TitlesSystem !== 'undefined') {
+                try {
+                    const unlockedTitles = await TitlesSystem.checkUnlockedTitles(currentUser.uid);
+                    const allTitles = TitlesSystem.TITLES;
+                    const activeTitle = currentProfile?.activeTitle;
+                    
+                    // Titre actif
+                    let activeTitleHTML = '';
+                    if (activeTitle && allTitles[activeTitle]) {
+                        const title = allTitles[activeTitle];
+                        activeTitleHTML = `
+                            <div class="active-title">
+                                <div class="active-title-info">
+                                    <span>${title.emoji}</span>
+                                    <strong>${title.name}</strong>
+                                </div>
+                                <span style="color: #856404;">Titre actif</span>
+                            </div>
+                        `;
+                    } else {
+                        activeTitleHTML = `
+                            <div class="active-title" style="background: #f8f9fa;">
+                                <div class="active-title-info">
+                                    <span>👤</span>
+                                    <span style="color: #7f8c8d;">Aucun titre sélectionné</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    document.getElementById('active-title-container').innerHTML = activeTitleHTML;
+                    
+                    // Grille des titres
+                    const titlesHTML = Object.entries(allTitles).map(([id, title]) => {
+                        const isUnlocked = unlockedTitles.includes(id);
+                        const isActive = activeTitle === id;
+                        
+                        return `
+                            <div class="title-card ${isUnlocked ? 'unlocked' : 'locked'} ${isActive ? 'active' : ''}"
+                                 onclick="${isUnlocked ? `setActiveTitle('${id}')` : ''}"
+                                 title="${title.description}">
+                                <div class="title-emoji">${title.emoji}</div>
+                                <div class="title-name">${title.name}</div>
+                                <span class="title-rarity ${title.rarity}">${title.rarity}</span>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('titles-grid').innerHTML = titlesHTML || '<p style="text-align: center; color: #7f8c8d;">Aucun titre disponible</p>';
+                } catch (e) {
+                    console.error('Erreur chargement titres:', e);
+                }
+            }
+        }
+
+        // Définir le titre actif
+        async function setActiveTitle(titleId) {
+            try {
+                await TitlesSystem.setActiveTitle(currentUser.uid, titleId);
+                currentProfile.activeTitle = titleId;
+                loadGamificationData(); // Recharger l'affichage
+            } catch (error) {
+                console.error('Erreur changement titre:', error);
+                alert('Erreur lors du changement de titre');
+            }
         }
 
         function formatTime(seconds) {

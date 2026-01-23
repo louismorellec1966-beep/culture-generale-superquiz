@@ -61,57 +61,36 @@
         }
     ],
     "categories": ["education", "games", "entertainment"],
-    "screenshots": [
-        {
-            "src": "/images/screenshot-1.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "label": "Page d'accueil CultureLudo",
-            "form_factor": "wide"
-        },
-        {
-            "src": "/images/screenshot-mobile.png",
-            "sizes": "720x1280",
-            "type": "image/png",
-            "label": "Quiz mobile",
-            "form_factor": "narrow"
-        }
-    ],
     "shortcuts": [
         {
             "name": "Quiz du Jour",
             "short_name": "Quiz Jour",
             "description": "Accéder au quiz quotidien",
-            "url": "/quiz-du-jour.html",
-            "icons": [{ "src": "/images/icon-quiz.png", "sizes": "96x96" }]
+            "url": "/quiz-du-jour.html"
         },
         {
             "name": "Tournois",
             "short_name": "Tournois",
             "description": "Participer aux tournois",
-            "url": "/tournois.html",
-            "icons": [{ "src": "/images/icon-tournament.png", "sizes": "96x96" }]
+            "url": "/tournois.html"
         },
         {
             "name": "Mon Profil",
             "short_name": "Profil",
             "description": "Voir mon profil et statistiques",
-            "url": "/Profil.html",
-            "icons": [{ "src": "/images/icon-profile.png", "sizes": "96x96" }]
+            "url": "/Profil.html"
         },
         {
             "name": "Classement",
             "short_name": "Classement",
             "description": "Voir le classement général",
-            "url": "/Classement.html",
-            "icons": [{ "src": "/images/icon-leaderboard.png", "sizes": "96x96" }]
+            "url": "/Classement.html"
         },
         {
             "name": "Révisions",
             "short_name": "Révisions",
             "description": "Réviser les questions ratées",
-            "url": "/revision.html",
-            "icons": [{ "src": "/images/icon-revision.png", "sizes": "96x96" }]
+            "url": "/revision.html"
         }
     ],
     "related_applications": [],

@@ -18,7 +18,7 @@ const firebaseConfig = {
 // Configuration Firestore pour désactiver QUIC et éviter les erreurs réseau
 const firestoreSettings = {
     experimentalForceLongPolling: true, // Force HTTP long polling au lieu de QUIC/WebSocket
-};
+    useFetchStreams: false};
 
 // Initialiser Firebase (compat version)
 firebase.initializeApp(firebaseConfig);

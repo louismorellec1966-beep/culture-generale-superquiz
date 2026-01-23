@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Configuration Firebase</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🧪 Test Configuration Firebase</h1>
+    <p>Test de la configuration Firebase après corrections.</p>
+
+    <button onclick="testFirebaseConfig()">Tester la configuration</button>
+    <div id="results" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function testFirebaseConfig() {
+            const results = document.getElementById('results');
+            results.textContent = '🔄 Test de la configuration Firebase...\n\n';
+
+            try {
+                // Attendre Firebase
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Test 1: Vérifier que Firebase est chargé
+                if (typeof firebase !== 'undefined') {
+                    results.textContent += '✅ Firebase SDK chargé\n';
+                } else {
+                    results.textContent += '❌ Firebase SDK non chargé\n';
+                    return;
+                }
+
+                // Test 2: Vérifier que db est défini globalement
+                if (typeof window.db !== 'undefined' && window.db) {
+                    results.textContent += '✅ window.db défini et accessible\n';
+                } else {
+                    results.textContent += '❌ window.db non défini ou inaccessible\n';
+                }
+
+                // Test 3: Vérifier que auth est défini globalement
+                if (typeof window.auth !== 'undefined' && window.auth) {
+                    results.textContent += '✅ window.auth défini et accessible\n';
+                } else {
+                    results.textContent += '❌ window.auth non défini ou inaccessible\n';
+                }
+
+                // Test 4: Vérifier les paramètres Firestore
+                try {
+                    const settings = firebase.firestore()._settings;
+                    if (settings) {
+                        results.textContent += '✅ Paramètres Firestore accessibles\n';
+                        results.textContent += `   experimentalForceLongPolling: ${settings.experimentalForceLongPolling || false}\n`;
+                        results.textContent += `   experimentalAutoDetectLongPolling: ${settings.experimentalAutoDetectLongPolling || false}\n`;
+                    } else {
+                        results.textContent += '⚠️ Paramètres Firestore non accessibles\n';
+                    }
+                } catch (error) {
+                    results.textContent += `❌ Erreur paramètres Firestore: ${error.message}\n`;
+                }
+
+                // Test 5: Test de connexion basique
+                try {
+                    const testQuery = await window.db.collection('profiles').limit(1).get();
+                    results.textContent += '✅ Connexion Firestore réussie\n';
+                } catch (error) {
+                    results.textContent += `❌ Erreur connexion Firestore: ${error.message}\n`;
+                }
+
+                // Test 6: Vérifier qu'il n'y a pas d'erreurs QUIC
+                const hasQuicErrors = results.textContent.includes('QUIC');
+                if (!hasQuicErrors) {
+                    results.textContent += '✅ Aucune erreur QUIC détectée\n';
+                } else {
+                    results.textContent += '❌ Erreurs QUIC présentes\n';
+                }
+
+                results.textContent += '\n🏁 TESTS TERMINÉS\n';
+
+                // Résumé
+                const errorCount = (results.textContent.match(/❌/g) || []).length;
+                if (errorCount === 0) {
+                    results.textContent += '\n🎉 TOUS LES TESTS RÉUSSIS ! Configuration Firebase OK.';
+                } else {
+                    results.textContent += `\n⚠️ ${errorCount} erreur(s) détectée(s). Vérifiez la configuration.`;
+                }
+
+            } catch (error) {
+                results.textContent += `\n💥 ERREUR GÉNÉRALE: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

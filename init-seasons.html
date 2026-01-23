@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Initialisation Saisons</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🌱 Initialisation des Saisons</h1>
+    <button onclick="initializeSeasons()">Initialiser les saisons</button>
+    <div id="status"></div>
+
+    <script>
+        async function initializeSeasons() {
+            const status = document.getElementById('status');
+            status.textContent = '🔄 Initialisation en cours...';
+
+            try {
+                // Attendre que Firebase soit prêt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    status.textContent = '❌ Vous devez être connecté';
+                    status.style.color = 'red';
+                    return;
+                }
+
+                const db = firebase.firestore();
+                const userId = user.uid;
+
+                // Créer la saison actuelle
+                const currentSeason = {
+                    id: 'winter_2026',
+                    name: 'Hiver 2026',
+                    emoji: '❄️',
+                    description: 'Saison hivernale - Montrez votre culture !',
+                    startDate: new Date('2026-01-01'),
+                    endDate: new Date('2026-03-31'),
+                    rewards: {
+                        1: { xp: 1000, title: 'Champion Hivernal' },
+                        2: { xp: 750, title: 'Vice-Champion' },
+                        3: { xp: 500, title: 'Troisième' }
+                    }
+                };
+
+                // Créer le document saison
+                await db.collection('seasons').doc(currentSeason.id).set({
+                    name: currentSeason.name,
+                    emoji: currentSeason.emoji,
+                    description: currentSeason.description,
+                    startDate: currentSeason.startDate,
+                    endDate: currentSeason.endDate,
+                    rewards: currentSeason.rewards,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                status.textContent = '✅ Saison créée: ' + currentSeason.name;
+
+                // Ajouter l'utilisateur à la saison avec quelques points
+                await db.collection('seasons')
+                    .doc(currentSeason.id)
+                    .collection('entries')
+                    .doc(userId)
+                    .set({
+                        userId: userId,
+                        points: Math.floor(Math.random() * 500) + 100, // Points aléatoires pour test
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                status.textContent += '\n✅ Utilisateur ajouté à la saison';
+
+                // Ajouter quelques utilisateurs fictifs pour tester le classement
+                const fakeUsers = [
+                    { id: 'user_test_1', points: 450 },
+                    { id: 'user_test_2', points: 320 },
+                    { id: 'user_test_3', points: 680 },
+                    { id: 'user_test_4', points: 210 },
+                    { id: 'user_test_5', points: 890 }
+                ];
+
+                for (const fakeUser of fakeUsers) {
+                    await db.collection('seasons')
+                        .doc(currentSeason.id)
+                        .collection('entries')
+                        .doc(fakeUser.id)
+                        .set({
+                            userId: fakeUser.id,
+                            points: fakeUser.points,
+                            joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                }
+
+                status.textContent += '\n✅ Utilisateurs de test ajoutés';
+                status.textContent += '\n🎉 Initialisation terminée !';
+                status.style.color = 'green';
+
+            } catch (error) {
+                console.error('Erreur initialisation:', error);
+                status.textContent = '❌ Erreur: ' + error.message;
+                status.style.color = 'red';
+            }
+        }
+    </script>
+</body>
+</html>

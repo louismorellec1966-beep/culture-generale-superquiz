@@ -561,64 +561,106 @@
         <p style="margin-top: 15px;">© 2024 CultureLudo - Tous droits réservés</p>
     </footer>
 
-    <!-- Firebase et scripts -->
+    <!-- Scripts Firebase (chargés une seule fois) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="firebase-config.js"></script>
+    
+    <!-- Scripts application -->
+    <script src="js/menu.js"></script>
+    <script src="js/script.js"></script>
     <script src="js/streaks-system.js"></script>
     <script src="js/seasons-system.js"></script>
     <script src="js/themes-system.js"></script>
 
     <script>
+        // Attendre que Firebase soit prêt
+        function waitForFirebase(callback) {
+            if (typeof firebase !== 'undefined' && typeof window.db !== 'undefined' && window.db) {
+                console.log('✅ Firebase et db sont prêts');
+                callback();
+            } else {
+                console.log('⏳ Attente de Firebase...');
+                setTimeout(() => waitForFirebase(callback), 100);
+            }
+        }
+
         // Afficher le thème du jour
-        window.addEventListener('load', async () => {
-            if (typeof firebase === 'undefined') return;
+        window.addEventListener('load', () => {
+            waitForFirebase(async () => {
+                const today = new Date().toISOString().split('T')[0];
+                try {
+                    const quizDoc = await window.db.collection('dailyQuiz').doc(today).get();
 
-            const today = new Date().toISOString().split('T')[0];
-            try {
-                const quizDoc = await firebase.firestore()
-                    .collection('dailyQuiz')
-                    .doc(today)
-                    .get();
-
-                if (quizDoc.exists) {
-                    document.getElementById('daily-theme-home').textContent =
-                        `Thème du jour : ${quizDoc.data().theme}`;
-                } else {
+                    if (quizDoc.exists) {
+                        document.getElementById('daily-theme-home').textContent =
+                            `Thème du jour : ${quizDoc.data().theme}`;
+                    } else {
+                        document.getElementById('daily-theme-home').textContent =
+                            `Un nouveau quiz vous attend !`;
+                    }
+                } catch (e) {
                     document.getElementById('daily-theme-home').textContent =
                         `Un nouveau quiz vous attend !`;
                 }
-            } catch (e) {
-                document.getElementById('daily-theme-home').textContent =
-                    `Un nouveau quiz vous attend !`;
-            }
 
-            // Mettre à jour la section utilisateur si connecté
-            firebase.auth().onAuthStateChanged(async (user) => {
-                if (user) {
-                    await updateUserSection(user);
-                }
+                // Mettre à jour la section utilisateur si connecté
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    if (user) {
+                        await updateUserSection(user);
+                    }
+                });
             });
         });
 
         // Mettre à jour la section utilisateur connecté
         async function updateUserSection(user) {
             const userCard = document.getElementById('user-welcome');
+            if (!userCard) return;
             
             try {
-                const profileDoc = await db.collection('profiles').doc(user.uid).get();
+                const profileDoc = await window.db.collection('profiles').doc(user.uid).get();
                 const profile = profileDoc.data() || {};
 
                 // Widget streak
                 let streakWidget = '';
                 if (typeof StreaksSystem !== 'undefined') {
-                    const streakInfo = await StreaksSystem.getStreakInfo(user.uid);
-                    if (streakInfo && streakInfo.currentStreak > 0) {
-                        const flameLevel = StreaksSystem.getFlameLevel(streakInfo.currentStreak);
-                        streakWidget = `
+                    try {
+                        const streakInfo = await StreaksSystem.getStreakInfo(user.uid);
+                        if (streakInfo && streakInfo.currentStreak > 0) {
+                            const flameLevel = StreaksSystem.getFlameLevel(streakInfo.currentStreak);
+                            streakWidget = `
+                                <div style="
+                                    background: linear-gradient(135deg, #ff6b35, #f7931e);
+                                    padding: 15px 25px;
+                                    border-radius: 12px;
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 10px;
+                                    margin-bottom: 20px;
+                                ">
+                                    <span style="font-size: 1.5em;">${flameLevel}</span>
+                                    <span style="font-weight: bold;">Série de ${streakInfo.currentStreak} jour${streakInfo.currentStreak > 1 ? 's' : ''} !</span>
+                                </div>
+                            `;
+                        }
+                    } catch (e) {
+                        console.log('Streak non disponible');
+                    }
+                }
+
+                // Widget saison
+                let seasonWidget = '';
+                if (typeof SeasonsSystem !== 'undefined') {
+                    try {
+                        const season = SeasonsSystem.getCurrentSeason();
+                        const userRank = await SeasonsSystem.getUserSeasonRank(user.uid);
+                        
+                        seasonWidget = `
                             <div style="
-                                background: linear-gradient(135deg, #ff6b35, #f7931e);
+                                background: ${season.color}22;
+                                border: 2px solid ${season.color};
                                 padding: 15px 25px;
                                 border-radius: 12px;
                                 display: inline-flex;
@@ -626,43 +668,22 @@
                                 gap: 10px;
                                 margin-bottom: 20px;
                             ">
-                                <span style="font-size: 1.5em;">${flameLevel}</span>
-                                <span style="font-weight: bold;">Série de ${streakInfo.currentStreak} jour${streakInfo.currentStreak > 1 ? 's' : ''} !</span>
+                                <span style="font-size: 1.5em;">${season.emoji}</span>
+                                <span>Saison ${season.name}</span>
+                                ${userRank ? `<span style="font-weight: bold;">• #${userRank.position} (${userRank.points} pts)</span>` : ''}
                             </div>
                         `;
+                    } catch (e) {
+                        console.log('Saison non disponible');
                     }
                 }
 
-                // Widget saison
-                let seasonWidget = '';
-                if (typeof SeasonsSystem !== 'undefined') {
-                    const season = SeasonsSystem.getCurrentSeason();
-                    const userRank = await SeasonsSystem.getUserSeasonRank(user.uid);
-                    
-                    seasonWidget = `
-                        <div style="
-                            background: ${season.color}22;
-                            border: 2px solid ${season.color};
-                            padding: 15px 25px;
-                            border-radius: 12px;
-                            display: inline-flex;
-                            align-items: center;
-                            gap: 10px;
-                            margin-bottom: 20px;
-                        ">
-                            <span style="font-size: 1.5em;">${season.emoji}</span>
-                            <span>Saison ${season.name}</span>
-                            ${userRank ? `<span style="font-weight: bold;">• #${userRank.position} (${userRank.points} pts)</span>` : ''}
-                        </div>
-                    `;
-                }
-
                 userCard.innerHTML = `
-                    <h2>👋 Bienvenue, ${profile.username || user.displayName || 'Joueur'} !</h2>
+                    <h2>👋 Bienvenue, ${profile.pseudo || profile.username || user.displayName || 'Joueur'} !</h2>
                     ${streakWidget}
                     ${seasonWidget}
                     <p style="margin: 15px 0;">
-                        Niveau ${profile.niveau || 1} • ${profile.xp || 0} XP • ${profile.quizJoues || 0} quiz joués
+                        Niveau ${profile.niveau || 1} • ${profile.experiencePoints || profile.xp || 0} XP • ${profile.stats?.totalQuiz || profile.quizJoues || 0} quiz joués
                     </p>
                     <div class="btn-group">
                         <a href="Quiz.html" class="btn-primary">Jouer maintenant</a>
@@ -703,14 +724,6 @@
             }
         });
     </script>
-    
-    <!-- Scripts chargés à la fin pour performance -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/script.js"></script>
 </body>
 
 </html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Permissions Firebase</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🔍 Diagnostic Permissions Firebase</h1>
+    <button onclick="runDiagnostic()">Lancer le diagnostic</button>
+    <div id="results" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function runDiagnostic() {
+            const results = document.getElementById('results');
+            results.textContent = '🔄 Diagnostic en cours...\n\n';
+
+            try {
+                // Attendre que Firebase soit prêt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    results.textContent += '❌ UTILISATEUR: Non connecté\n';
+                    return;
+                }
+
+                results.textContent += `✅ UTILISATEUR: Connecté (${user.uid})\n\n`;
+
+                const db = firebase.firestore();
+                const userId = user.uid;
+
+                // Test 1: Authentification
+                results.textContent += '🔐 TEST AUTH:\n';
+                results.textContent += `   - UID: ${user.uid}\n`;
+                results.textContent += `   - Email: ${user.email}\n\n`;
+
+                // Test 2: Lecture profil
+                results.textContent += '👤 TEST PROFIL:\n';
+                try {
+                    const profileDoc = await db.collection('profiles').doc(userId).get();
+                    if (profileDoc.exists) {
+                        results.textContent += '   ✅ Lecture profil: OK\n';
+                        results.textContent += `   📊 Données: ${JSON.stringify(profileDoc.data()).substring(0, 100)}...\n`;
+                    } else {
+                        results.textContent += '   ⚠️ Profil inexistant\n';
+                    }
+                } catch (error) {
+                    results.textContent += `   ❌ Lecture profil: ${error.message}\n`;
+                }
+
+                // Test 3: Écriture profil
+                results.textContent += '\n✏️ TEST ÉCRITURE PROFIL:\n';
+                try {
+                    await db.collection('profiles').doc(userId).set({
+                        testField: 'diagnostic_' + Date.now(),
+                        lastTest: new Date()
+                    }, { merge: true });
+                    results.textContent += '   ✅ Écriture profil: OK\n';
+                } catch (error) {
+                    results.textContent += `   ❌ Écriture profil: ${error.message}\n`;
+                }
+
+                // Test 4: Lecture saisons
+                results.textContent += '\n🏆 TEST SAISONS:\n';
+                try {
+                    const seasonsSnapshot = await db.collection('seasons').get();
+                    results.textContent += `   ✅ Collection saisons accessible (${seasonsSnapshot.size} documents)\n`;
+
+                    if (seasonsSnapshot.size > 0) {
+                        const firstSeason = seasonsSnapshot.docs[0];
+                        results.textContent += `   📄 Première saison: ${firstSeason.id}\n`;
+
+                        // Test sous-collection entries
+                        const entriesSnapshot = await db.collection('seasons')
+                            .doc(firstSeason.id)
+                            .collection('entries')
+                            .get();
+                        results.textContent += `   📊 Entries: ${entriesSnapshot.size} documents\n`;
+                    }
+                } catch (error) {
+                    results.textContent += `   ❌ Lecture saisons: ${error.message}\n`;
+                    results.textContent += `   🔍 Code d'erreur: ${error.code}\n`;
+                }
+
+                // Test 5: Écriture saison
+                results.textContent += '\n💾 TEST ÉCRITURE SAISON:\n';
+                try {
+                    const testSeasonId = 'diagnostic_test_' + Date.now();
+                    await db.collection('seasons').doc(testSeasonId).set({
+                        name: 'Test Diagnostic',
+                        startDate: new Date(),
+                        endDate: new Date(Date.now() + 86400000)
+                    });
+
+                    // Test écriture dans sous-collection
+                    await db.collection('seasons')
+                        .doc(testSeasonId)
+                        .collection('entries')
+                        .doc(userId)
+                        .set({
+                            userId: userId,
+                            points: 100,
+                            joinedAt: new Date()
+                        });
+
+                    results.textContent += '   ✅ Écriture saison: OK\n';
+
+                    // Nettoyer
+                    await db.collection('seasons').doc(testSeasonId).delete();
+
+                } catch (error) {
+                    results.textContent += `   ❌ Écriture saison: ${error.message}\n`;
+                    results.textContent += `   🔍 Code d'erreur: ${error.code}\n`;
+                }
+
+                // Test 6: Simulation getUserSeasonRank
+                results.textContent += '\n🎯 TEST getUserSeasonRank SIMULATION:\n';
+                try {
+                    // Créer une saison de test
+                    const testSeasonId = 'diagnostic_season_' + Date.now();
+                    await db.collection('seasons').doc(testSeasonId).set({
+                        name: 'Saison Diagnostic',
+                        emoji: '🔧',
+                        startDate: new Date(),
+                        endDate: new Date(Date.now() + 86400000)
+                    });
+
+                    // Ajouter quelques entries de test
+                    await db.collection('seasons').doc(testSeasonId).collection('entries').doc(userId).set({
+                        userId: userId,
+                        points: 150
+                    });
+
+                    await db.collection('seasons').doc(testSeasonId).collection('entries').doc('test_user_1').set({
+                        userId: 'test_user_1',
+                        points: 200
+                    });
+
+                    await db.collection('seasons').doc(testSeasonId).collection('entries').doc('test_user_2').set({
+                        userId: 'test_user_2',
+                        points: 100
+                    });
+
+                    // Simuler getUserSeasonRank
+                    const entryDoc = await db.collection('seasons')
+                        .doc(testSeasonId)
+                        .collection('entries')
+                        .doc(userId)
+                        .get();
+
+                    if (entryDoc.exists) {
+                        const userPoints = entryDoc.data().points;
+                        results.textContent += `   ✅ Entry trouvée: ${userPoints} points\n`;
+
+                        const higherSnapshot = await db.collection('seasons')
+                            .doc(testSeasonId)
+                            .collection('entries')
+                            .where('points', '>', userPoints)
+                            .get();
+
+                        const rank = higherSnapshot.size + 1;
+                        results.textContent += `   ✅ Calcul rang: ${rank}\n`;
+
+                        const totalSnapshot = await db.collection('seasons')
+                            .doc(testSeasonId)
+                            .collection('entries')
+                            .get();
+
+                        const totalParticipants = totalSnapshot.size;
+                        results.textContent += `   ✅ Total participants: ${totalParticipants}\n`;
+
+                        results.textContent += '   🎉 SIMULATION RÉUSSIE !\n';
+                    }
+
+                    // Nettoyer
+                    await db.collection('seasons').doc(testSeasonId).delete();
+
+                } catch (error) {
+                    results.textContent += `   ❌ Simulation échouée: ${error.message}\n`;
+                    results.textContent += `   🔍 Code d'erreur: ${error.code}\n`;
+                }
+
+                results.textContent += '\n🏁 DIAGNOSTIC TERMINÉ\n';
+
+            } catch (error) {
+                results.textContent += `\n💥 ERREUR GÉNÉRALE: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

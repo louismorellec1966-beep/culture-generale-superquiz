@@ -144,7 +144,27 @@ const SeasonsSystem = {
 
             return true;
         } catch (error) {
-            console.error('Erreur addSeasonPoints:', error);
+            console.warn('⚠️ Erreur addSeasonPoints (points sauvegardés localement):', error.message);
+
+            // Sauvegarder localement en cas d'erreur Firestore
+            try {
+                const localSeasonData = JSON.parse(localStorage.getItem('localSeasonData') || '{}');
+                if (!localSeasonData[currentSeason.id]) {
+                    localSeasonData[currentSeason.id] = { points: 0, quizCompleted: 0, perfectQuiz: 0 };
+                }
+
+                localSeasonData[currentSeason.id].points += points;
+                localSeasonData[currentSeason.id].quizCompleted += 1;
+                if (quizPerfect) {
+                    localSeasonData[currentSeason.id].perfectQuiz += 1;
+                }
+
+                localStorage.setItem('localSeasonData', JSON.stringify(localSeasonData));
+                console.log('💾 Points sauvegardés localement:', points);
+            } catch (localError) {
+                console.error('Erreur sauvegarde locale:', localError);
+            }
+
             return false;
         }
     },
@@ -193,7 +213,33 @@ const SeasonsSystem = {
                 .doc(userId)
                 .get();
 
-            if (!entryDoc.exists) return null;
+            if (!entryDoc.exists) {
+                // Si pas d'entry, vérifier les données locales
+                console.log('ℹ️ Aucune donnée de saison trouvée, vérification des données locales');
+                const localSeasonData = JSON.parse(localStorage.getItem('localSeasonData') || '{}');
+                const localData = localSeasonData[currentSeason.id];
+
+                if (localData) {
+                    return {
+                        position: 1, // Position estimée
+                        points: localData.points || 0,
+                        percentile: 50, // Percentile estimé
+                        totalParticipants: 1,
+                        rank: 'bronze',
+                        rankData: SeasonsSystem.RANKS.bronze,
+                        localData: true // Indicateur de données locales
+                    };
+                }
+
+                return {
+                    position: 1,
+                    points: 0,
+                    percentile: 0,
+                    totalParticipants: 1,
+                    rank: 'bronze',
+                    rankData: SeasonsSystem.RANKS.bronze
+                };
+            }
 
             const userPoints = entryDoc.data().points || 0;
 
@@ -232,8 +278,18 @@ const SeasonsSystem = {
                 rankData: SeasonsSystem.RANKS[currentRank]
             };
         } catch (error) {
-            console.error('Erreur getUserSeasonRank:', error);
-            return null;
+            console.warn('⚠️ Erreur getUserSeasonRank (utilisation des valeurs par défaut):', error.message);
+
+            // Retourner des valeurs par défaut en cas d'erreur de permissions
+            return {
+                position: 1,
+                points: 0,
+                percentile: 0,
+                totalParticipants: 1,
+                rank: 'bronze',
+                rankData: SeasonsSystem.RANKS.bronze,
+                error: true // Indicateur d'erreur
+            };
         }
     },
 

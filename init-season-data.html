@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Initialisation Saisons CultureLudo</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🚀 Initialisation Saisons CultureLudo</h1>
+    <p>Cette page initialise les données de saison pour l'utilisateur actuel.</p>
+
+    <button onclick="initializeSeasonData()">Initialiser les données saison</button>
+    <div id="status" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function initializeSeasonData() {
+            const status = document.getElementById('status');
+            status.textContent = '🔄 Initialisation en cours...\n\n';
+
+            try {
+                // Attendre Firebase
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    status.textContent += '❌ ERREUR: Utilisateur non connecté\n';
+                    return;
+                }
+
+                status.textContent += `✅ Utilisateur connecté: ${user.uid}\n\n`;
+
+                const db = firebase.firestore();
+                const userId = user.uid;
+
+                // Vérifier si les données existent déjà
+                const existingSeasonDoc = await db.collection('seasons').doc(userId).get();
+                const existingProfileDoc = await db.collection('profiles').doc(userId).get();
+
+                if (existingSeasonDoc.exists) {
+                    status.textContent += 'ℹ️ Données saison déjà existantes\n';
+                } else {
+                    // Créer les données saison de base
+                    const currentSeason = {
+                        userId: userId,
+                        currentSeason: 'season_2024_q1',
+                        totalPoints: 0,
+                        rank: 'bronze',
+                        rankPoints: 0,
+                        gamesPlayed: 0,
+                        correctAnswers: 0,
+                        winStreak: 0,
+                        bestStreak: 0,
+                        lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+                        achievements: [],
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    await db.collection('seasons').doc(userId).set(currentSeason);
+                    status.textContent += '✅ Données saison créées\n';
+
+                    // Stocker localement aussi
+                    localStorage.setItem('seasonData', JSON.stringify(currentSeason));
+                }
+
+                // Initialiser les statistiques saison dans le profil
+                const profileData = existingProfileDoc.exists ? existingProfileDoc.data() : {};
+
+                if (!profileData.seasonStats) {
+                    const seasonStats = {
+                        totalSeasons: 1,
+                        bestRank: 'bronze',
+                        totalPoints: 0,
+                        seasonsPlayed: ['season_2024_q1'],
+                        achievements: [],
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    await db.collection('profiles').doc(userId).set({
+                        seasonStats: seasonStats
+                    }, { merge: true });
+
+                    status.textContent += '✅ Statistiques saison initialisées\n';
+
+                    // Stocker localement
+                    localStorage.setItem('seasonStats', JSON.stringify(seasonStats));
+                } else {
+                    status.textContent += 'ℹ️ Statistiques saison déjà existantes\n';
+                }
+
+                // Créer une entrée dans la saison actuelle si elle n'existe pas
+                const currentSeasonId = 'season_2024_q1';
+                const seasonEntryRef = db.collection('seasons')
+                    .doc(currentSeasonId)
+                    .collection('entries')
+                    .doc(userId);
+
+                const seasonEntryDoc = await seasonEntryRef.get();
+
+                if (!seasonEntryDoc.exists) {
+                    const seasonEntry = {
+                        userId: userId,
+                        displayName: profileData.displayName || 'Utilisateur',
+                        points: 0,
+                        rank: 'bronze',
+                        gamesPlayed: 0,
+                        correctAnswers: 0,
+                        winStreak: 0,
+                        lastActivity: firebase.firestore.FieldValue.serverTimestamp(),
+                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    await seasonEntryRef.set(seasonEntry);
+                    status.textContent += '✅ Entrée saison créée\n';
+                } else {
+                    status.textContent += 'ℹ️ Entrée saison déjà existante\n';
+                }
+
+                status.textContent += '\n🎉 INITIALISATION TERMINÉE\n';
+                status.textContent += '💡 Les données saison sont maintenant prêtes !\n';
+
+            } catch (error) {
+                status.textContent += `\n💥 ERREUR: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

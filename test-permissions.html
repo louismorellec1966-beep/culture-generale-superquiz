@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Permissions Firestore</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🧪 Test des Permissions Firestore</h1>
+    <button onclick="testPermissions()">Tester les permissions</button>
+    <div id="results"></div>
+
+    <script>
+        async function testPermissions() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>🔄 Test en cours...</p>';
+
+            try {
+                // Attendre que Firebase soit prêt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                if (!firebase.auth().currentUser) {
+                    results.innerHTML = '<p style="color: red;">❌ Vous devez être connecté pour tester les permissions</p>';
+                    return;
+                }
+
+                const userId = firebase.auth().currentUser.uid;
+                let testResults = [];
+
+                // Test 1: Lecture du profil
+                try {
+                    const profileDoc = await firebase.firestore().collection('profiles').doc(userId).get();
+                    testResults.push('✅ Lecture profil: OK');
+                } catch (error) {
+                    testResults.push('❌ Lecture profil: ' + error.message);
+                }
+
+                // Test 2: Lecture des saisons
+                try {
+                    const seasonsSnapshot = await firebase.firestore().collection('seasons').limit(1).get();
+                    testResults.push('✅ Lecture saisons: OK');
+                } catch (error) {
+                    testResults.push('❌ Lecture saisons: ' + error.message);
+                }
+
+                // Test 3: Lecture des fiches culture
+                try {
+                    const cardsSnapshot = await firebase.firestore().collection('cultureCards').limit(1).get();
+                    testResults.push('✅ Lecture fiches culture: OK');
+                } catch (error) {
+                    testResults.push('❌ Lecture fiches culture: ' + error.message);
+                }
+
+                // Test 4: Lecture des tournois
+                try {
+                    const tournamentsSnapshot = await firebase.firestore().collection('tournaments').limit(1).get();
+                    testResults.push('✅ Lecture tournois: OK');
+                } catch (error) {
+                    testResults.push('❌ Lecture tournois: ' + error.message);
+                }
+
+                // Test 5: Lecture des clubs
+                try {
+                    const clubsSnapshot = await firebase.firestore().collection('clubs').limit(1).get();
+                    testResults.push('✅ Lecture clubs: OK');
+                } catch (error) {
+                    testResults.push('❌ Lecture clubs: ' + error.message);
+                }
+
+                results.innerHTML = '<h2>Résultats du test:</h2>' + testResults.map(r => `<p>${r}</p>`).join('');
+
+            } catch (error) {
+                results.innerHTML = '<p style="color: red;">❌ Erreur générale: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

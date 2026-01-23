@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synchronisation Données Saisons</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🔄 Synchronisation Données Saisons</h1>
+    <p>Cette page synchronise les données de saisons stockées localement avec Firestore.</p>
+
+    <button onclick="syncSeasonData()">Synchroniser les données</button>
+    <div id="status" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function syncSeasonData() {
+            const status = document.getElementById('status');
+            status.textContent = '🔄 Démarrage de la synchronisation...\n\n';
+
+            try {
+                // Attendre Firebase
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    status.textContent += '❌ ERREUR: Utilisateur non connecté\n';
+                    return;
+                }
+
+                status.textContent += `✅ Utilisateur connecté: ${user.uid}\n\n`;
+
+                const db = firebase.firestore();
+                const userId = user.uid;
+
+                // Récupérer les données locales
+                const localSeasonData = localStorage.getItem('seasonData');
+                const localSeasonStats = localStorage.getItem('seasonStats');
+
+                if (!localSeasonData && !localSeasonStats) {
+                    status.textContent += 'ℹ️ Aucune donnée locale trouvée\n';
+                    return;
+                }
+
+                status.textContent += '📊 Données locales trouvées:\n';
+                if (localSeasonData) status.textContent += '   ✅ Données saison\n';
+                if (localSeasonStats) status.textContent += '   ✅ Statistiques saison\n\n';
+
+                // Synchroniser les données saison
+                if (localSeasonData) {
+                    try {
+                        const seasonData = JSON.parse(localSeasonData);
+                        await db.collection('seasons').doc(userId).set(seasonData);
+                        status.textContent += '✅ Données saison synchronisées\n';
+                    } catch (error) {
+                        status.textContent += `❌ Erreur synchronisation saison: ${error.message}\n`;
+                    }
+                }
+
+                // Synchroniser les statistiques saison
+                if (localSeasonStats) {
+                    try {
+                        const seasonStats = JSON.parse(localSeasonStats);
+                        await db.collection('profiles').doc(userId).set({
+                            seasonStats: seasonStats
+                        }, { merge: true });
+                        status.textContent += '✅ Statistiques saison synchronisées\n';
+                    } catch (error) {
+                        status.textContent += `❌ Erreur synchronisation stats: ${error.message}\n`;
+                    }
+                }
+
+                // Vérifier la synchronisation
+                status.textContent += '\n🔍 Vérification de la synchronisation...\n';
+
+                try {
+                    const seasonDoc = await db.collection('seasons').doc(userId).get();
+                    if (seasonDoc.exists) {
+                        status.textContent += '✅ Données saison vérifiées dans Firestore\n';
+                    } else {
+                        status.textContent += '⚠️ Données saison non trouvées après synchronisation\n';
+                    }
+                } catch (error) {
+                    status.textContent += `❌ Erreur vérification saison: ${error.message}\n`;
+                }
+
+                try {
+                    const profileDoc = await db.collection('profiles').doc(userId).get();
+                    if (profileDoc.exists && profileDoc.data().seasonStats) {
+                        status.textContent += '✅ Statistiques saison vérifiées dans Firestore\n';
+                    } else {
+                        status.textContent += '⚠️ Statistiques saison non trouvées après synchronisation\n';
+                    }
+                } catch (error) {
+                    status.textContent += `❌ Erreur vérification stats: ${error.message}\n`;
+                }
+
+                status.textContent += '\n🎉 SYNCHRONISATION TERMINÉE\n';
+                status.textContent += '💡 Vous pouvez maintenant utiliser les données saison dans le cloud !\n';
+
+            } catch (error) {
+                status.textContent += `\n💥 ERREUR GÉNÉRALE: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

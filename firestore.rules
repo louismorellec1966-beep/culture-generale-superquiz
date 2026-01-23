@@ -1,0 +1,155 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Fonction helper pour vérifier si l'utilisateur est admin
+    function isAdmin() {
+      return request.auth != null &&
+             request.auth.token.email == 'louismorellec1966@gmail.com';
+    }
+
+    // Collection users - lecture/écriture si connecté et propriétaire
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Collection profiles - lecture publique, écriture si propriétaire
+    match /profiles/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Collection scores - lecture publique, écriture si connecté et propriétaire
+    match /scores/{scoreId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // Collection friendRequests
+    match /friendRequests/{requestId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+        (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+    }
+
+    // Collection friendships
+    match /friendships/{friendshipId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null &&
+        request.auth.uid in resource.data.users;
+    }
+
+    // Collection socialFeed
+    match /socialFeed/{feedId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // Collection notifications
+    match /notifications/{notifId} {
+      allow read: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+    }
+
+    // Collection challenges
+    match /challenges/{challengeId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null &&
+        (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+    }
+
+    // Quiz du jour - lecture publique, écriture admin uniquement
+    match /dailyQuiz/{date} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Scores du quiz du jour
+    match /dailyQuizScores/{scoreId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // Banque de questions - lecture publique, écriture admin uniquement
+    match /questionBank/{questionId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Records du mode survie
+    match /survivalRecords/{recordId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ============ NOUVELLES COLLECTIONS GAMIFICATION ============
+
+    // Système de saisons
+    match /seasons/{seasonId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Entries de saison (points utilisateurs)
+    match /seasons/{seasonId}/entries/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Fiches culture
+    match /cultureCards/{cardId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Favoris de fiches culture
+    match /profiles/{userId}/cultureCardFavorites/{cardId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Quiz personnalisés
+    match /customQuizzes/{quizId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Système de paris
+    match /bets/{betId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Système de clubs
+    match /clubs/{clubId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Sous-collections des clubs (feed d'activité)
+    match /clubs/{clubId}/feed/{feedId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Système de tournois
+    match /tournaments/{tournamentId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Statistiques globales
+    match /globalStats/{statId} {
+      allow read: if request.auth != null;
+    }
+  }
+}

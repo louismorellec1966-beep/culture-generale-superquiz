@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Règles Firestore CultureLudo</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🧪 Test Règles Firestore CultureLudo</h1>
+    <button onclick="testAllCollections()">Tester toutes les collections</button>
+    <div id="results" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function testAllCollections() {
+            const results = document.getElementById('results');
+            results.textContent = '🔄 Test des collections en cours...\n\n';
+
+            try {
+                // Attendre que Firebase soit prêt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    results.textContent += '❌ UTILISATEUR: Non connecté\n';
+                    return;
+                }
+
+                results.textContent += `✅ UTILISATEUR: Connecté (${user.uid})\n\n`;
+
+                const db = firebase.firestore();
+                const userId = user.uid;
+
+                // Test des collections EXISTANTES
+                results.textContent += '📁 COLLECTIONS EXISTANTES:\n';
+
+                const existingCollections = [
+                    'profiles',
+                    'scores',
+                    'questionBank',
+                    'notifications',
+                    'challenges',
+                    'dailyQuiz',
+                    'dailyQuizScores',
+                    'friendRequests',
+                    'friendships',
+                    'survivalRecords'
+                ];
+
+                for (const collection of existingCollections) {
+                    try {
+                        const snapshot = await db.collection(collection).limit(1).get();
+                        results.textContent += `   ✅ ${collection}: Accessible\n`;
+                    } catch (error) {
+                        results.textContent += `   ❌ ${collection}: ${error.message}\n`;
+                    }
+                }
+
+                // Test des collections NOUVELLES (gamification)
+                results.textContent += '\n🎮 COLLECTIONS GAMIFICATION:\n';
+
+                const newCollections = [
+                    'seasons',
+                    'cultureCards',
+                    'customQuizzes',
+                    'bets',
+                    'clubs',
+                    'tournaments',
+                    'globalStats'
+                ];
+
+                for (const collection of newCollections) {
+                    try {
+                        const snapshot = await db.collection(collection).limit(1).get();
+                        results.textContent += `   ✅ ${collection}: Accessible\n`;
+                    } catch (error) {
+                        results.textContent += `   ❌ ${collection}: ${error.message}\n`;
+                    }
+                }
+
+                // Test des sous-collections
+                results.textContent += '\n📂 SOUS-COLLECTIONS:\n';
+
+                try {
+                    // Test sous-collection saisons
+                    const seasonSnapshot = await db.collection('seasons').limit(1).get();
+                    if (!seasonSnapshot.empty) {
+                        const seasonId = seasonSnapshot.docs[0].id;
+                        const entriesSnapshot = await db.collection('seasons')
+                            .doc(seasonId)
+                            .collection('entries')
+                            .limit(1)
+                            .get();
+                        results.textContent += '   ✅ seasons/*/entries: Accessible\n';
+                    } else {
+                        results.textContent += '   ℹ️ seasons/*/entries: Aucune saison trouvée\n';
+                    }
+                } catch (error) {
+                    results.textContent += `   ❌ seasons/*/entries: ${error.message}\n`;
+                }
+
+                try {
+                    // Test sous-collection clubs
+                    const clubSnapshot = await db.collection('clubs').limit(1).get();
+                    if (!clubSnapshot.empty) {
+                        const clubId = clubSnapshot.docs[0].id;
+                        const feedSnapshot = await db.collection('clubs')
+                            .doc(clubId)
+                            .collection('feed')
+                            .limit(1)
+                            .get();
+                        results.textContent += '   ✅ clubs/*/feed: Accessible\n';
+                    } else {
+                        results.textContent += '   ℹ️ clubs/*/feed: Aucun club trouvé\n';
+                    }
+                } catch (error) {
+                    results.textContent += `   ❌ clubs/*/feed: ${error.message}\n`;
+                }
+
+                try {
+                    // Test sous-collection favoris culture
+                    const favoritesSnapshot = await db.collection('profiles')
+                        .doc(userId)
+                        .collection('cultureCardFavorites')
+                        .limit(1)
+                        .get();
+                    results.textContent += '   ✅ profiles/*/cultureCardFavorites: Accessible\n';
+                } catch (error) {
+                    results.textContent += `   ❌ profiles/*/cultureCardFavorites: ${error.message}\n`;
+                }
+
+                // Test d'écriture
+                results.textContent += '\n✏️ TESTS D\'ÉCRITURE:\n';
+
+                try {
+                    // Test écriture profil
+                    await db.collection('profiles').doc(userId).set({
+                        testField: 'test_' + Date.now(),
+                        lastTest: new Date()
+                    }, { merge: true });
+                    results.textContent += '   ✅ Écriture profil: OK\n';
+                } catch (error) {
+                    results.textContent += `   ❌ Écriture profil: ${error.message}\n`;
+                }
+
+                try {
+                    // Test écriture score
+                    const scoreRef = await db.collection('scores').add({
+                        userId: userId,
+                        score: 100,
+                        total: 10,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    results.textContent += '   ✅ Écriture score: OK\n';
+
+                    // Nettoyer
+                    await scoreRef.delete();
+                } catch (error) {
+                    results.textContent += `   ❌ Écriture score: ${error.message}\n`;
+                }
+
+                results.textContent += '\n🏁 TESTS TERMINÉS\n';
+
+                // Résumé
+                const errorCount = (results.textContent.match(/❌/g) || []).length;
+                if (errorCount === 0) {
+                    results.textContent += '\n🎉 TOUS LES TESTS RÉUSSIS ! Règles Firestore OK.';
+                } else {
+                    results.textContent += `\n⚠️ ${errorCount} erreur(s) détectée(s). Vérifiez les règles.`;
+                }
+
+            } catch (error) {
+                results.textContent += `\n💥 ERREUR GÉNÉRALE: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

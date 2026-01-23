@@ -1,6 +1,7 @@
 // ========== CONFIGURATION FIREBASE ==========
 // Configuration Firebase pour SuperQuiz avec système de profils enrichis
 // VERSION CORRIGÉE - Compatible avec et sans Realtime Database
+// CORRECTION QUIC: Désactivation du protocole QUIC pour éviter les erreurs réseau
 
 const firebaseConfig = {
     apiKey: "AIzaSyCAEGKVsQYmKnzkMu8vclmxrf01sHmvZXA",
@@ -14,15 +15,29 @@ const firebaseConfig = {
     databaseURL: "https://super-quiz-da40b-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
+// Configuration Firestore pour désactiver QUIC et éviter les erreurs réseau
+const firestoreSettings = {
+    experimentalForceLongPolling: true, // Force HTTP long polling au lieu de QUIC/WebSocket
+    merge: true // Fusionner avec les paramètres par défaut pour éviter l'avertissement
+};
+
 // Initialiser Firebase (compat version)
 firebase.initializeApp(firebaseConfig);
+
+// Configurer Firestore avec les paramètres anti-QUIC
+firebase.firestore().settings(firestoreSettings);
 
 // Références globales - Firestore (toujours disponible)
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-console.log('🔥 Firebase initialisé');
-console.log('✅ Firestore prêt');
+// Rendre db accessible globalement
+window.db = db;
+window.auth = auth;
+
+console.log('🔥 Firebase initialisé avec configuration anti-QUIC');
+console.log('✅ Firestore configuré pour éviter les erreurs QUIC_PROTOCOL_ERROR');
+console.log('✅ Utilisation de HTTP long polling au lieu de QUIC/WebSocket');
 
 // Realtime Database - SEULEMENT si le SDK est chargé
 let rtdb = null;

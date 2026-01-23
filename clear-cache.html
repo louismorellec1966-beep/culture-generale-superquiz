@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nettoyage Cache Firebase</title>
+</head>
+<body>
+    <h1>🧹 Nettoyage Cache Firebase</h1>
+    <p>Cette page nettoie le cache local et les données Firebase qui peuvent causer des erreurs QUIC.</p>
+
+    <button onclick="clearFirebaseCache()">Nettoyer le cache Firebase</button>
+    <button onclick="clearAllLocalData()">Nettoyer toutes les données locales</button>
+    <div id="results" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        function clearFirebaseCache() {
+            const results = document.getElementById('results');
+            results.textContent = '🧹 Nettoyage du cache Firebase...\n\n';
+
+            try {
+                // Supprimer les données Firebase du localStorage
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.includes('firebase') || key.includes('firestore') || key.includes('auth'))) {
+                        keysToRemove.push(key);
+                    }
+                }
+
+                keysToRemove.forEach(key => {
+                    localStorage.removeItem(key);
+                    results.textContent += `   🗑️ Supprimé: ${key}\n`;
+                });
+
+                // Supprimer les données spécifiques au projet
+                const projectKeys = [
+                    'seasonData',
+                    'seasonStats',
+                    'userProfile',
+                    'quizProgress',
+                    'dailyRewards',
+                    'cultureCards',
+                    'customQuizzes'
+                ];
+
+                projectKeys.forEach(key => {
+                    if (localStorage.getItem(key)) {
+                        localStorage.removeItem(key);
+                        results.textContent += `   🗑️ Supprimé: ${key}\n`;
+                    }
+                });
+
+                // Vider le cache de session
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => {
+                            if (name.includes('firebase') || name.includes('firestore')) {
+                                caches.delete(name);
+                                results.textContent += `   🗑️ Cache supprimé: ${name}\n`;
+                            }
+                        });
+                    });
+                }
+
+                // Forcer le rechargement de Firebase
+                if (typeof firebase !== 'undefined') {
+                    // Déconnecter l'utilisateur
+                    firebase.auth().signOut();
+                    results.textContent += '   👤 Utilisateur déconnecté\n';
+                }
+
+                results.textContent += '\n✅ Cache Firebase nettoyé\n';
+                results.textContent += '💡 Rechargez la page pour réinitialiser Firebase\n';
+
+            } catch (error) {
+                results.textContent += `\n❌ Erreur lors du nettoyage: ${error.message}\n`;
+            }
+        }
+
+        function clearAllLocalData() {
+            const results = document.getElementById('results');
+            results.textContent = '🧹 Nettoyage complet des données locales...\n\n';
+
+            try {
+                const totalItems = localStorage.length;
+
+                // Garder seulement les données essentielles (si nécessaire)
+                const essentialKeys = []; // Liste des clés à garder si besoin
+
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key && !essentialKeys.includes(key)) {
+                        localStorage.removeItem(key);
+                        results.textContent += `   🗑️ Supprimé: ${key}\n`;
+                    }
+                }
+
+                // Vider tous les caches
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => {
+                            caches.delete(name);
+                            results.textContent += `   🗑️ Cache supprimé: ${name}\n`;
+                        });
+                    });
+                }
+
+                // Vider les cookies Firebase
+                document.cookie.split(";").forEach(c => {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+
+                results.textContent += `\n✅ ${totalItems} éléments supprimés du localStorage\n`;
+                results.textContent += '✅ Caches vidés\n';
+                results.textContent += '✅ Cookies nettoyés\n';
+                results.textContent += '\n💡 Rechargez complètement la page (Ctrl+F5)\n';
+
+            } catch (error) {
+                results.textContent += `\n❌ Erreur lors du nettoyage: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

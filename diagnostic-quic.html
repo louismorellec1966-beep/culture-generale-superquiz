@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Firebase QUIC</title>
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+</head>
+<body>
+    <h1>🔍 Diagnostic Firebase QUIC</h1>
+    <p>Cette page diagnostique les erreurs QUIC_PROTOCOL_ERROR et QUIC_NETWORK_IDLE_TIMEOUT.</p>
+
+    <button onclick="runDiagnostics()">Lancer le diagnostic</button>
+    <div id="results" style="margin-top: 20px; font-family: monospace; white-space: pre-line;"></div>
+
+    <script>
+        async function runDiagnostics() {
+            const results = document.getElementById('results');
+            results.textContent = '🔄 Démarrage du diagnostic...\n\n';
+
+            try {
+                // Attendre Firebase
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                results.textContent += '✅ Firebase chargé\n';
+
+                // Test de connexion basique
+                try {
+                    const testDoc = await firebase.firestore().collection('profiles').limit(1).get();
+                    results.textContent += '✅ Connexion Firestore basique: OK\n';
+                } catch (error) {
+                    results.textContent += `❌ Connexion Firestore basique: ${error.message}\n`;
+                }
+
+                // Test d'authentification
+                const user = firebase.auth().currentUser;
+                if (user) {
+                    results.textContent += `✅ Utilisateur connecté: ${user.email}\n`;
+                } else {
+                    results.textContent += 'ℹ️ Utilisateur non connecté\n';
+                }
+
+                // Test des listeners (source potentielle des erreurs QUIC)
+                results.textContent += '\n🔍 Test des listeners Firestore (cause fréquente des erreurs QUIC):\n';
+
+                // Test listener simple
+                try {
+                    const unsubscribe = firebase.firestore()
+                        .collection('profiles')
+                        .limit(1)
+                        .onSnapshot((snapshot) => {
+                            results.textContent += '✅ Listener simple: OK\n';
+                            unsubscribe(); // Se désabonner immédiatement
+                        }, (error) => {
+                            results.textContent += `❌ Listener simple: ${error.message}\n`;
+                        });
+
+                    // Attendre un peu pour le résultat
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+
+                } catch (error) {
+                    results.textContent += `❌ Test listener: ${error.message}\n`;
+                }
+
+                // Vérifier les paramètres Firestore
+                results.textContent += '\n⚙️ Paramètres Firestore:\n';
+                const settings = firebase.firestore()._settings;
+                if (settings) {
+                    results.textContent += `   experimentalForceLongPolling: ${settings.experimentalForceLongPolling || false}\n`;
+                    results.textContent += `   host: ${settings.host || 'défaut'}\n`;
+                } else {
+                    results.textContent += '   Paramètres non accessibles\n';
+                }
+
+                // Test de réseau
+                results.textContent += '\n🌐 Test de réseau:\n';
+                try {
+                    const response = await fetch('https://firestore.googleapis.com/v1/projects/super-quiz-da40b/databases/(default)/documents:runQuery', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            structuredQuery: {
+                                from: [{ collectionId: 'profiles' }],
+                                limit: 1
+                            }
+                        })
+                    });
+
+                    if (response.ok) {
+                        results.textContent += '✅ API REST Firestore: OK\n';
+                    } else {
+                        results.textContent += `⚠️ API REST Firestore: ${response.status}\n`;
+                    }
+                } catch (error) {
+                    results.textContent += `❌ API REST Firestore: ${error.message}\n`;
+                }
+
+                // Recommandations
+                results.textContent += '\n💡 RECOMMANDATIONS:\n';
+
+                const hasQuicErrors = results.textContent.includes('QUIC');
+                if (hasQuicErrors) {
+                    results.textContent += '   ❌ Erreurs QUIC détectées - La configuration anti-QUIC devrait aider\n';
+                    results.textContent += '   🔧 Essayez de vider le cache du navigateur\n';
+                    results.textContent += '   🔧 Désactivez temporairement les extensions VPN/proxy\n';
+                    results.textContent += '   🔧 Utilisez un réseau différent si possible\n';
+                } else {
+                    results.textContent += '   ✅ Aucune erreur QUIC détectée\n';
+                }
+
+                results.textContent += '\n🏁 DIAGNOSTIC TERMINÉ\n';
+
+            } catch (error) {
+                results.textContent += `\n💥 ERREUR GÉNÉRALE: ${error.message}\n`;
+            }
+        }
+    </script>
+</body>
+</html>

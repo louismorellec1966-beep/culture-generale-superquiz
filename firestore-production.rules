@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // RÈGLES DE PRODUCTION - SÉCURISÉES
+
+    // Utilisateurs - accès privé
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Profils - lecture publique pour classements, écriture privée
+    match /profiles/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Sous-collections des profils (favoris, questions ratées)
+    match /profiles/{userId}/{subcollection}/{docId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Scores - accès authentifié
+    match /scores/{scoreId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Saisons - accès authentifié
+    match /seasons/{seasonId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Entries de saison - accès authentifié
+    match /seasons/{seasonId}/entries/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Questions - accès authentifié
+    match /questionBank/{questionId} {
+      allow read: if request.auth != null;
+    }
+
+    // Tournois - accès authentifié
+    match /tournaments/{tournamentId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Clubs - accès authentifié
+    match /clubs/{clubId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Sous-collections des clubs
+    match /clubs/{clubId}/{subcollection}/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Fiches culture - accès authentifié
+    match /cultureCards/{cardId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Quiz personnalisés - accès authentifié
+    match /customQuizzes/{quizId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Statistiques globales - lecture seule
+    match /globalStats/{statId} {
+      allow read: if request.auth != null;
+    }
+
+    // Notifications - accès authentifié
+    match /notifications/{notificationId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Paris - accès authentifié
+    match /bets/{betId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

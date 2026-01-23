@@ -716,6 +716,200 @@
         .title-rarity.legendary { background: #fff3cd; color: #856404; }
         .title-rarity.mythic { background: linear-gradient(135deg, #ff6b6b, #ffd700); color: white; }
 
+        /* Section Fiches Culture */
+        .culture-cards-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+        }
+
+        .culture-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .culture-card-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .culture-card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .culture-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .culture-card-title {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .culture-card-favorite {
+            color: #f39c12;
+            font-size: 1.2em;
+        }
+
+        .culture-card-preview {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .culture-card-matiere {
+            font-size: 0.8em;
+            color: #667eea;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        /* Modal Fiches Culture */
+        .culture-card-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .culture-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        .culture-card-content {
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .culture-card-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .culture-card-header h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .culture-card-close {
+            cursor: pointer;
+            font-size: 1.5em;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .culture-card-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .culture-card-body {
+            padding: 25px;
+        }
+
+        .culture-card-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .culture-card-text {
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+            font-size: 1.05em;
+        }
+
+        .culture-card-sources {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .culture-card-actions {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .culture-card-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-favorite {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-favorite:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-close {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-close:hover {
+            background: #5a6268;
+        }
+
         /* Loading */
         .loading-container {
             text-align: center;
@@ -1065,6 +1259,14 @@
                     </div>
                 </div>
 
+                <!-- Fiches Culture Favorites -->
+                <div class="culture-cards-section" id="culture-cards-section">
+                    <h2 class="section-title">📚 Fiches Culture Favorites</h2>
+                    <div id="culture-cards-container">
+                        <p style="text-align: center; color: #7f8c8d;">Chargement des fiches culture...</p>
+                    </div>
+                </div>
+
                 <!-- Statistiques principales -->
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -1272,6 +1474,53 @@
                     console.error('Erreur chargement titres:', e);
                 }
             }
+
+            // Charger les fiches culture favorites
+            if (typeof CultureCardsSystem !== 'undefined') {
+                try {
+                    const favoritesRef = db.collection('profiles').doc(currentUser.uid)
+                        .collection('cultureCardFavorites');
+                    const favoritesSnapshot = await favoritesRef.get();
+
+                    if (!favoritesSnapshot.empty) {
+                        const favoriteCards = [];
+                        for (const favDoc of favoritesSnapshot.docs) {
+                            const questionId = favDoc.id;
+                            const card = await CultureCardsSystem.getCardForQuestion(questionId);
+                            if (card) {
+                                favoriteCards.push({ id: questionId, ...card });
+                            }
+                        }
+
+                        if (favoriteCards.length > 0) {
+                            const cardsHTML = favoriteCards.map(card => `
+                                <div class="culture-card-item" onclick="showCultureCard('${card.id}')">
+                                    <div class="culture-card-header">
+                                        <div class="culture-card-title">${card.titre || 'Fiche Culture'}</div>
+                                        <div class="culture-card-favorite">⭐</div>
+                                    </div>
+                                    <div class="culture-card-preview">${card.contenu || card.description || 'Contenu non disponible'}</div>
+                                    <div class="culture-card-matiere">${CultureCardsSystem.CATEGORIES[card.matiere]?.emoji || '📖'} ${card.matiere || 'Général'}</div>
+                                </div>
+                            `).join('');
+
+                            document.getElementById('culture-cards-container').innerHTML = `
+                                <div class="culture-cards-grid">${cardsHTML}</div>
+                            `;
+                        } else {
+                            document.getElementById('culture-cards-container').innerHTML =
+                                '<p style="text-align: center; color: #7f8c8d;">Aucune fiche culture favorite. Découvrez-en de nouvelles en jouant !</p>';
+                        }
+                    } else {
+                        document.getElementById('culture-cards-container').innerHTML =
+                            '<p style="text-align: center; color: #7f8c8d;">Aucune fiche culture favorite. Découvrez-en de nouvelles en jouant !</p>';
+                    }
+                } catch (e) {
+                    console.error('Erreur chargement fiches culture:', e);
+                    document.getElementById('culture-cards-container').innerHTML =
+                        '<p style="text-align: center; color: #7f8c8d;">Erreur lors du chargement des fiches culture.</p>';
+                }
+            }
         }
 
         // Définir le titre actif
@@ -1283,6 +1532,80 @@
             } catch (error) {
                 console.error('Erreur changement titre:', error);
                 alert('Erreur lors du changement de titre');
+            }
+        }
+
+        // Afficher une fiche culture
+        async function showCultureCard(questionId) {
+            if (typeof CultureCardsSystem === 'undefined') return;
+
+            try {
+                const card = await CultureCardsSystem.getCardForQuestion(questionId);
+                if (!card) {
+                    alert('Fiche culture introuvable');
+                    return;
+                }
+
+                // Créer une modale pour afficher la fiche
+                const modal = document.createElement('div');
+                modal.className = 'culture-card-modal';
+                modal.innerHTML = `
+                    <div class="culture-card-overlay" onclick="this.parentElement.remove()"></div>
+                    <div class="culture-card-content">
+                        <div class="culture-card-header">
+                            <span class="culture-card-close" onclick="this.closest('.culture-card-modal').remove()">✕</span>
+                            <h3>📚 Fiche Culture</h3>
+                        </div>
+                        <div class="culture-card-body">
+                            <div class="culture-card-title">${card.titre || 'Fiche Culture'}</div>
+                            <div class="culture-card-text">${card.contenu || card.description || 'Contenu non disponible'}</div>
+                            ${card.sources ? `<div class="culture-card-sources"><strong>Sources:</strong> ${card.sources}</div>` : ''}
+                        </div>
+                        <div class="culture-card-actions">
+                            <button class="btn-favorite" onclick="toggleCultureCardFavorite('${questionId}', this)">
+                                ✅ En favoris
+                            </button>
+                            <button class="btn-close" onclick="this.closest('.culture-card-modal').remove()">Fermer</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                // Animation d'entrée
+                setTimeout(() => {
+                    modal.querySelector('.culture-card-content').style.transform = 'scale(1)';
+                    modal.querySelector('.culture-card-content').style.opacity = '1';
+                }, 10);
+            } catch (error) {
+                console.error('Erreur affichage fiche culture:', error);
+                alert('Erreur lors de l\'affichage de la fiche culture');
+            }
+        }
+
+        // Basculer l'état favoris d'une fiche culture
+        async function toggleCultureCardFavorite(questionId, buttonElement) {
+            if (typeof firebase === 'undefined' || !firebase.auth) {
+                alert('Connexion requise pour gérer les favoris');
+                return;
+            }
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert('Connexion requise pour gérer les favoris');
+                return;
+            }
+
+            try {
+                await CultureCardsSystem.removeFromFavorites(user.uid, questionId);
+                buttonElement.textContent = '⭐ Ajouter aux favoris';
+                buttonElement.className = 'btn-favorite';
+
+                // Recharger les fiches culture
+                loadGamificationData();
+            } catch (error) {
+                console.error('Erreur gestion favoris:', error);
+                alert('Erreur lors de la gestion des favoris');
             }
         }
 

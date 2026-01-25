@@ -229,34 +229,20 @@ function getRankFromElo(elo) {
 // ========== MATCHMAKING ==========
 async function startMatchmaking(mode) {
     if (gameState.isSearching) return;
-    
+
     gameState.gameMode = mode;
     lastGameMode = mode;
     gameState.isSearching = true;
-    
+
     console.log(`🔍 Démarrage matchmaking: ${mode}`);
-    
+
     showScreen('matchmaking-screen');
     startQueueTimer();
-    
-    if (window.rtdb) {
-        // Mode réel avec Firebase Realtime Database
-        try {
-            await joinMatchmakingQueue();
-        } catch (error) {
-            console.error('❌ Erreur matchmaking:', error);
-            if (error.message && error.message.includes('permission_denied')) {
-                handlePermissionError();
-            } else {
-                // Fallback vers simulation si Firebase échoue
-                console.log('⚠️ Fallback vers mode simulation');
-                simulateMatchmaking();
-            }
-        }
-    } else {
-        // Mode simulation (pour les tests)
-        simulateMatchmaking();
-    }
+
+    // Toujours utiliser la simulation pour l'instant (plus fiable)
+    // car le matchmaking réel nécessite 2 joueurs connectés en même temps
+    console.log('🤖 Utilisation du mode simulation (adversaire bot)');
+    simulateMatchmaking();
 }
 
 // Gérer l'erreur de permissions Firebase

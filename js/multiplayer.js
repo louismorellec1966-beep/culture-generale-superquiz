@@ -239,10 +239,40 @@ async function startMatchmaking(mode) {
     showScreen('matchmaking-screen');
     startQueueTimer();
 
-    // Toujours utiliser la simulation pour l'instant (plus fiable)
-    // car le matchmaking réel nécessite 2 joueurs connectés en même temps
-    console.log('🤖 Utilisation du mode simulation (adversaire bot)');
-    simulateMatchmaking();
+    if (window.rtdb) {
+        // Mode réel avec Firebase Realtime Database
+        try {
+            console.log('🔎 Recherche d\'un adversaire réel...');
+            await joinMatchmakingQueue();
+
+            // Timeout de 30 secondes : si pas d'adversaire trouvé, passer au bot
+            gameState.matchmakingTimeout = setTimeout(() => {
+                if (gameState.isSearching && !gameState.matchId) {
+                    console.log('⏰ 30s écoulées - Passage au mode simulation');
+                    // Nettoyer la file d'attente
+                    if (gameState.matchmakingRef) {
+                        gameState.matchmakingRef.off();
+                        gameState.matchmakingRef.remove();
+                    }
+                    simulateMatchmaking();
+                }
+            }, 30000); // 30 secondes
+
+        } catch (error) {
+            console.error('❌ Erreur matchmaking:', error);
+            if (error.message && error.message.includes('permission_denied')) {
+                handlePermissionError();
+            } else {
+                // Fallback vers simulation si Firebase échoue
+                console.log('⚠️ Fallback vers mode simulation');
+                simulateMatchmaking();
+            }
+        }
+    } else {
+        // Mode simulation (pour les tests sans Firebase)
+        console.log('🤖 Firebase non disponible - Mode simulation');
+        simulateMatchmaking();
+    }
 }
 
 // Gérer l'erreur de permissions Firebase
@@ -439,10 +469,16 @@ async function createMatch(opponentId, opponentData) {
 
 // Match trouvé
 async function onMatchFound(matchId, opponentId) {
-    console.log(`✅ Match trouvé: ${matchId}`);
-    
+    console.log(`✅ Match trouvé avec un vrai joueur: ${matchId}`);
+
     gameState.isSearching = false;
     stopQueueTimer();
+
+    // Annuler le timeout de simulation (un vrai joueur a été trouvé)
+    if (gameState.matchmakingTimeout) {
+        clearTimeout(gameState.matchmakingTimeout);
+        gameState.matchmakingTimeout = null;
+    }
     
     // Récupérer les données du match
     const matchSnapshot = await window.rtdb.ref(`matches/${matchId}`).once('value');
@@ -515,10 +551,16 @@ function stopQueueTimer() {
 // Annuler le matchmaking
 function cancelMatchmaking() {
     console.log('❌ Matchmaking annulé');
-    
+
     gameState.isSearching = false;
     stopQueueTimer();
-    
+
+    // Annuler le timeout de simulation
+    if (gameState.matchmakingTimeout) {
+        clearTimeout(gameState.matchmakingTimeout);
+        gameState.matchmakingTimeout = null;
+    }
+
     // Supprimer de la file d'attente
     if (gameState.matchmakingRef) {
         gameState.matchmakingRef.off();

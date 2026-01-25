@@ -336,6 +336,14 @@
             return num.toString();
         }
 
+        // Helper pour extraire l'avatar correctement
+        function getAvatar(avatar) {
+            if (!avatar) return '👤';
+            if (typeof avatar === 'string') return avatar;
+            if (typeof avatar === 'object' && avatar.value) return avatar.value;
+            return '👤';
+        }
+
         function displayPodium(top3) {
             const container = document.getElementById('podium-container');
             if (top3.length === 0) {
@@ -349,7 +357,7 @@
             container.innerHTML = `<div class="podium">${top3.map((p, i) => {
                 const isXP = currentFilter === 'xp';
                 const mainValue = isXP ? (p.experiencePoints || 0) : (p.totalScore || 0);
-                const avatar = p.avatar || '👤';
+                const avatar = getAvatar(p.avatar);
                 const niveau = p.niveau || 1;
                 const quizCount = p.quizCount || p.totalQuiz || 0;
                 
@@ -379,7 +387,7 @@
                 const rank = p.rank || (i + 1);
                 const isCurrent = currentUser && (p.uid === currentUser.uid);
                 const mainValue = isXP ? (p.experiencePoints || 0) : (p.totalScore || 0);
-                const avatar = p.avatar || '👤';
+                const avatar = getAvatar(p.avatar);
                 const niveau = p.niveau || 1;
                 const quizCount = p.quizCount || p.totalQuiz || 0;
                 const tauxReussite = p.tauxReussite || (p.average ? Math.round(p.average) : 0);

@@ -311,6 +311,102 @@ const FirebaseScores = {
         }
     },
 
+    // Classement par score global (pour les matières)
+    getLeaderboard: async (matiere = null, limit = 50) => {
+        try {
+            console.log('📥 Récupération classement scores...', matiere || 'global');
+
+            // Fonction helper pour extraire l'avatar
+            const getAvatarValue = (avatar) => {
+                if (!avatar) return '👤';
+                if (typeof avatar === 'string') return avatar;
+                if (typeof avatar === 'object' && avatar.value) return avatar.value;
+                return '👤';
+            };
+
+            // Récupérer tous les scores
+            let scoresQuery = db.collection('scores');
+            if (matiere) {
+                scoresQuery = scoresQuery.where('matiere', '==', matiere);
+            }
+
+            const scoresSnapshot = await scoresQuery.get();
+
+            // Agréger les scores par utilisateur
+            const userScores = {};
+            scoresSnapshot.forEach(doc => {
+                const data = doc.data();
+                const uid = data.userId;
+                if (!uid) return;
+
+                if (!userScores[uid]) {
+                    userScores[uid] = {
+                        uid: uid,
+                        totalScore: 0,
+                        quizCount: 0,
+                        totalCorrect: 0,
+                        totalQuestions: 0
+                    };
+                }
+
+                userScores[uid].totalScore += data.score || 0;
+                userScores[uid].quizCount++;
+                userScores[uid].totalCorrect += data.score || 0;
+                userScores[uid].totalQuestions += data.total || 0;
+            });
+
+            // Récupérer les profils pour les noms et avatars
+            const userIds = Object.keys(userScores);
+            const profiles = {};
+
+            // Charger les profils par lots
+            for (const uid of userIds) {
+                try {
+                    const profileDoc = await db.collection('profiles').doc(uid).get();
+                    if (profileDoc.exists) {
+                        profiles[uid] = profileDoc.data();
+                    }
+                } catch (e) {
+                    console.log('Profil non trouvé:', uid);
+                }
+            }
+
+            // Construire le classement
+            const leaderboard = userIds.map(uid => {
+                const score = userScores[uid];
+                const profile = profiles[uid] || {};
+                const average = score.totalQuestions > 0
+                    ? Math.round((score.totalCorrect / score.totalQuestions) * 100)
+                    : 0;
+
+                return {
+                    uid: uid,
+                    pseudo: profile.pseudo || 'Joueur',
+                    avatar: getAvatarValue(profile.avatar),
+                    niveau: profile.niveau || 1,
+                    totalScore: score.totalScore,
+                    quizCount: score.quizCount,
+                    totalQuiz: score.quizCount,
+                    average: average,
+                    tauxReussite: average
+                };
+            })
+            .filter(p => p.quizCount > 0)
+            .sort((a, b) => b.totalScore - a.totalScore)
+            .slice(0, limit)
+            .map((p, index) => ({
+                ...p,
+                rank: index + 1
+            }));
+
+            console.log('✅ Classement scores prêt:', leaderboard.length, 'joueurs');
+            return leaderboard;
+        } catch (error) {
+            console.error('❌ Erreur récupération classement scores:', error);
+            return [];
+        }
+    },
+
     // Classement par ELO (pour le mode multijoueur)
     getLeaderboardByELO: async (limit = 20) => {
         try {

@@ -53,9 +53,9 @@ const ClubsSystem = {
                 isPublic: isPublic,
                 ownerId: userId,
                 members: [{
-                    odlerId: odlerId,
-                    username: profile.username || 'Anonyme',
-                    avatar: profile.avatar || '😊',
+                    userId: userId,
+                    username: profile.pseudo || profile.username || 'Anonyme',
+                    avatar: profile.avatar?.value || profile.avatar || '😊',
                     role: 'owner',
                     joinedAt: new Date()
                 }],
@@ -116,7 +116,7 @@ const ClubsSystem = {
             // Ajouter le membre
             await db.collection('clubs').doc(clubId).update({
                 members: firebase.firestore.FieldValue.arrayUnion({
-                    odlerId: odlerId,
+                    userId: userId,
                     username: profile.username || 'Anonyme',
                     avatar: profile.avatar || '😊',
                     role: 'member',
@@ -134,7 +134,7 @@ const ClubsSystem = {
             // Notification au club
             await db.collection('clubs').doc(clubId).collection('feed').add({
                 type: 'member_joined',
-                odlerId: odlerId,
+                userId: userId,
                 username: profile.username,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -170,7 +170,7 @@ const ClubsSystem = {
                 await db.collection('clubs').doc(profile.clubId).delete();
             } else {
                 // Retirer le membre
-                const updatedMembers = club.members.filter(m => m.odlerId !== userId);
+                const updatedMembers = club.members.filter(m => m.userId !== userId);
                 await db.collection('clubs').doc(profile.clubId).update({
                     members: updatedMembers,
                     memberCount: firebase.firestore.FieldValue.increment(-1)
@@ -221,7 +221,7 @@ const ClubsSystem = {
             // Ajouter au feed du club
             await db.collection('clubs').doc(profile.clubId).collection('feed').add({
                 type: 'quiz_completed',
-                odlerId: odlerId,
+                userId: userId,
                 username: profile.username,
                 xp: xpAmount,
                 isPerfect: quizStats.isPerfect || false,
@@ -239,30 +239,33 @@ const ClubsSystem = {
     getClubsRanking: async (limit = 20, period = 'all') => {
         try {
             const orderField = period === 'weekly' ? 'weeklyXP' : 'totalXP';
-            
-            const snapshot = await db.collection('clubs')
-                .where('memberCount', '>=', ClubsSystem.MIN_MEMBERS_FOR_RANKING)
-                .orderBy('memberCount')
-                .orderBy(orderField, 'desc')
-                .limit(limit)
-                .get();
+
+            // Récupérer tous les clubs et filtrer/trier côté client
+            // pour éviter le besoin d'un index composite
+            const snapshot = await db.collection('clubs').get();
 
             const clubs = [];
-            let rank = 1;
-
             snapshot.forEach(doc => {
-                clubs.push({
-                    rank: rank++,
-                    id: doc.id,
-                    ...doc.data()
-                });
+                const data = doc.data();
+                // Filtrer par nombre minimum de membres
+                if ((data.memberCount || 0) >= ClubsSystem.MIN_MEMBERS_FOR_RANKING) {
+                    clubs.push({
+                        id: doc.id,
+                        ...data
+                    });
+                }
             });
 
-            // Re-trier car Firestore ne permet pas d'ordonner directement
-            clubs.sort((a, b) => b[orderField.replace('.', '')] - a[orderField.replace('.', '')]);
-            clubs.forEach((club, index) => club.rank = index + 1);
+            // Trier par XP côté client
+            clubs.sort((a, b) => (b[orderField] || 0) - (a[orderField] || 0));
 
-            return clubs;
+            // Limiter et ajouter le rang
+            const rankedClubs = clubs.slice(0, limit).map((club, index) => ({
+                ...club,
+                rank: index + 1
+            }));
+
+            return rankedClubs;
         } catch (error) {
             console.error('Erreur getClubsRanking:', error);
             return [];
@@ -275,20 +278,35 @@ const ClubsSystem = {
 
         try {
             const queryLower = query.toLowerCase();
-            
-            const snapshot = await db.collection('clubs')
-                .where('isPublic', '==', true)
-                .where('nameLower', '>=', queryLower)
-                .where('nameLower', '<=', queryLower + '\uf8ff')
-                .limit(20)
-                .get();
+
+            // Récupérer les clubs publics et filtrer côté client
+            // pour éviter le besoin d'un index composite
+            const snapshot = await db.collection('clubs').get();
 
             const clubs = [];
             snapshot.forEach(doc => {
-                clubs.push({ id: doc.id, ...doc.data() });
+                const data = doc.data();
+                // Filtrer: public et nom correspondant à la recherche
+                if (data.isPublic !== false) {
+                    const nameLower = (data.nameLower || data.name || '').toLowerCase();
+                    if (nameLower.includes(queryLower)) {
+                        clubs.push({ id: doc.id, ...data });
+                    }
+                }
             });
 
-            return clubs;
+            // Trier par pertinence (commence par > contient)
+            clubs.sort((a, b) => {
+                const aName = (a.nameLower || a.name || '').toLowerCase();
+                const bName = (b.nameLower || b.name || '').toLowerCase();
+                const aStarts = aName.startsWith(queryLower);
+                const bStarts = bName.startsWith(queryLower);
+                if (aStarts && !bStarts) return -1;
+                if (!aStarts && bStarts) return 1;
+                return aName.localeCompare(bName);
+            });
+
+            return clubs.slice(0, 20);
         } catch (error) {
             console.error('Erreur searchClubs:', error);
             return [];
@@ -353,7 +371,7 @@ const ClubsSystem = {
 
     // Rendu de la carte de club
     renderClubCard: (club, showJoinButton = false, userId = null) => {
-        const isMember = userId && club.members?.some(m => m.odlerId === userId);
+        const isMember = userId && club.members?.some(m => m.userId === userId);
         const avgXP = club.memberCount > 0 ? Math.round(club.totalXP / club.memberCount) : 0;
 
         return `

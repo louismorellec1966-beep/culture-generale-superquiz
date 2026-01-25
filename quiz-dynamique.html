@@ -28,8 +28,6 @@
     <script defer src="js/social-system.js"></script>
     <script defer src="js/streaks-system.js"></script>
     <script defer src="js/seasons-system.js"></script>
-    <script defer src="js/betting-system.js"></script>
-    <script defer src="js/culture-cards-system.js"></script>
     <script defer src="js/clubs-system.js"></script>
     <script defer src="js/titles-system.js"></script>
     <script defer src="js/themes-system.js"></script>
@@ -220,6 +218,10 @@
             background: #e74c3c;
         }
 
+        .mode-badge.revision {
+            background: #9b59b6;
+        }
+
         .difficulty-badge {
             display: inline-block;
             padding: 5px 15px;
@@ -272,11 +274,13 @@
 
         .results-content {
             background: white;
-            border-radius: 20px;
-            padding: 40px;
+            border-radius: 15px;
+            padding: 25px 20px;
             text-align: center;
-            max-width: 400px;
+            max-width: 360px;
             width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
             animation: popIn 0.3s ease;
         }
 
@@ -293,47 +297,48 @@
         }
 
         .results-header {
-            font-size: 4em;
-            margin-bottom: 20px;
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
 
         .results-score {
-            font-size: 3em;
+            font-size: 2em;
             font-weight: bold;
             color: #2c3e50;
         }
 
         .results-percentage {
-            font-size: 1.5em;
+            font-size: 1.1em;
             color: #7f8c8d;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .xp-gain {
             background: linear-gradient(135deg, #f1c40f, #f39c12);
             color: white;
-            padding: 15px 25px;
-            border-radius: 10px;
-            margin: 20px 0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 12px 0;
         }
 
         .xp-gain-title {
-            font-size: 0.9em;
+            font-size: 0.8em;
             opacity: 0.9;
         }
 
         .xp-gain-value {
-            font-size: 1.8em;
+            font-size: 1.4em;
             font-weight: bold;
         }
 
         .level-up {
             background: linear-gradient(135deg, #9b59b6, #8e44ad);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
             font-weight: bold;
+            font-size: 0.9em;
             animation: pulse 1s infinite;
         }
 
@@ -350,31 +355,33 @@
         }
 
         .new-badges {
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         .badge-earned {
             display: inline-block;
             background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin: 5px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin: 3px;
             border: 2px solid #f1c40f;
+            font-size: 0.85em;
         }
 
         .results-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .btn-result {
-            padding: 12px 25px;
+            padding: 10px 16px;
             border-radius: 8px;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 0.9em;
             border: none;
             cursor: pointer;
             transition: transform 0.2s;
@@ -579,41 +586,40 @@
             </div>
 
             <div class="level-up" id="level-up-section" style="display: none;">
-                🎊 Niveau supérieur ! Niveau <span id="new-level">2</span>
+                🎊 Niveau <span id="new-level">2</span> atteint !
             </div>
 
             <!-- Section streak -->
-            <div id="streak-section" style="display: none; margin: 15px 0; padding: 15px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 12px; color: white;">
-                <div style="font-size: 2em; margin-bottom: 5px;" id="streak-flame">🔥</div>
-                <div style="font-weight: bold;" id="streak-count">Série de X jours !</div>
-                <div style="font-size: 0.9em; opacity: 0.9;" id="streak-bonus"></div>
+            <div id="streak-section" style="display: none; margin: 10px 0; padding: 10px; background: linear-gradient(135deg, #ff6b35, #f7931e); border-radius: 8px; color: white;">
+                <div style="font-size: 1.3em; display: inline;" id="streak-flame">🔥</div>
+                <span style="font-weight: bold; font-size: 0.9em;" id="streak-count">Série de X jours !</span>
+                <div style="font-size: 0.8em; opacity: 0.9;" id="streak-bonus"></div>
             </div>
 
             <!-- Section saison -->
-            <div id="season-section" style="display: none; margin: 15px 0; padding: 15px; background: var(--bg-secondary, #f8f9fa); border-radius: 12px;">
-                <div id="season-points" style="font-weight: bold;"></div>
+            <div id="season-section" style="display: none; margin: 10px 0; padding: 8px 12px; background: var(--bg-secondary, #f8f9fa); border-radius: 8px;">
+                <div id="season-points" style="font-weight: bold; font-size: 0.9em;"></div>
             </div>
 
             <div class="new-badges" id="new-badges-section"></div>
 
             <!-- Section partage et défis -->
-            <div class="share-section" id="share-section" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                <p style="margin: 0 0 15px 0; font-weight: 600; color: #2c3e50;">📤 Partager ce score</p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
-                    <button onclick="shareResult('twitter')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #1DA1F2; color: white; cursor: pointer; font-weight: 600;">🐦 Twitter</button>
-                    <button onclick="shareResult('facebook')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #4267B2; color: white; cursor: pointer; font-weight: 600;">📘 Facebook</button>
-                    <button onclick="shareResult('whatsapp')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #25D366; color: white; cursor: pointer; font-weight: 600;">💬 WhatsApp</button>
-                    <button onclick="shareResult('download')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #667eea; color: white; cursor: pointer; font-weight: 600;">📥 Image</button>
-                    <button onclick="shareResult('copy')" style="padding: 10px 15px; border: none; border-radius: 8px; background: #95a5a6; color: white; cursor: pointer; font-weight: 600;">📋 Copier</button>
+            <div class="share-section" id="share-section" style="margin: 12px 0; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                <p style="margin: 0 0 8px 0; font-weight: 600; color: #2c3e50; font-size: 0.85em;">📤 Partager</p>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;">
+                    <button onclick="shareResult('twitter')" style="padding: 6px 10px; border: none; border-radius: 6px; background: #1DA1F2; color: white; cursor: pointer; font-size: 0.8em;">🐦</button>
+                    <button onclick="shareResult('facebook')" style="padding: 6px 10px; border: none; border-radius: 6px; background: #4267B2; color: white; cursor: pointer; font-size: 0.8em;">📘</button>
+                    <button onclick="shareResult('whatsapp')" style="padding: 6px 10px; border: none; border-radius: 6px; background: #25D366; color: white; cursor: pointer; font-size: 0.8em;">💬</button>
+                    <button onclick="shareResult('copy')" style="padding: 6px 10px; border: none; border-radius: 6px; background: #95a5a6; color: white; cursor: pointer; font-size: 0.8em;">📋</button>
                 </div>
             </div>
 
             <!-- Bouton défier un ami -->
-            <div id="challenge-friend-section" style="margin: 15px 0; display: none;">
-                <button onclick="openChallengeModal()" style="padding: 12px 25px; border: none; border-radius: 10px; background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white; cursor: pointer; font-weight: 600; font-size: 1.1em;">⚔️ Défier un ami</button>
+            <div id="challenge-friend-section" style="margin: 10px 0; display: none;">
+                <button onclick="openChallengeModal()" style="padding: 8px 16px; border: none; border-radius: 8px; background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white; cursor: pointer; font-weight: 600; font-size: 0.9em;">⚔️ Défier un ami</button>
             </div>
 
-            <div class="results-actions">
+            <div class="results-actions" id="results-actions">
                 <a href="Quiz.html" class="btn-result secondary">← Autre Quiz</a>
                 <button class="btn-result primary" onclick="location.reload()">🔄 Rejouer</button>
                 <a href="Profil.html" class="btn-result secondary">👤 Mon Profil</a>
@@ -638,6 +644,9 @@
         let currentScore = 0;
         let quizStartTime = null;
         let timerInterval = null;
+        let isRevisionMode = mode === 'revision' || sessionStorage.getItem('revisionMode') === 'true';
+        let revisionQuestionIds = [];
+        let revisionQuestionsData = []; // Pour stocker les données des questions en révision
 
         // Initialisation
         window.addEventListener('load', () => {
@@ -647,6 +656,12 @@
         async function initQuiz() {
             if (typeof firebase === 'undefined') {
                 setTimeout(initQuiz, 200);
+                return;
+            }
+
+            // Mode révision
+            if (isRevisionMode) {
+                await initRevisionQuiz();
                 return;
             }
 
@@ -666,7 +681,7 @@
                 let query = db.collection('questionBank')
                     .where('matiere', '==', matiere)
                     .where('categorie', '==', categorie);
-                
+
                 // Ajouter le filtre de difficulté si spécifié
                 if (difficulty) {
                     query = query.where('difficulty', '==', difficulty);
@@ -702,7 +717,7 @@
                 const modeBadge = mode === 'challenge'
                     ? '<span class="mode-badge challenge">🔥 DÉFI</span>'
                     : '<span class="mode-badge classic">🎯 CLASSIQUE</span>';
-                
+
                 // Badge de difficulté
                 let difficultyBadge = '';
                 if (difficulty) {
@@ -710,7 +725,7 @@
                     const difficultyNames = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' };
                     difficultyBadge = `<span class="difficulty-badge ${difficulty}">${difficultyEmojis[difficulty]} ${difficultyNames[difficulty]}</span>`;
                 }
-                
+
                 document.getElementById('quiz-title').innerHTML = titreQuiz + modeBadge + difficultyBadge;
 
                 // Breadcrumb
@@ -724,7 +739,7 @@
 
                 // Stocker les bonnes réponses pour chaque question
                 window.correctAnswersMap = [];
-                
+
                 selectedQuestions.forEach((q, index) => {
                     // Mélanger les réponses aléatoirement
                     const shuffledAnswers = q.reponses.map((rep, i) => ({ text: rep, originalIndex: i }));
@@ -735,7 +750,7 @@
                     // Trouver le nouvel index de la bonne réponse et le stocker
                     const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
                     window.correctAnswersMap[index] = newCorrectIndex;
-                    
+
                     const questionDiv = document.createElement('div');
                     questionDiv.className = 'question-card';
                     questionDiv.innerHTML = `
@@ -765,9 +780,209 @@
                 console.error(error);
                 document.getElementById('quiz-container').innerHTML =
                     `<div class="error-message"><h2>Erreur de chargement</h2><p>${error.message}<br>
-                    Note: La recherche par catégorie peut nécessiter la création d'un index dans Firebase. 
+                    Note: La recherche par catégorie peut nécessiter la création d'un index dans Firebase.
                     Vérifiez la console du navigateur (F12) pour un lien de création d'index.
                     <br><a href="Quiz.html" style="color: #3498db;">Retour aux quiz</a></p></div>`;
+            }
+        }
+
+        // ========== MODE RÉVISION ==========
+        async function initRevisionQuiz() {
+            const user = firebase.auth().currentUser;
+
+            if (!user) {
+                // Attendre l'authentification
+                firebase.auth().onAuthStateChanged(async (authUser) => {
+                    if (authUser) {
+                        await loadRevisionQuestions(authUser.uid);
+                    } else {
+                        document.getElementById('quiz-container').innerHTML =
+                            '<div class="error-message"><h2>Connexion requise</h2><p>Connectez-vous pour accéder au mode révision.<br><a href="Auth.html?redirect=revision.html" style="color: #3498db;">Se connecter</a></p></div>';
+                    }
+                });
+                return;
+            }
+
+            await loadRevisionQuestions(user.uid);
+        }
+
+        async function loadRevisionQuestions(userId) {
+            try {
+                // Récupérer les IDs des questions à réviser depuis sessionStorage
+                const storedIds = sessionStorage.getItem('revisionQuestionIds');
+
+                let questionsToLoad = [];
+
+                if (storedIds) {
+                    revisionQuestionIds = JSON.parse(storedIds);
+
+                    // Charger les questions spécifiques
+                    for (const qId of revisionQuestionIds) {
+                        const docRef = db.collection('profiles').doc(userId)
+                            .collection('missedQuestions').doc(qId);
+                        const doc = await docRef.get();
+
+                        if (doc.exists) {
+                            questionsToLoad.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        }
+                    }
+                } else {
+                    // Si pas d'IDs spécifiés, charger toutes les questions non maîtrisées
+                    const snapshot = await db.collection('profiles').doc(userId)
+                        .collection('missedQuestions')
+                        .where('masteredAt', '==', null)
+                        .limit(10)
+                        .get();
+
+                    // Si la requête avec where ne fonctionne pas, essayer sans
+                    if (snapshot.empty) {
+                        const allSnapshot = await db.collection('profiles').doc(userId)
+                            .collection('missedQuestions')
+                            .limit(20)
+                            .get();
+
+                        allSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (!data.masteredAt) {
+                                questionsToLoad.push({
+                                    id: doc.id,
+                                    ...data
+                                });
+                            }
+                        });
+
+                        // Limiter à 10 questions
+                        questionsToLoad = questionsToLoad.slice(0, 10);
+                    } else {
+                        snapshot.forEach(doc => {
+                            questionsToLoad.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                    }
+                }
+
+                // Nettoyer le sessionStorage
+                sessionStorage.removeItem('revisionQuestionIds');
+                sessionStorage.removeItem('revisionMode');
+
+                if (questionsToLoad.length === 0) {
+                    document.getElementById('quiz-container').innerHTML =
+                        `<div class="error-message">
+                            <h2>🎉 Bravo !</h2>
+                            <p>Tu n'as aucune question à réviser pour le moment.<br>
+                            Continue à jouer pour enrichir ta liste de révision !</p>
+                            <a href="Quiz.html" style="color: #3498db; display: inline-block; margin-top: 15px;">Jouer un quiz</a>
+                        </div>`;
+                    return;
+                }
+
+                // Stocker les données pour la mise à jour après réponse
+                revisionQuestionsData = questionsToLoad;
+
+                // Mélanger les questions
+                const shuffledQuestions = [...questionsToLoad].sort(() => 0.5 - Math.random());
+
+                // Afficher le titre
+                document.getElementById('quiz-title').innerHTML =
+                    `📚 Quiz de Révision <span class="mode-badge revision">🔄 RÉVISION</span>`;
+
+                // Breadcrumb
+                document.getElementById('breadcrumb').innerHTML =
+                    `<a href="Quiz.html">Quiz</a> > <a href="revision.html">Révision</a> > Quiz de révision`;
+
+                // Afficher les questions
+                const container = document.getElementById('quiz-container');
+                container.innerHTML = '';
+
+                window.correctAnswersMap = [];
+
+                shuffledQuestions.forEach((q, index) => {
+                    // Récupérer les réponses
+                    const reponses = q.reponses || [];
+                    const correctIndex = q.correctIndex || 0;
+
+                    // Mélanger les réponses
+                    const shuffledAnswers = reponses.map((rep, i) => ({ text: rep, originalIndex: i }));
+                    for (let i = shuffledAnswers.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
+                    }
+
+                    // Trouver le nouvel index de la bonne réponse
+                    const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === correctIndex);
+                    window.correctAnswersMap[index] = newCorrectIndex;
+
+                    // Stocker l'ID de la question pour la mise à jour
+                    if (!window.revisionQuestionIdsMap) window.revisionQuestionIdsMap = [];
+                    window.revisionQuestionIdsMap[index] = q.id;
+
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question-card';
+                    questionDiv.innerHTML = `
+                        <span class="question-number">Question ${index + 1}</span>
+                        <div class="question-meta" style="margin: 10px 0; font-size: 0.85em;">
+                            <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">📚 ${q.matiere || 'Général'}</span>
+                            <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">❌ ${q.missCount || 1} erreur(s)</span>
+                        </div>
+                        <div class="question-text">${q.question}</div>
+                        ${shuffledAnswers.map((ans, i) => `
+                            <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
+                                ${ans.text}
+                            </div>
+                        `).join('')}
+                        <div id="feedback${index}" class="reponse-feedback"></div>
+                    `;
+                    container.appendChild(questionDiv);
+                });
+
+                document.getElementById('total-questions').textContent = shuffledQuestions.length;
+                quizStartTime = Date.now();
+
+            } catch (error) {
+                console.error('Erreur chargement révision:', error);
+                document.getElementById('quiz-container').innerHTML =
+                    `<div class="error-message"><h2>Erreur de chargement</h2><p>${error.message}<br>
+                    <a href="revision.html" style="color: #3498db;">Retour aux révisions</a></p></div>`;
+            }
+        }
+
+        // Marquer une question comme maîtrisée après bonne réponse en mode révision
+        async function markQuestionAsMastered(questionId) {
+            const user = firebase.auth().currentUser;
+            if (!user || !questionId) return;
+
+            try {
+                await db.collection('profiles').doc(user.uid)
+                    .collection('missedQuestions').doc(questionId)
+                    .update({
+                        masteredAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        attempts: firebase.firestore.FieldValue.increment(1)
+                    });
+                console.log('✅ Question marquée comme maîtrisée:', questionId);
+            } catch (error) {
+                console.error('Erreur marquage maîtrisé:', error);
+            }
+        }
+
+        // Incrémenter les tentatives après mauvaise réponse en mode révision
+        async function incrementQuestionAttempts(questionId) {
+            const user = firebase.auth().currentUser;
+            if (!user || !questionId) return;
+
+            try {
+                await db.collection('profiles').doc(user.uid)
+                    .collection('missedQuestions').doc(questionId)
+                    .update({
+                        attempts: firebase.firestore.FieldValue.increment(1),
+                        lastMissedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+            } catch (error) {
+                console.error('Erreur incrémentation tentatives:', error);
             }
         }
 
@@ -814,7 +1029,13 @@
                 feedback.className = 'reponse-feedback correct';
                 feedback.textContent = '✅ Bravo ! Bonne réponse !';
                 selectedOption.classList.add('correct-answer');
-                
+
+                // En mode révision, marquer comme maîtrisé
+                if (isRevisionMode && window.revisionQuestionIdsMap && window.revisionQuestionIdsMap[qIndex]) {
+                    markQuestionAsMastered(window.revisionQuestionIdsMap[qIndex]);
+                    feedback.textContent = '✅ Bravo ! Question maîtrisée !';
+                }
+
                 // Afficher une fiche culture après une bonne réponse
                 setTimeout(() => {
                     showCultureCard(qIndex);
@@ -826,6 +1047,11 @@
                 selectedOption.classList.add('wrong-answer');
                 // Montrer la bonne réponse
                 correctOption.classList.add('correct-answer');
+
+                // En mode révision, incrémenter les tentatives
+                if (isRevisionMode && window.revisionQuestionIdsMap && window.revisionQuestionIdsMap[qIndex]) {
+                    incrementQuestionAttempts(window.revisionQuestionIdsMap[qIndex]);
+                }
             }
 
             feedback.style.display = 'block';
@@ -959,6 +1185,27 @@
             const user = firebase.auth().currentUser;
             if (!user) {
                 showResults(score, total, null);
+                return;
+            }
+
+            // En mode révision, on ne sauvegarde pas le score normalement
+            if (isRevisionMode) {
+                // Calculer un bonus XP pour la révision
+                const revisionXP = score * 5; // 5 XP par bonne réponse en révision
+
+                try {
+                    // Mettre à jour le profil avec les XP de révision
+                    if (typeof ProfileSystem !== 'undefined') {
+                        await db.collection('profiles').doc(user.uid).update({
+                            experiencePoints: firebase.firestore.FieldValue.increment(revisionXP)
+                        });
+                    }
+
+                    showResults(score, total, { xpGagne: revisionXP });
+                } catch (error) {
+                    console.error('Erreur sauvegarde révision:', error);
+                    showResults(score, total, { xpGagne: revisionXP });
+                }
                 return;
             }
 
@@ -1101,7 +1348,18 @@
 
             // XP et badges
             if (profileUpdate) {
-                document.getElementById('xp-gained').textContent = `+${profileUpdate.xpGagne} XP`;
+                // Message différent pour le mode révision
+                if (isRevisionMode) {
+                    document.getElementById('xp-section').innerHTML = `
+                        <div class="xp-gain-title">🔄 XP Révision</div>
+                        <div class="xp-gain-value">+${profileUpdate.xpGagne} XP</div>
+                        <div style="font-size: 0.75em; margin-top: 3px; opacity: 0.9;">
+                            ${score} question${score > 1 ? 's' : ''} maîtrisée${score > 1 ? 's' : ''} !
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('xp-gained').textContent = `+${profileUpdate.xpGagne} XP`;
+                }
 
                 // Level up ?
                 if (profileUpdate.levelUp) {
@@ -1118,11 +1376,12 @@
                         '<p style="margin-bottom: 10px;">🎖️ Nouveaux badges :</p>' + badgesHtml;
                 }
 
-                // Afficher la série (streak)
-                showStreakInfo();
-                
-                // Afficher les points de saison
-                showSeasonInfo(score);
+                // Afficher la série (streak) - pas en mode révision
+                if (!isRevisionMode) {
+                    showStreakInfo();
+                    // Afficher les points de saison
+                    showSeasonInfo(score);
+                }
             } else {
                 document.getElementById('xp-section').innerHTML =
                     '<p style="color: #7f8c8d;">Connectez-vous pour gagner des XP !</p>';
@@ -1157,9 +1416,21 @@
             // Afficher le modal
             document.getElementById('results-modal').classList.add('active');
 
-            // Afficher le bouton de défi si connecté
-            if (firebase.auth().currentUser) {
+            // Afficher le bouton de défi si connecté (sauf en mode révision)
+            if (firebase.auth().currentUser && !isRevisionMode) {
                 document.getElementById('challenge-friend-section').style.display = 'block';
+            }
+
+            // Adapter les boutons pour le mode révision
+            if (isRevisionMode) {
+                document.getElementById('results-actions').innerHTML = `
+                    <a href="revision.html" class="btn-result secondary">← Révisions</a>
+                    <button class="btn-result primary" onclick="location.reload()">🔄 Continuer</button>
+                    <a href="Quiz.html" class="btn-result secondary">🎮 Autre Quiz</a>
+                `;
+
+                // Cacher la section partage en mode révision
+                document.getElementById('share-section').style.display = 'none';
             }
         }
 

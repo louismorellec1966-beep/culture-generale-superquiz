@@ -840,27 +840,31 @@ function handleTimeout() {
 function simulateOpponentAnswer(correctAnswer) {
     // L'adversaire a 70% de chance de bien répondre
     const isCorrect = Math.random() < 0.7;
-    
+    // Temps de réponse simulé (entre 1s et 8s)
+    const responseTime = Math.floor(Math.random() * 7000) + 1000;
+
     setTimeout(() => {
         if (isCorrect) {
             gameState.opponentScore++;
         } else {
             gameState.opponentLives--;
         }
-        
-        gameState.opponentAnswers.push({
+
+        // Stocker avec le temps de réponse pour le départage
+        gameState.opponentAnswers[gameState.currentQuestionIndex] = {
             questionIndex: gameState.currentQuestionIndex,
-            correct: isCorrect
-        });
-        
+            correct: isCorrect,
+            time: responseTime
+        };
+
         updateDuelHeader();
         updateOpponentAnswerStatus(isCorrect);
-        
+
         // Passer à la question suivante après un délai
         setTimeout(() => {
             nextQuestion();
         }, 1500);
-        
+
     }, Math.random() * 2000 + 500);
 }
 
@@ -969,11 +973,24 @@ function updateLivesDisplay(elementId, lives) {
 // ========== FIN DU DUEL ==========
 function endDuel() {
     console.log('🏁 Fin du duel !');
-    
+
     clearInterval(gameState.timer);
-    
+
+    // Calculer les temps totaux de réponse (pour départager)
+    const playerTotalTime = gameState.playerAnswers
+        .filter(a => a.time > 0)
+        .reduce((sum, a) => sum + a.time, 0);
+
+    const opponentTotalTime = Object.values(gameState.opponentAnswers)
+        .filter(a => a.time > 0)
+        .reduce((sum, a) => sum + a.time, 0);
+
+    console.log(`⏱️ Temps total - Joueur: ${playerTotalTime}ms, Adversaire: ${opponentTotalTime}ms`);
+
     // Déterminer le résultat
     let result;
+    let wonBySpeed = false; // Indique si départagé par rapidité
+
     if (gameState.playerLives <= 0 && gameState.opponentLives > 0) {
         result = 'defeat';
     } else if (gameState.opponentLives <= 0 && gameState.playerLives > 0) {
@@ -983,13 +1000,24 @@ function endDuel() {
     } else if (gameState.playerScore < gameState.opponentScore) {
         result = 'defeat';
     } else {
-        result = 'draw';
+        // Égalité de score - Le plus rapide gagne !
+        if (playerTotalTime < opponentTotalTime) {
+            result = 'victory';
+            wonBySpeed = true;
+            console.log('🏆 Victoire par rapidité !');
+        } else if (playerTotalTime > opponentTotalTime) {
+            result = 'defeat';
+            wonBySpeed = true;
+            console.log('😔 Défaite par rapidité...');
+        } else {
+            result = 'draw'; // Vraie égalité (très rare)
+        }
     }
-    
+
     // Calculer le changement ELO (seulement pour les parties classées)
     let eloDiff = 0;
     let newElo = gameState.playerProfile.elo;
-    
+
     if (gameState.gameMode === 'duel') {
         eloDiff = calculateEloChange(
             gameState.playerProfile.elo,
@@ -998,9 +1026,9 @@ function endDuel() {
         );
         newElo = gameState.playerProfile.elo + eloDiff;
     }
-    
+
     // Afficher les résultats
-    showResults(result, eloDiff, newElo);
+    showResults(result, eloDiff, newElo, wonBySpeed, playerTotalTime, opponentTotalTime);
     
     // Sauvegarder les stats
     saveMatchResults(result, eloDiff, newElo);
@@ -1027,20 +1055,26 @@ function calculateEloChange(playerElo, opponentElo, result) {
 }
 
 // Afficher les résultats
-function showResults(result, eloDiff, newElo) {
+function showResults(result, eloDiff, newElo, wonBySpeed = false, playerTime = 0, opponentTime = 0) {
     const profile = gameState.playerProfile;
     const opponent = gameState.opponent;
     const resultBanner = document.getElementById('result-banner');
-    
+
     // Configuration selon le résultat
-    let icon, title;
+    let icon, title, subtitle = '';
     if (result === 'victory') {
         icon = '🏆';
         title = 'Victoire !';
+        if (wonBySpeed) {
+            subtitle = `⚡ Départagé par rapidité (${(playerTime/1000).toFixed(1)}s vs ${(opponentTime/1000).toFixed(1)}s)`;
+        }
         resultBanner.className = 'result-banner victory';
     } else if (result === 'defeat') {
         icon = '😔';
         title = 'Défaite';
+        if (wonBySpeed) {
+            subtitle = `⚡ Départagé par rapidité (${(playerTime/1000).toFixed(1)}s vs ${(opponentTime/1000).toFixed(1)}s)`;
+        }
         resultBanner.className = 'result-banner defeat';
     } else {
         icon = '🤝';
@@ -1050,7 +1084,19 @@ function showResults(result, eloDiff, newElo) {
     
     document.getElementById('result-icon').textContent = icon;
     document.getElementById('result-title').textContent = title;
-    
+
+    // Afficher le sous-titre si départagé par rapidité
+    let subtitleEl = document.getElementById('result-subtitle');
+    if (!subtitleEl) {
+        // Créer l'élément s'il n'existe pas
+        subtitleEl = document.createElement('p');
+        subtitleEl.id = 'result-subtitle';
+        subtitleEl.style.cssText = 'font-size: 0.9em; margin-top: 5px; opacity: 0.9;';
+        document.getElementById('result-title').after(subtitleEl);
+    }
+    subtitleEl.textContent = subtitle;
+    subtitleEl.style.display = subtitle ? 'block' : 'none';
+
     // Scores finaux
     document.getElementById('result-player-avatar').textContent = profile.avatar || '👤';
     document.getElementById('result-player-name').textContent = profile.pseudo || 'Vous';
@@ -1073,12 +1119,13 @@ function showResults(result, eloDiff, newElo) {
     }
     
     // Statistiques du match
+    const opponentAnswersArray = Object.values(gameState.opponentAnswers);
     const avgTimePlayer = calculateAverageTime(gameState.playerAnswers);
-    const avgTimeOpponent = calculateAverageTime(gameState.opponentAnswers);
+    const avgTimeOpponent = calculateAverageTime(opponentAnswersArray);
     const correctPlayer = gameState.playerAnswers.filter(a => a.correct).length;
-    const correctOpponent = gameState.opponentAnswers.filter(a => a.correct).length;
+    const correctOpponent = opponentAnswersArray.filter(a => a.correct).length;
     const streakPlayer = calculateBestStreak(gameState.playerAnswers);
-    const streakOpponent = calculateBestStreak(gameState.opponentAnswers);
+    const streakOpponent = calculateBestStreak(opponentAnswersArray);
     
     document.getElementById('stat-correct-you').textContent = correctPlayer;
     document.getElementById('stat-correct-opponent').textContent = correctOpponent;
@@ -1276,22 +1323,41 @@ function handleOpponentDisconnect() {
 
 // ========== CHARGEMENT DES QUESTIONS ==========
 async function loadQuestionsForMatch() {
-    const totalQuestions = gameState.gameMode === 'duel' 
-        ? MULTIPLAYER_CONFIG.DUEL_QUESTIONS 
+    const totalQuestions = gameState.gameMode === 'duel'
+        ? MULTIPLAYER_CONFIG.DUEL_QUESTIONS
         : MULTIPLAYER_CONFIG.QUICK_QUESTIONS;
-    
+
     try {
-        // Essayer de charger depuis Firebase
-        if (typeof QuestionsLoader !== 'undefined') {
-            const allQuestions = await QuestionsLoader.loadAllQuestions();
+        // Charger des questions de TOUTES les matières depuis Firebase
+        const db = firebase.firestore();
+        const snapshot = await db.collection('questionBank').get();
+
+        if (!snapshot.empty) {
+            const allQuestions = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                allQuestions.push({
+                    id: doc.id,
+                    question: data.question,
+                    reponses: data.reponses,
+                    correct: data.correct,
+                    matiere: data.matiere,
+                    categorie: data.categorie,
+                    difficulty: data.difficulty
+                });
+            });
+
             if (allQuestions.length > 0) {
+                console.log(`📚 ${allQuestions.length} questions chargées de toutes les catégories`);
+                // Mélanger et prendre le nombre requis
                 return shuffleArray(allQuestions).slice(0, totalQuestions);
             }
         }
-        
+
         // Fallback : questions de test
+        console.log('⚠️ Aucune question en base, utilisation des questions de test');
         return getFallbackQuestions(totalQuestions);
-        
+
     } catch (error) {
         console.error('Erreur chargement questions:', error);
         return getFallbackQuestions(totalQuestions);

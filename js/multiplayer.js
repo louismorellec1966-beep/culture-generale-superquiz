@@ -873,10 +873,21 @@ function showAnswerFeedback(selectedIndex, isCorrect, correctIndex) {
     const feedbackEl = document.getElementById('answer-feedback');
     const iconEl = document.getElementById('feedback-icon');
     const textEl = document.getElementById('feedback-text');
-    
+
+    // Récupérer le temps de réponse
+    const lastAnswer = gameState.playerAnswers[gameState.playerAnswers.length - 1];
+    const responseTime = lastAnswer ? (lastAnswer.time / 1000).toFixed(1) : 0;
+
     if (isCorrect) {
         iconEl.textContent = '✅';
-        textEl.textContent = 'Bonne réponse !';
+        // Afficher le temps avec une indication de rapidité
+        let speedBonus = '';
+        if (responseTime < 3) {
+            speedBonus = ' ⚡ Ultra rapide!';
+        } else if (responseTime < 5) {
+            speedBonus = ' 🚀 Rapide!';
+        }
+        textEl.innerHTML = `Bonne réponse ! <span style="font-size: 0.85em; opacity: 0.8;">(${responseTime}s)${speedBonus}</span>`;
         textEl.style.color = '#2ecc71';
     } else {
         iconEl.textContent = '❌';
@@ -1327,60 +1338,128 @@ async function loadQuestionsForMatch() {
         ? MULTIPLAYER_CONFIG.DUEL_QUESTIONS
         : MULTIPLAYER_CONFIG.QUICK_QUESTIONS;
 
+    console.log(`🎯 Chargement de ${totalQuestions} questions...`);
+
     try {
-        // Charger des questions de TOUTES les matières depuis Firebase
-        const db = firebase.firestore();
-        const snapshot = await db.collection('questionBank').get();
+        // Vérifier que Firebase est disponible
+        if (typeof firebase === 'undefined' || !firebase.firestore) {
+            console.warn('⚠️ Firebase non disponible');
+            return getFallbackQuestions(totalQuestions);
+        }
+
+        // Utiliser la variable globale db si disponible, sinon créer une instance
+        const database = (typeof db !== 'undefined') ? db : firebase.firestore();
+
+        console.log('📡 Requête Firebase questionBank...');
+        const snapshot = await database.collection('questionBank').get();
 
         if (!snapshot.empty) {
             const allQuestions = [];
             snapshot.forEach(doc => {
                 const data = doc.data();
-                allQuestions.push({
-                    id: doc.id,
-                    question: data.question,
-                    reponses: data.reponses,
-                    correct: data.correct,
-                    matiere: data.matiere,
-                    categorie: data.categorie,
-                    difficulty: data.difficulty
-                });
+                // Vérifier que la question a les champs nécessaires
+                if (data.question && data.reponses && data.correct !== undefined) {
+                    allQuestions.push({
+                        id: doc.id,
+                        question: data.question,
+                        reponses: data.reponses,
+                        correct: data.correct,
+                        matiere: data.matiere || 'general',
+                        categorie: data.categorie || 'general',
+                        difficulty: data.difficulty || 'moyen'
+                    });
+                }
             });
 
             if (allQuestions.length > 0) {
-                console.log(`📚 ${allQuestions.length} questions chargées de toutes les catégories`);
+                console.log(`✅ ${allQuestions.length} questions chargées de toutes les catégories`);
                 // Mélanger et prendre le nombre requis
-                return shuffleArray(allQuestions).slice(0, totalQuestions);
+                const selectedQuestions = shuffleArray(allQuestions).slice(0, totalQuestions);
+                console.log(`🎲 ${selectedQuestions.length} questions sélectionnées:`,
+                    selectedQuestions.map(q => q.matiere).join(', '));
+                return selectedQuestions;
             }
         }
 
         // Fallback : questions de test
-        console.log('⚠️ Aucune question en base, utilisation des questions de test');
+        console.log('⚠️ Aucune question valide en base, utilisation des questions de test');
         return getFallbackQuestions(totalQuestions);
 
     } catch (error) {
-        console.error('Erreur chargement questions:', error);
+        console.error('❌ Erreur chargement questions:', error);
         return getFallbackQuestions(totalQuestions);
     }
 }
 
-// Questions de fallback
+// Questions de fallback - variées et nombreuses
 function getFallbackQuestions(count) {
     const questions = [
-        { question: "Quelle est la capitale de la France ?", reponses: ["Paris", "Lyon", "Marseille", "Bordeaux"], correct: 0 },
-        { question: "Qui a peint la Joconde ?", reponses: ["Michel-Ange", "Léonard de Vinci", "Raphaël", "Donatello"], correct: 1 },
-        { question: "En quelle année a eu lieu la Révolution française ?", reponses: ["1789", "1799", "1815", "1848"], correct: 0 },
-        { question: "Quel est le plus grand océan du monde ?", reponses: ["Atlantique", "Indien", "Arctique", "Pacifique"], correct: 3 },
-        { question: "Combien de continents y a-t-il sur Terre ?", reponses: ["5", "6", "7", "8"], correct: 2 },
-        { question: "Quelle planète est surnommée la 'planète rouge' ?", reponses: ["Vénus", "Mars", "Jupiter", "Saturne"], correct: 1 },
-        { question: "Qui a écrit 'Les Misérables' ?", reponses: ["Émile Zola", "Victor Hugo", "Gustave Flaubert", "Honoré de Balzac"], correct: 1 },
-        { question: "Quel est le symbole chimique de l'or ?", reponses: ["Or", "Ag", "Au", "Fe"], correct: 2 },
-        { question: "En quelle année l'homme a-t-il marché sur la Lune pour la première fois ?", reponses: ["1965", "1969", "1972", "1975"], correct: 1 },
-        { question: "Quel est le plus long fleuve du monde ?", reponses: ["Amazone", "Nil", "Mississippi", "Yangtsé"], correct: 1 },
-        { question: "Quelle est la monnaie du Japon ?", reponses: ["Yuan", "Won", "Yen", "Ringgit"], correct: 2 },
-        { question: "Qui a découvert la pénicilline ?", reponses: ["Louis Pasteur", "Alexander Fleming", "Marie Curie", "Robert Koch"], correct: 1 }
+        // GÉOGRAPHIE
+        { question: "Quelle est la capitale de la France ?", reponses: ["Paris", "Lyon", "Marseille", "Bordeaux"], correct: 0, matiere: "geographie" },
+        { question: "Quel est le plus grand océan du monde ?", reponses: ["Atlantique", "Indien", "Arctique", "Pacifique"], correct: 3, matiere: "geographie" },
+        { question: "Combien de continents y a-t-il sur Terre ?", reponses: ["5", "6", "7", "8"], correct: 2, matiere: "geographie" },
+        { question: "Quel est le plus long fleuve du monde ?", reponses: ["Amazone", "Nil", "Mississippi", "Yangtsé"], correct: 1, matiere: "geographie" },
+        { question: "Quelle est la capitale de l'Australie ?", reponses: ["Sydney", "Melbourne", "Canberra", "Brisbane"], correct: 2, matiere: "geographie" },
+        { question: "Quel pays a la plus grande population ?", reponses: ["États-Unis", "Inde", "Chine", "Russie"], correct: 2, matiere: "geographie" },
+        { question: "Quelle est la plus haute montagne du monde ?", reponses: ["K2", "Mont Blanc", "Everest", "Kilimandjaro"], correct: 2, matiere: "geographie" },
+        { question: "Quelle est la capitale du Canada ?", reponses: ["Toronto", "Vancouver", "Montréal", "Ottawa"], correct: 3, matiere: "geographie" },
+        { question: "Quel désert est le plus grand du monde ?", reponses: ["Sahara", "Gobi", "Antarctique", "Kalahari"], correct: 2, matiere: "geographie" },
+        { question: "Combien d'étoiles y a-t-il sur le drapeau de l'Union Européenne ?", reponses: ["10", "12", "15", "27"], correct: 1, matiere: "geographie" },
+
+        // HISTOIRE
+        { question: "En quelle année a eu lieu la Révolution française ?", reponses: ["1789", "1799", "1815", "1848"], correct: 0, matiere: "histoire" },
+        { question: "En quelle année l'homme a-t-il marché sur la Lune ?", reponses: ["1965", "1969", "1972", "1975"], correct: 1, matiere: "histoire" },
+        { question: "Qui était le premier président des États-Unis ?", reponses: ["Lincoln", "Jefferson", "Washington", "Adams"], correct: 2, matiere: "histoire" },
+        { question: "En quelle année a débuté la Seconde Guerre mondiale ?", reponses: ["1937", "1938", "1939", "1940"], correct: 2, matiere: "histoire" },
+        { question: "Qui a découvert l'Amérique en 1492 ?", reponses: ["Vasco de Gama", "Christophe Colomb", "Magellan", "Amerigo Vespucci"], correct: 1, matiere: "histoire" },
+        { question: "Quel pharaon est associé à la grande pyramide de Gizeh ?", reponses: ["Toutânkhamon", "Ramsès II", "Khéops", "Cléopâtre"], correct: 2, matiere: "histoire" },
+        { question: "En quelle année le mur de Berlin est-il tombé ?", reponses: ["1987", "1989", "1991", "1993"], correct: 1, matiere: "histoire" },
+        { question: "Qui était le roi de France pendant la Révolution ?", reponses: ["Louis XIV", "Louis XV", "Louis XVI", "Louis XVIII"], correct: 2, matiere: "histoire" },
+
+        // SCIENCE
+        { question: "Quelle planète est surnommée la 'planète rouge' ?", reponses: ["Vénus", "Mars", "Jupiter", "Saturne"], correct: 1, matiere: "science" },
+        { question: "Quel est le symbole chimique de l'or ?", reponses: ["Or", "Ag", "Au", "Fe"], correct: 2, matiere: "science" },
+        { question: "Qui a découvert la pénicilline ?", reponses: ["Louis Pasteur", "Alexander Fleming", "Marie Curie", "Robert Koch"], correct: 1, matiere: "science" },
+        { question: "Combien de planètes y a-t-il dans notre système solaire ?", reponses: ["7", "8", "9", "10"], correct: 1, matiere: "science" },
+        { question: "Quel gaz les plantes absorbent-elles ?", reponses: ["Oxygène", "Azote", "Dioxyde de carbone", "Hydrogène"], correct: 2, matiere: "science" },
+        { question: "Quelle est la formule chimique de l'eau ?", reponses: ["H2O", "CO2", "O2", "NaCl"], correct: 0, matiere: "science" },
+        { question: "Qui a développé la théorie de la relativité ?", reponses: ["Newton", "Einstein", "Hawking", "Bohr"], correct: 1, matiere: "science" },
+        { question: "Quel organe pompe le sang dans le corps ?", reponses: ["Poumons", "Foie", "Cœur", "Reins"], correct: 2, matiere: "science" },
+        { question: "Combien d'os compte le corps humain adulte ?", reponses: ["186", "206", "226", "256"], correct: 1, matiere: "science" },
+
+        // LITTÉRATURE
+        { question: "Qui a écrit 'Les Misérables' ?", reponses: ["Émile Zola", "Victor Hugo", "Gustave Flaubert", "Honoré de Balzac"], correct: 1, matiere: "litterature" },
+        { question: "Qui a écrit 'Le Petit Prince' ?", reponses: ["Jules Verne", "Albert Camus", "Antoine de Saint-Exupéry", "Marcel Proust"], correct: 2, matiere: "litterature" },
+        { question: "Quel auteur a créé Sherlock Holmes ?", reponses: ["Agatha Christie", "Arthur Conan Doyle", "Edgar Allan Poe", "Charles Dickens"], correct: 1, matiere: "litterature" },
+        { question: "Qui a écrit 'Roméo et Juliette' ?", reponses: ["Molière", "Shakespeare", "Racine", "Corneille"], correct: 1, matiere: "litterature" },
+
+        // ART
+        { question: "Qui a peint la Joconde ?", reponses: ["Michel-Ange", "Léonard de Vinci", "Raphaël", "Donatello"], correct: 1, matiere: "art" },
+        { question: "Qui a peint 'La Nuit étoilée' ?", reponses: ["Monet", "Picasso", "Van Gogh", "Renoir"], correct: 2, matiere: "art" },
+        { question: "Dans quel musée se trouve la Joconde ?", reponses: ["British Museum", "Louvre", "Prado", "Uffizi"], correct: 1, matiere: "art" },
+        { question: "Quel artiste a créé la statue de David à Florence ?", reponses: ["Donatello", "Michel-Ange", "Bernin", "Rodin"], correct: 1, matiere: "art" },
+
+        // SPORT
+        { question: "Combien de joueurs y a-t-il dans une équipe de football ?", reponses: ["9", "10", "11", "12"], correct: 2, matiere: "sport" },
+        { question: "Dans quel pays les Jeux Olympiques modernes ont-ils été créés ?", reponses: ["Italie", "France", "Grèce", "Angleterre"], correct: 2, matiere: "sport" },
+        { question: "Combien de sets faut-il gagner pour remporter un match de tennis masculin en Grand Chelem ?", reponses: ["2", "3", "4", "5"], correct: 1, matiere: "sport" },
+        { question: "Quel pays a remporté la Coupe du Monde 2018 ?", reponses: ["Brésil", "Allemagne", "France", "Argentine"], correct: 2, matiere: "sport" },
+
+        // CULTURE GÉNÉRALE
+        { question: "Quelle est la monnaie du Japon ?", reponses: ["Yuan", "Won", "Yen", "Ringgit"], correct: 2, matiere: "culture" },
+        { question: "Combien y a-t-il de couleurs dans un arc-en-ciel ?", reponses: ["5", "6", "7", "8"], correct: 2, matiere: "culture" },
+        { question: "Quel animal est le symbole de la paix ?", reponses: ["Aigle", "Colombe", "Lion", "Chouette"], correct: 1, matiere: "culture" },
+        { question: "Combien de jours y a-t-il dans une année bissextile ?", reponses: ["364", "365", "366", "367"], correct: 2, matiere: "culture" },
+        { question: "Quel instrument a 88 touches ?", reponses: ["Guitare", "Violon", "Piano", "Harpe"], correct: 2, matiere: "culture" },
+        { question: "Quelle est la langue la plus parlée au monde ?", reponses: ["Anglais", "Espagnol", "Mandarin", "Hindi"], correct: 2, matiere: "culture" },
+
+        // CINÉMA
+        { question: "Qui a réalisé 'Titanic' ?", reponses: ["Steven Spielberg", "James Cameron", "Martin Scorsese", "Christopher Nolan"], correct: 1, matiere: "cinema" },
+        { question: "Quel acteur joue Jack Sparrow ?", reponses: ["Brad Pitt", "Johnny Depp", "Leonardo DiCaprio", "Tom Cruise"], correct: 1, matiere: "cinema" },
+        { question: "En quelle année est sorti le premier film 'Star Wars' ?", reponses: ["1975", "1977", "1979", "1981"], correct: 1, matiere: "cinema" }
     ];
-    
+
+    console.log(`🎲 Sélection de ${count} questions parmi ${questions.length} disponibles`);
     return shuffleArray(questions).slice(0, count);
 }
 

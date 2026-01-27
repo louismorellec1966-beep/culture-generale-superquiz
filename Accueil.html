@@ -416,10 +416,125 @@
             .hero-stats { flex-direction: column; gap: 20px; }
             .btn-group { flex-direction: column; }
         }
+
+        /* Bannière Beta Test */
+        .beta-banner {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            padding: 12px 20px;
+            position: fixed;
+            top: 65px;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .beta-banner.hidden {
+            display: none;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .beta-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .beta-badge {
+            background: rgba(0,0,0,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            animation: pulse 2s infinite;
+        }
+
+        .beta-text {
+            font-size: 0.95rem;
+            color: white;
+        }
+
+        .beta-text strong {
+            color: #fff;
+        }
+
+        .beta-link {
+            color: white;
+            text-decoration: underline;
+            font-weight: bold;
+            margin-left: 8px;
+            transition: opacity 0.3s;
+        }
+
+        .beta-link:hover {
+            opacity: 0.8;
+        }
+
+        .beta-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+
+        .beta-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        /* Ajuster le padding du body quand la bannière est visible */
+        body.beta-visible {
+            padding-top: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .beta-banner {
+                top: 0;
+                padding: 10px 15px;
+            }
+            .beta-content {
+                gap: 10px;
+            }
+            .beta-text {
+                font-size: 0.85rem;
+                text-align: center;
+            }
+            body.beta-visible {
+                padding-top: 140px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <!-- Bannière Beta Test -->
+    <div class="beta-banner">
+        <div class="beta-content">
+            <span class="beta-badge">🚧 BETA</span>
+            <p class="beta-text">
+                <strong>Site en phase de test !</strong> Des bugs peuvent survenir.
+                <a href="avis.html" class="beta-link">Signalez-les ici →</a>
+            </p>
+            <button class="beta-close" onclick="closeBetaBanner()" aria-label="Fermer">×</button>
+        </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
@@ -557,6 +672,7 @@
     <!-- Footer -->
     <footer class="home-footer">
         <p>
+            <a href="avis.html">Avis & Bugs</a>
             <a href="Contact.html">Contact</a>
             <a href="Mentions-Legales.html">Mentions légales</a>
             <a href="Politique-Confidentialite.html">Confidentialité</a>
@@ -698,6 +814,28 @@
                 console.error('Erreur mise à jour section utilisateur:', error);
             }
         }
+
+        // Gestion de la bannière beta
+        function closeBetaBanner() {
+            const banner = document.querySelector('.beta-banner');
+            if (banner) {
+                banner.classList.add('hidden');
+                document.body.classList.remove('beta-visible');
+                localStorage.setItem('betaBannerClosed', 'true');
+            }
+        }
+
+        // Vérifier si la bannière a été fermée
+        document.addEventListener('DOMContentLoaded', function() {
+            const betaClosed = localStorage.getItem('betaBannerClosed');
+            const banner = document.querySelector('.beta-banner');
+
+            if (betaClosed === 'true' && banner) {
+                banner.classList.add('hidden');
+            } else if (banner) {
+                document.body.classList.add('beta-visible');
+            }
+        });
 
         // Gestion du menu mobile
         document.addEventListener('DOMContentLoaded', function() {

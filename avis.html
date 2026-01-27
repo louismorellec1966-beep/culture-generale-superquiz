@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <link rel="icon" type="image/png" sizes="32x32" href="Images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="Images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="Images/logo-192.png">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CultureLudo - Donnez votre avis, signalez des bugs et aidez-nous a ameliorer le site">
+    <meta name="keywords" content="avis, feedback, bugs, suggestions, CultureLudo">
+    <title>CultureLudo - Avis et Signalements</title>
+    <link rel="preload" href="css/style.css" as="style">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <!-- Firebase SDK -->
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script defer src="firebase-config.js"></script>
+    <script src="js/menu.js" defer></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding-top: 80px;
+            padding-bottom: 100px;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .page-header p {
+            color: #a0aec0;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .beta-notice {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            max-width: 800px;
+            margin: 0 auto 30px;
+            padding: 20px 25px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .beta-notice-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+        }
+
+        .beta-notice-text {
+            flex: 1;
+        }
+
+        .beta-notice-text strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .beta-notice-text span {
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Formulaire */
+        .feedback-form-container {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback-form-container h2 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #e2e8f0;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .type-option {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .type-option input {
+            display: none;
+        }
+
+        .type-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .type-option label:hover {
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.08);
+        }
+
+        .type-option input:checked + label {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.2);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .type-option .type-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .type-option .type-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-required {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .auth-required p {
+            margin-bottom: 15px;
+            color: #ffc107;
+        }
+
+        .btn-auth {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-auth:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Liste des avis */
+        .feedback-list-container {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feedback-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .feedback-list-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 18px;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 25px;
+            background: transparent;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .filter-tab:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .feedback-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .feedback-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-item:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .feedback-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .feedback-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feedback-username {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .feedback-date {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .feedback-type-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .feedback-type-badge.bug {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .feedback-type-badge.suggestion {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .feedback-type-badge.avis {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+
+        .feedback-content {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .feedback-page {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .feedback-page span {
+            color: #a0aec0;
+        }
+
+        .no-feedback {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .no-feedback-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            padding: 15px 30px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 3000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .beta-notice {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .feedback-form-container,
+            .feedback-list-container {
+                padding: 25px 20px;
+            }
+
+            .type-selector {
+                flex-direction: column;
+            }
+
+            .type-option {
+                min-width: 100%;
+            }
+
+            .feedback-list-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-tabs {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-header">
+        <h1>Avis et Signalements</h1>
+        <p>Aidez-nous a ameliorer CultureLudo ! Signalez des bugs, proposez des idees ou partagez simplement votre avis.</p>
+    </div>
+
+    <div class="container">
+        <!-- Notice Beta -->
+        <div class="beta-notice">
+            <div class="beta-notice-icon">🚧</div>
+            <div class="beta-notice-text">
+                <strong>Le site est actuellement en phase de beta test</strong>
+                <span>Des bugs et imperfections peuvent survenir. Votre feedback est precieux pour nous aider a ameliorer l'experience !</span>
+            </div>
+        </div>
+
+        <!-- Formulaire de feedback -->
+        <div class="feedback-form-container">
+            <h2>📝 Envoyer un feedback</h2>
+
+            <div id="auth-message" class="auth-required" style="display: none;">
+                <p>Connectez-vous pour envoyer un feedback</p>
+                <a href="Auth.html" class="btn-auth">Se connecter</a>
+            </div>
+
+            <form id="feedback-form" style="display: none;">
+                <div class="form-group">
+                    <label>Type de feedback</label>
+                    <div class="type-selector">
+                        <div class="type-option">
+                            <input type="radio" name="type" id="type-bug" value="bug" checked>
+                            <label for="type-bug">
+                                <span class="type-icon">🐛</span>
+                                <span class="type-name">Bug</span>
+                            </label>
+                        </div>
+                        <div class="type-option">
+                            <input type="radio" name="type" id="type-suggestion" value="suggestion">
+                            <label for="type-suggestion">
+                                <span class="type-icon">💡</span>
+                                <span class="type-name">Suggestion</span>
+                            </label>
+                        </div>
+                        <div class="type-option">
+                            <input type="radio" name="type" id="type-avis" value="avis">
+                            <label for="type-avis">
+                                <span class="type-icon">⭐</span>
+                                <span class="type-name">Avis general</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="page-concernee">Page concernee (optionnel)</label>
+                    <select id="page-concernee" name="page">
+                        <option value="">-- Selectionnez une page --</option>
+                        <option value="Accueil">Accueil</option>
+                        <option value="Quiz">Quiz Classique</option>
+                        <option value="Quiz du jour">Quiz du jour</option>
+                        <option value="Multiplayer">Mode Duel</option>
+                        <option value="Mode Survie">Mode Survie</option>
+                        <option value="Tournois">Tournois</option>
+                        <option value="Clubs">Clubs</option>
+                        <option value="Profil">Profil</option>
+                        <option value="Classement">Classement</option>
+                        <option value="Social">Social / Amis</option>
+                        <option value="Parametres">Parametres</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="feedback-content">Votre message *</label>
+                    <textarea id="feedback-content" name="content" placeholder="Decrivez le bug rencontre, votre suggestion ou votre avis..." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submit-btn">
+                    <span>Envoyer</span>
+                    <span>📤</span>
+                </button>
+            </form>
+        </div>
+
+        <!-- Liste des feedbacks -->
+        <div class="feedback-list-container">
+            <div class="feedback-list-header">
+                <h2>💬 Derniers feedbacks</h2>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">Tous</button>
+                    <button class="filter-tab" data-filter="bug">🐛 Bugs</button>
+                    <button class="filter-tab" data-filter="suggestion">💡 Suggestions</button>
+                    <button class="filter-tab" data-filter="avis">⭐ Avis</button>
+                </div>
+            </div>
+
+            <div id="feedback-list" class="feedback-list">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Attendre que Firebase soit pret
+        function waitForFirebase(callback) {
+            if (typeof firebase !== 'undefined' && typeof window.db !== 'undefined' && window.db) {
+                callback();
+            } else {
+                setTimeout(() => waitForFirebase(callback), 100);
+            }
+        }
+
+        // Variables globales
+        let currentUser = null;
+        let currentFilter = 'all';
+
+        // Initialisation
+        window.addEventListener('load', () => {
+            waitForFirebase(() => {
+                initAuth();
+                loadFeedbacks();
+                initFilterTabs();
+            });
+        });
+
+        // Gestion de l'authentification
+        function initAuth() {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                currentUser = user;
+                const authMessage = document.getElementById('auth-message');
+                const feedbackForm = document.getElementById('feedback-form');
+
+                if (user) {
+                    authMessage.style.display = 'none';
+                    feedbackForm.style.display = 'block';
+                } else {
+                    authMessage.style.display = 'block';
+                    feedbackForm.style.display = 'none';
+                }
+            });
+        }
+
+        // Soumission du formulaire
+        document.getElementById('feedback-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser) {
+                showToast('Vous devez etre connecte', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Envoi en cours...</span>';
+
+            try {
+                const type = document.querySelector('input[name="type"]:checked').value;
+                const page = document.getElementById('page-concernee').value;
+                const content = document.getElementById('feedback-content').value.trim();
+
+                if (!content) {
+                    showToast('Veuillez entrer un message', 'error');
+                    return;
+                }
+
+                // Recuperer le profil utilisateur
+                let username = 'Utilisateur';
+                try {
+                    const profileDoc = await window.db.collection('profiles').doc(currentUser.uid).get();
+                    if (profileDoc.exists) {
+                        const profile = profileDoc.data();
+                        username = profile.pseudo || profile.username || currentUser.displayName || 'Utilisateur';
+                    }
+                } catch (e) {
+                    console.log('Profil non trouve');
+                }
+
+                // Sauvegarder le feedback
+                await window.db.collection('feedbacks').add({
+                    userId: currentUser.uid,
+                    username: username,
+                    type: type,
+                    page: page || null,
+                    content: content,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'new'
+                });
+
+                showToast('Merci pour votre feedback !', 'success');
+                document.getElementById('feedback-form').reset();
+                loadFeedbacks();
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast('Erreur lors de l\'envoi', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Envoyer</span><span>📤</span>';
+            }
+        });
+
+        // Charger les feedbacks
+        async function loadFeedbacks() {
+            const feedbackList = document.getElementById('feedback-list');
+            feedbackList.innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
+
+            try {
+                let query = window.db.collection('feedbacks')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50);
+
+                if (currentFilter !== 'all') {
+                    query = window.db.collection('feedbacks')
+                        .where('type', '==', currentFilter)
+                        .orderBy('createdAt', 'desc')
+                        .limit(50);
+                }
+
+                const snapshot = await query.get();
+
+                if (snapshot.empty) {
+                    feedbackList.innerHTML = `
+                        <div class="no-feedback">
+                            <div class="no-feedback-icon">📭</div>
+                            <p>Aucun feedback pour le moment.<br>Soyez le premier a partager votre avis !</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                feedbackList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const feedback = doc.data();
+                    feedbackList.appendChild(createFeedbackElement(feedback));
+                });
+
+            } catch (error) {
+                console.error('Erreur chargement feedbacks:', error);
+                feedbackList.innerHTML = `
+                    <div class="no-feedback">
+                        <div class="no-feedback-icon">⚠️</div>
+                        <p>Erreur lors du chargement des feedbacks</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Creer un element feedback
+        function createFeedbackElement(feedback) {
+            const div = document.createElement('div');
+            div.className = 'feedback-item';
+
+            const date = feedback.createdAt ? new Date(feedback.createdAt.toDate()).toLocaleDateString('fr-FR', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            }) : 'Date inconnue';
+
+            const initial = (feedback.username || 'U').charAt(0).toUpperCase();
+
+            const typeLabels = {
+                'bug': 'Bug',
+                'suggestion': 'Suggestion',
+                'avis': 'Avis'
+            };
+
+            div.innerHTML = `
+                <div class="feedback-header">
+                    <div class="feedback-user">
+                        <div class="feedback-avatar">${initial}</div>
+                        <div class="feedback-user-info">
+                            <span class="feedback-username">${escapeHtml(feedback.username || 'Utilisateur')}</span>
+                            <span class="feedback-date">${date}</span>
+                        </div>
+                    </div>
+                    <span class="feedback-type-badge ${feedback.type}">${typeLabels[feedback.type] || feedback.type}</span>
+                </div>
+                <div class="feedback-content">${escapeHtml(feedback.content)}</div>
+                ${feedback.page ? `<div class="feedback-page">Page : <span>${escapeHtml(feedback.page)}</span></div>` : ''}
+            `;
+
+            return div;
+        }
+
+        // Filtres
+        function initFilterTabs() {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    loadFeedbacks();
+                });
+            });
+        }
+
+        // Toast notification
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Echapper le HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+
+</body>
+
+</html>

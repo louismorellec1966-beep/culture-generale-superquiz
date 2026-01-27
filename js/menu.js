@@ -63,6 +63,7 @@ function initMenu() {
                 </ul>
             </li>
             
+            <li><a href="avis.html" ${currentPage === 'avis.html' ? 'aria-current="page"' : ''}>💬 Avis</a></li>
             <li><a href="Contact.html" ${currentPage === 'Contact.html' ? 'aria-current="page"' : ''}>📧 Contact</a></li>
         </ul>
         
@@ -141,6 +142,7 @@ function initMenu() {
                 </div>
                 <div class="mobile-menu-section">
                     <h3>ℹ️ Autres</h3>
+                    <a href="avis.html">💬 Avis & Bugs</a>
                     <a href="Contact.html">📧 Contact</a>
                     <a href="Mentions-Legales.html">📋 Mentions légales</a>
                 </div>

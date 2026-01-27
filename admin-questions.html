@@ -681,7 +681,8 @@
                 </select>
 
                 <button onclick="loadQuestions()" class="btn btn-secondary btn-small">🔄 Rafraîchir</button>
-                
+                <button onclick="findDuplicates()" class="btn btn-primary btn-small" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">🔍 Trouver les doublons</button>
+
                 <span class="questions-count" id="questions-count">0 questions</span>
             </div>
 
@@ -796,6 +797,32 @@
                     <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Annuler</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal des doublons -->
+    <div class="modal-overlay" id="duplicates-modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>🔍 Questions en Double</h2>
+                <button class="modal-close" onclick="closeDuplicatesModal()">×</button>
+            </div>
+
+            <div id="duplicates-message"></div>
+
+            <div id="duplicates-content">
+                <div class="loading">Recherche des doublons...</div>
+            </div>
+
+            <div id="duplicates-actions" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 2px solid #ecf0f1;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span id="duplicates-selected-count">0 doublon(s) sélectionné(s)</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="selectAllDuplicates()" class="btn btn-secondary btn-small">Tout sélectionner</button>
+                        <button onclick="deleteDuplicates()" class="btn btn-danger" id="btn-delete-duplicates" disabled>🗑️ Supprimer les doublons sélectionnés</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1763,6 +1790,222 @@
                 
             } catch (error) {
                 messageDiv.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        // ========== GESTION DES DOUBLONS ==========
+        let duplicatesMap = new Map(); // Map des groupes de doublons
+        let selectedDuplicates = new Set(); // IDs des doublons à supprimer
+
+        // Normaliser le texte pour la comparaison
+        function normalizeText(text) {
+            return text
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Enlever les accents
+                .replace(/[^a-z0-9]/g, '') // Garder que lettres et chiffres
+                .trim();
+        }
+
+        async function findDuplicates() {
+            const modal = document.getElementById('duplicates-modal');
+            const content = document.getElementById('duplicates-content');
+            const actions = document.getElementById('duplicates-actions');
+            const message = document.getElementById('duplicates-message');
+
+            modal.classList.add('active');
+            content.innerHTML = '<div class="loading">⏳ Chargement de toutes les questions...</div>';
+            actions.style.display = 'none';
+            message.innerHTML = '';
+            duplicatesMap.clear();
+            selectedDuplicates.clear();
+
+            try {
+                // Charger toutes les questions
+                const snapshot = await db.collection('questionBank').get();
+                const questions = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                content.innerHTML = '<div class="loading">🔍 Analyse de ' + questions.length + ' questions...</div>';
+
+                // Grouper par texte normalisé
+                const questionGroups = new Map();
+
+                questions.forEach(q => {
+                    const normalized = normalizeText(q.question || '');
+                    if (!questionGroups.has(normalized)) {
+                        questionGroups.set(normalized, []);
+                    }
+                    questionGroups.get(normalized).push(q);
+                });
+
+                // Trouver les groupes avec plus d'une question (doublons)
+                const duplicateGroups = [];
+                questionGroups.forEach((group, key) => {
+                    if (group.length > 1) {
+                        duplicateGroups.push({
+                            key: key,
+                            questions: group
+                        });
+                    }
+                });
+
+                if (duplicateGroups.length === 0) {
+                    content.innerHTML = `
+                        <div class="alert alert-success" style="text-align: center; padding: 40px;">
+                            <span style="font-size: 3em;">✅</span>
+                            <h3 style="margin-top: 15px;">Aucun doublon trouvé !</h3>
+                            <p style="color: #7f8c8d; margin-top: 10px;">${questions.length} questions analysées - toutes uniques.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Compter le total des doublons
+                let totalDuplicates = 0;
+                duplicateGroups.forEach(g => {
+                    totalDuplicates += g.questions.length - 1; // -1 car on garde un exemplaire
+                });
+
+                // Stocker pour la suppression
+                duplicatesMap = new Map();
+                duplicateGroups.forEach((group, index) => {
+                    group.questions.forEach((q, i) => {
+                        if (i > 0) { // Marquer comme doublon (garder le premier)
+                            duplicatesMap.set(q.id, {
+                                groupIndex: index,
+                                question: q
+                            });
+                        }
+                    });
+                });
+
+                // Afficher les résultats
+                content.innerHTML = `
+                    <div class="alert alert-info" style="margin-bottom: 20px;">
+                        📊 <strong>${duplicateGroups.length} groupe(s) de doublons</strong> trouvé(s) -
+                        <strong>${totalDuplicates} question(s)</strong> peuvent être supprimées
+                    </div>
+
+                    <div style="max-height: 400px; overflow-y: auto;">
+                        ${duplicateGroups.map((group, gIndex) => `
+                            <div style="background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #9b59b6;">
+                                <div style="font-weight: bold; margin-bottom: 10px; color: #2c3e50;">
+                                    Groupe ${gIndex + 1} - ${group.questions.length} exemplaires
+                                </div>
+                                <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                    <strong>Question :</strong> ${group.questions[0].question}
+                                </div>
+                                ${group.questions.map((q, i) => `
+                                    <div style="display: flex; align-items: center; padding: 8px; background: ${i === 0 ? '#d4edda' : '#fff3cd'}; border-radius: 5px; margin-bottom: 5px;">
+                                        ${i === 0 ? `
+                                            <span style="margin-right: 10px; color: #28a745;">✅ Garder</span>
+                                        ` : `
+                                            <input type="checkbox"
+                                                   id="dup-${q.id}"
+                                                   class="duplicate-checkbox"
+                                                   onchange="toggleDuplicateSelection('${q.id}')"
+                                                   style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
+                                        `}
+                                        <div style="flex: 1; font-size: 0.9em;">
+                                            <span style="color: #7f8c8d;">ID: ${q.id.substring(0, 8)}...</span>
+                                            <span style="margin-left: 10px;">📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'}</span>
+                                            <span style="margin-left: 10px;">${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || '')}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                actions.style.display = 'block';
+                updateDuplicatesCount();
+
+            } catch (error) {
+                console.error('Erreur findDuplicates:', error);
+                content.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
+            }
+        }
+
+        function closeDuplicatesModal() {
+            document.getElementById('duplicates-modal').classList.remove('active');
+        }
+
+        function toggleDuplicateSelection(id) {
+            const checkbox = document.getElementById(`dup-${id}`);
+            if (checkbox.checked) {
+                selectedDuplicates.add(id);
+            } else {
+                selectedDuplicates.delete(id);
+            }
+            updateDuplicatesCount();
+        }
+
+        function selectAllDuplicates() {
+            const checkboxes = document.querySelectorAll('.duplicate-checkbox');
+            const allChecked = selectedDuplicates.size === duplicatesMap.size;
+
+            checkboxes.forEach(cb => {
+                const id = cb.id.replace('dup-', '');
+                cb.checked = !allChecked;
+                if (!allChecked) {
+                    selectedDuplicates.add(id);
+                } else {
+                    selectedDuplicates.delete(id);
+                }
+            });
+
+            updateDuplicatesCount();
+        }
+
+        function updateDuplicatesCount() {
+            const count = selectedDuplicates.size;
+            document.getElementById('duplicates-selected-count').textContent = `${count} doublon(s) sélectionné(s)`;
+            document.getElementById('btn-delete-duplicates').disabled = count === 0;
+        }
+
+        async function deleteDuplicates() {
+            const count = selectedDuplicates.size;
+            if (count === 0) return;
+
+            const confirmation = confirm(`⚠️ ATTENTION !\n\nVous allez supprimer ${count} question(s) en double.\n\nCette action est IRRÉVERSIBLE.\n\nContinuer ?`);
+            if (!confirmation) return;
+
+            const message = document.getElementById('duplicates-message');
+            message.innerHTML = '<div class="alert alert-info">⏳ Suppression en cours...</div>';
+
+            try {
+                let deleted = 0;
+                let errors = 0;
+
+                for (const id of selectedDuplicates) {
+                    try {
+                        await db.collection('questionBank').doc(id).delete();
+                        deleted++;
+                    } catch (e) {
+                        console.error(`Erreur suppression ${id}:`, e);
+                        errors++;
+                    }
+                }
+
+                if (errors > 0) {
+                    message.innerHTML = `<div class="alert alert-success">✅ ${deleted} doublon(s) supprimé(s)</div>
+                                        <div class="alert alert-error">❌ ${errors} erreur(s)</div>`;
+                } else {
+                    message.innerHTML = `<div class="alert alert-success">✅ ${deleted} doublon(s) supprimé(s) avec succès !</div>`;
+                }
+
+                // Relancer la recherche pour mettre à jour l'affichage
+                setTimeout(() => {
+                    findDuplicates();
+                    loadQuestions(); // Rafraîchir aussi la liste principale
+                }, 1500);
+
+            } catch (error) {
+                message.innerHTML = `<div class="alert alert-error">❌ Erreur : ${error.message}</div>`;
             }
         }
 

@@ -11,16 +11,14 @@
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
-
         gtag('config', 'G-G3YEKJLDRT');
     </script>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-        content="Quiz d'histoire - Choisissez votre période : Antiquité, Moyen Âge, Histoire de l'Art, Guerres Mondiales">
-    <meta name="keywords" content="quiz histoire, france, culture générale, antiquité, moyen âge">
-    <title>SuperQuiz.com - Histoire</title>
+    <meta name="description" content="Quiz d'histoire - Choisissez votre periode : Antiquite, Moyen Age, Histoire de l'Art, Guerres Mondiales">
+    <meta name="keywords" content="quiz histoire, france, culture generale, antiquite, moyen age">
+    <title>CultureLudo - Histoire</title>
     <link rel="preload" href="css/style.css" as="style">
     <link rel="stylesheet" href="css/style.css" type="text/css">
     <link rel="preload" href="js/script.js" as="script">
@@ -31,57 +29,234 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
     <script src="js/menu.js" defer></script>
+
+    <style>
+        .category-hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .category-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .category-hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .category-hero p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .categories-container {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 30px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        .category-card .card-arrow {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%) translateX(-10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .category-card:hover .card-arrow {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .back-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-link a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .category-hero {
+                padding: 40px 20px 30px;
+            }
+            .category-icon {
+                font-size: 3rem;
+            }
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="h1">
-            <h1>SUPERQUIZ - HISTOIRE</h1>
-        </div>
-        <div class="phrase-de-bienvenue">
-            <p>Choisissez votre période historique favorite</p>
-        </div>
-    </header>
+    <section class="category-hero">
+        <span class="category-icon">📜</span>
+        <h1>Histoire</h1>
+        <p>Voyagez a travers les epoques et testez vos connaissances historiques</p>
+    </section>
 
-    <main>
-        <div class="quiz-categories">
-            <h2>Catégories d'Histoire</h2>
-            <div class="categories-grid">
-                <a href="mode-selection.html?matiere=histoire&categorie=antiquite" class="category-card">
-                    <h3>🏛️ Antiquité</h3>
-                    <p>Rome, Grèce, Égypte ancienne</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=moyenage" class="category-card">
-                    <h3>⚔️ Moyen Âge</h3>
-                    <p>Chevaliers, châteaux, croisades</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=art" class="category-card">
-                    <h3>🎨 Histoire de l'Art</h3>
-                    <p>Peinture, sculpture, architecture</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=guerres" class="category-card">
-                    <h3>⚡ Guerres Mondiales</h3>
-                    <p>XXe siècle, conflits majeurs</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=france" class="category-card">
-                    <h3>🇫🇷 Histoire de France</h3>
-                    <p>Révolution, Empire, République</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=contemporaine" class="category-card">
-                    <h3>📱 Histoire Contemporaine</h3>
-                    <p>Depuis 1945 à nos jours</p>
-                </a>
-                <a href="mode-selection.html?matiere=histoire&categorie=préhistoire" class="category-card">
-                    <h3>🏛️ Préhistoire</h3>
-                    <p>Dinosaures</p>
-                </a>
-            </div>
+    <main class="categories-container">
+        <div class="categories-grid">
+            <a href="mode-selection.html?matiere=histoire&categorie=antiquite" class="category-card">
+                <h3><span>🏛️</span> Antiquite</h3>
+                <p>Rome, Grece, Egypte ancienne</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=moyenage" class="category-card">
+                <h3><span>⚔️</span> Moyen Age</h3>
+                <p>Chevaliers, chateaux, croisades</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=art" class="category-card">
+                <h3><span>🎨</span> Histoire de l'Art</h3>
+                <p>Peinture, sculpture, architecture</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=guerres" class="category-card">
+                <h3><span>⚡</span> Guerres Mondiales</h3>
+                <p>XXe siecle, conflits majeurs</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=france" class="category-card">
+                <h3><span>🇫🇷</span> Histoire de France</h3>
+                <p>Revolution, Empire, Republique</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=contemporaine" class="category-card">
+                <h3><span>📱</span> Histoire Contemporaine</h3>
+                <p>Depuis 1945 a nos jours</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=histoire&categorie=prehistoire" class="category-card">
+                <h3><span>🦖</span> Prehistoire</h3>
+                <p>Les origines de l'humanite</p>
+                <span class="card-arrow">→</span>
+            </a>
+        </div>
+
+        <div class="back-link">
+            <a href="Quiz.html">← Retour aux categories</a>
         </div>
     </main>
 
-    <footer>
-        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    <footer class="page-footer">
+        <p>© 2024 CultureLudo - Tous droits reserves</p>
     </footer>
+
 </body>
 </html>

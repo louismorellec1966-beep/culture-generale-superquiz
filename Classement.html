@@ -23,16 +23,56 @@
     <script defer src="js/menu.js"></script>
     <script defer src="js/profile-system.js"></script>
     <style>
-        .classement-header {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 40px;
-            text-align: center;
-            border-radius: 15px;
-            margin-bottom: 30px;
+        body {
+            padding-top: 80px;
         }
-        .classement-header h1 { margin: 0; font-size: 2.5em; }
-        .classement-header p { margin: 10px 0 0 0; opacity: 0.9; }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .classement-header {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        .classement-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f093fb, #f5576c, #f093fb);
+            background-size: 200% 100%;
+            animation: gradientMove 3s linear infinite;
+        }
+        @keyframes gradientMove {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+        .classement-header h1 {
+            margin: 0;
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .classement-header p {
+            margin: 15px 0 0 0;
+            color: var(--text-secondary, #a0aec0);
+            font-size: 1.1rem;
+        }
 
         .filter-tabs {
             display: flex;
@@ -42,20 +82,26 @@
             flex-wrap: wrap;
         }
         .filter-tab {
-            padding: 12px 25px;
-            background: white;
-            border: 2px solid #ecf0f1;
-            border-radius: 25px;
+            padding: 12px 22px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             font-weight: 600;
-            color: #7f8c8d;
+            color: var(--text-secondary, #a0aec0);
+            font-size: 0.9rem;
         }
-        .filter-tab:hover { border-color: #3498db; color: #3498db; }
+        .filter-tab:hover {
+            border-color: rgba(102, 126, 234, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
         .filter-tab.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-color: transparent;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
         }
 
         /* Podium amélioré */
@@ -68,44 +114,59 @@
             align-items: flex-end;
         }
         .podium-place {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 30px 20px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
             position: relative;
+            color: white;
         }
-        .podium-place:hover { transform: translateY(-10px); }
+        .podium-place:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
         .podium-place.first {
             order: 2;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 170, 0, 0.2));
+            border-color: rgba(255, 215, 0, 0.4);
             padding: 40px 20px;
             z-index: 2;
         }
+        .podium-place.first:hover {
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
+        }
         .podium-place.second {
             order: 1;
-            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.15), rgba(192, 192, 192, 0.1));
+            border-color: rgba(192, 192, 192, 0.3);
         }
         .podium-place.third {
             order: 3;
-            background: linear-gradient(135deg, #cd7f32 0%, #e89b65 100%);
-            color: white;
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.1));
+            border-color: rgba(205, 127, 50, 0.4);
         }
 
         .podium-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 40px;
             margin: 0 auto 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .podium-place.first .podium-avatar { width: 100px; height: 100px; font-size: 50px; }
+        .podium-place.first .podium-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 50px;
+            border-color: rgba(255, 215, 0, 0.5);
+        }
 
         .medal {
             position: absolute;
@@ -114,6 +175,7 @@
             transform: translateX(-50%);
             font-size: 2.5em;
             animation: bounce 2s infinite;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
         }
         @keyframes bounce {
             0%, 100% { transform: translateX(-50%) translateY(0); }
@@ -123,25 +185,33 @@
         .podium-name { font-size: 1.2em; font-weight: bold; margin: 10px 0; }
         .podium-level {
             display: inline-block;
-            background: rgba(0,0,0,0.1);
-            padding: 4px 12px;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 14px;
+            border-radius: 20px;
             font-size: 0.85em;
             margin-bottom: 10px;
         }
-        .podium-xp { font-size: 1.8em; font-weight: bold; margin: 10px 0; }
-        .podium-details { font-size: 0.9em; opacity: 0.8; }
+        .podium-xp {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .podium-details { font-size: 0.9em; color: var(--text-secondary, #a0aec0); }
 
         /* Table classement */
         .classement-table {
-            background: white;
-            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
             margin-top: 40px;
         }
         .table-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
             color: white;
             padding: 18px 20px;
             font-weight: bold;
@@ -149,27 +219,33 @@
             grid-template-columns: 60px 60px 2fr 100px 100px 80px;
             gap: 15px;
             align-items: center;
+            font-size: 0.9rem;
         }
         .classement-row {
             padding: 15px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             display: grid;
             grid-template-columns: 60px 60px 2fr 100px 100px 80px;
             gap: 15px;
             align-items: center;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
+            color: var(--text-secondary, #a0aec0);
         }
-        .classement-row:hover { background: #f8f9fa; transform: translateX(5px); }
+        .classement-row:last-child { border-bottom: none; }
+        .classement-row:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
         .classement-row.highlight {
-            background: linear-gradient(90deg, #e3f2fd, #fff);
-            border-left: 4px solid #3498db;
+            background: linear-gradient(90deg, rgba(102, 126, 234, 0.15), transparent);
+            border-left: 4px solid #667eea;
         }
 
         .rank {
             font-size: 1.3em;
             font-weight: bold;
             text-align: center;
-            color: #7f8c8d;
+            color: var(--text-muted, #718096);
         }
         .rank.top3 { font-size: 1.8em; }
 
@@ -177,28 +253,35 @@
             width: 45px;
             height: 45px;
             border-radius: 50%;
-            background: #f0f0f0;
+            background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 25px;
+            font-size: 22px;
         }
 
         .player-info { display: flex; flex-direction: column; gap: 3px; }
-        .player-name { font-weight: 600; color: #2c3e50; }
+        .player-name { font-weight: 600; color: white; }
         .player-level {
             display: inline-block;
-            background: #e3f2fd;
-            color: #3498db;
-            padding: 2px 8px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #818cf8;
+            padding: 3px 10px;
             border-radius: 10px;
             font-size: 0.75em;
             font-weight: 600;
             width: fit-content;
         }
 
-        .player-xp { font-size: 1.1em; font-weight: bold; color: #f39c12; }
-        .quiz-count { color: #7f8c8d; }
+        .player-xp {
+            font-size: 1.1em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .quiz-count { color: var(--text-muted, #718096); }
         .success-rate { font-weight: 600; }
         .success-rate.good { color: #2ecc71; }
         .success-rate.medium { color: #f39c12; }
@@ -212,25 +295,48 @@
             margin: 30px 0;
         }
         .stat-box {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 25px;
-            border-radius: 15px;
+            border-radius: 16px;
             text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
         }
-        .stat-box:hover { transform: translateY(-5px); }
-        .stat-number { font-size: 2.2em; font-weight: bold; color: #3498db; }
-        .stat-label { color: #7f8c8d; margin-top: 5px; }
+        .stat-box:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-label { color: var(--text-muted, #718096); margin-top: 8px; font-size: 0.9rem; }
 
         .no-data {
             text-align: center;
             padding: 60px 20px;
-            color: #7f8c8d;
+            color: var(--text-muted, #718096);
         }
-        .no-data h3 { margin-bottom: 10px; color: #2c3e50; }
+        .no-data h3 { margin-bottom: 10px; color: white; }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted, #718096);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 60px;
+        }
 
         @media (max-width: 768px) {
+            body {
+                padding-top: 20px;
+                padding-bottom: 100px;
+            }
             .podium { grid-template-columns: 1fr; }
             .podium-place { order: initial !important; }
             .table-header { display: none; }
@@ -239,6 +345,8 @@
                 gap: 10px;
             }
             .classement-row > *:nth-child(n+4) { display: none; }
+            .filter-tabs { gap: 8px; }
+            .filter-tab { padding: 10px 16px; font-size: 0.8rem; }
         }
     </style>
 </head>

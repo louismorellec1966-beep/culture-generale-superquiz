@@ -4,62 +4,88 @@
     <link rel="icon" type="image/png" sizes="32x32" href="Images/favicon-32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="Images/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="Images/logo-192.png">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-G3YEKJLDRT');</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperQuiz.com - Cinéma</title>
-    <link rel="preload" href="css/style.css" as="style">
-    <link rel="stylesheet" href="css/style.css" type="text/css">
-    <link rel="preload" href="js/script.js" as="script">
+    <meta name="description" content="Quiz de Cinema - Films, Realisateurs, Acteurs">
+    <title>CultureLudo - Cinema</title>
+    <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
-    <!-- Firebase SDK -->
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
     <script src="js/menu.js" defer></script>
+    <style>
+        .category-hero { text-align: center; padding: 60px 20px 40px; position: relative; }
+        .category-hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 300px; height: 300px; background: radial-gradient(circle, rgba(102, 126, 234, 0.15) 0%, transparent 70%); pointer-events: none; }
+        .category-icon { font-size: 4rem; margin-bottom: 20px; display: block; animation: float 3s ease-in-out infinite; }
+        .category-hero h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 15px; }
+        .category-hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 500px; margin: 0 auto; }
+        .categories-container { max-width: 1000px; margin: 0 auto 60px; padding: 0 20px; }
+        .categories-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .category-card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 30px; text-decoration: none; color: white; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .category-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); opacity: 0; transition: opacity 0.3s ease; }
+        .category-card:hover { transform: translateY(-8px); border-color: rgba(102, 126, 234, 0.5); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(102, 126, 234, 0.2); }
+        .category-card:hover::before { opacity: 1; }
+        .category-card h3 { font-size: 1.3rem; margin-bottom: 10px; position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; }
+        .category-card p { color: var(--text-secondary); font-size: 0.95rem; position: relative; z-index: 1; margin: 0; }
+        .category-card .card-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%) translateX(-10px); opacity: 0; transition: all 0.3s ease; font-size: 1.2rem; }
+        .category-card:hover .card-arrow { opacity: 1; transform: translateY(-50%) translateX(0); }
+        .back-link { text-align: center; margin-top: 40px; }
+        .back-link a { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); text-decoration: none; padding: 12px 24px; border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s ease; }
+        .back-link a:hover { background: rgba(255, 255, 255, 0.05); border-color: var(--primary-color); color: var(--white); }
+        .page-footer { text-align: center; padding: 30px 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-muted); font-size: 0.9rem; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @media (max-width: 768px) { .category-hero { padding: 40px 20px 30px; } .category-icon { font-size: 3rem; } .categories-grid { grid-template-columns: 1fr; } }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="h1">
-            <h1>SUPERQUIZ - CINÉMA</h1>
+    <section class="category-hero">
+        <span class="category-icon">🎬</span>
+        <h1>Cinema</h1>
+        <p>Plongez dans l'univers du 7e art</p>
+    </section>
+    <main class="categories-container">
+        <div class="categories-grid">
+            <a href="mode-selection.html?matiere=cinema&categorie=francais" class="category-card">
+                <h3><span>🇫🇷</span> Cinema francais</h3>
+                <p>Films, realisateurs et acteurs francais</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=cinema&categorie=international" class="category-card">
+                <h3><span>🌍</span> Cinema international</h3>
+                <p>Hollywood, Bollywood, Asie, Europe...</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=cinema&categorie=acteurs" class="category-card">
+                <h3><span>🎭</span> Acteurs & Actrices</h3>
+                <p>Stars du grand ecran</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=cinema&categorie=realisateurs" class="category-card">
+                <h3><span>🎥</span> Realisateurs</h3>
+                <p>Maitres de la mise en scene</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=cinema&categorie=oscars" class="category-card">
+                <h3><span>🏆</span> Oscars & Recompenses</h3>
+                <p>Palmares et distinctions</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="mode-selection.html?matiere=cinema&categorie=films-cultes" class="category-card">
+                <h3><span>🎞️</span> Films cultes</h3>
+                <p>Les incontournables du cinema</p>
+                <span class="card-arrow">→</span>
+            </a>
         </div>
-        <div class="phrase-de-bienvenue">
-            <p>Plongez dans l'univers du 7e art !</p>
-        </div>
-    </header>
-    <main>
-        <div class="quiz-categories">
-            <h2>Catégories de Cinéma</h2>
-            <div class="categories-grid">
-                <a href="mode-selection.html?matiere=cinema&categorie=francais" class="category-card">
-                    <h3>🇫🇷 Cinéma français</h3>
-                    <p>Films, réalisateurs et acteurs français</p>
-                </a>
-                <a href="mode-selection.html?matiere=cinema&categorie=international" class="category-card">
-                    <h3>🌍 Cinéma international</h3>
-                    <p>Hollywood, Bollywood, Asie, Europe...</p>
-                </a>
-                <a href="mode-selection.html?matiere=cinema&categorie=acteurs" class="category-card">
-                    <h3>🎭 Acteurs & Actrices</h3>
-                    <p>Stars du grand écran</p>
-                </a>
-                <a href="mode-selection.html?matiere=cinema&categorie=realisateurs" class="category-card">
-                    <h3>🎬 Réalisateurs</h3>
-                    <p>Maîtres de la mise en scène</p>
-                </a>
-                <a href="mode-selection.html?matiere=cinema&categorie=oscars" class="category-card">
-                    <h3>🏆 Oscars & Récompenses</h3>
-                    <p>Palmarès et distinctions</p>
-                </a>
-                <a href="mode-selection.html?matiere=cinema&categorie=films-cultes" class="category-card">
-                    <h3>🎞️ Films cultes</h3>
-                    <p>Les incontournables du cinéma</p>
-                </a>
-            </div>
+        <div class="back-link">
+            <a href="Quiz.html">← Retour aux categories</a>
         </div>
     </main>
-    <footer>
-        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    <footer class="page-footer">
+        <p>© 2024 CultureLudo - Tous droits reserves</p>
     </footer>
 </body>
 </html>

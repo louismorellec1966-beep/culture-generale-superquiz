@@ -39,7 +39,6 @@ function initMenu() {
                             <a href="Sport.html" ${currentPage === 'Sport.html' ? 'class="active"' : ''}>⚽ Sport</a>
                             <a href="Musique.html" ${currentPage === 'Musique.html' ? 'class="active"' : ''}>🎵 Musique</a>
                             <a href="Art.html" ${currentPage === 'Art.html' ? 'class="active"' : ''}>🎨 Art</a>
-                            <a href="Culture.html" ${currentPage === 'Culture.html' ? 'class="active"' : ''}>🎭 Culture</a>
                             <a href="Cinéma.html" ${currentPage === 'Cinéma.html' ? 'class="active"' : ''}>🎬 Cinéma</a>
                             <a href="Gastronomie.html" ${currentPage === 'Gastronomie.html' ? 'class="active"' : ''}>🍽️ Gastronomie</a>
                             <a href="Politique.html" ${currentPage === 'Politique.html' ? 'class="active"' : ''}>🏛️ Politique</a>
@@ -126,7 +125,6 @@ function initMenu() {
                         <a href="Sport.html">⚽ Sport</a>
                         <a href="Musique.html">🎵 Musique</a>
                         <a href="Art.html">🎨 Art</a>
-                        <a href="Culture.html">🎭 Culture</a>
                         <a href="Cinéma.html">🎬 Cinéma</a>
                         <a href="Gastronomie.html">🍽️ Gastro</a>
                         <a href="Politique.html">🏛️ Politique</a>

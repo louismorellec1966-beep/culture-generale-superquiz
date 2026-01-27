@@ -55,8 +55,7 @@ const categoryPages = [
     '/Sport.html',
     '/Gastronomie.html',
     '/Philosophie.html',
-    '/Politique.html',
-    '/Culture.html'
+    '/Politique.html'
 ];
 
 // Installation du Service Worker

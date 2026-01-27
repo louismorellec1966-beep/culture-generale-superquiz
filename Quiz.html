@@ -6,23 +6,18 @@
     <link rel="icon" type="image/png" sizes="16x16" href="Images/favicon-16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="Images/logo-192.png">
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-G3YEKJLDRT');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-G3YEKJLDRT');
+    </script>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SuperQuiz - Choisissez votre catégorie de quiz : histoire, géographie, science ou littérature">
-    <meta name="keywords" content="quiz, culture générale, choix catégories">
-    <title>SuperQuiz.com - Quiz</title>
-    <link rel="preload" href="css/style.css" as="style">
-    <link rel="stylesheet" href="css/style.css" type="text/css">
-    <link rel="preload" href="js/script.js" as="script">
+    <meta name="description" content="CultureLudo - Choisissez votre categorie de quiz : histoire, geographie, science et bien plus">
+    <title>CultureLudo - Quiz</title>
+    <link rel="stylesheet" href="css/style.css">
     <script src="js/script.js" defer></script>
     <!-- Firebase SDK -->
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -30,88 +25,333 @@
     <script defer src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script defer src="firebase-config.js"></script>
     <script src="js/menu.js" defer></script>
+
+    <style>
+        .category-hero {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+        }
+
+        .category-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .category-hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+
+        .category-hero p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .categories-container {
+            max-width: 1200px;
+            margin: 0 auto 60px;
+            padding: 0 20px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-card .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .category-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .category-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        .category-card .card-arrow {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .category-card:hover .card-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Couleurs personnalisées pour chaque catégorie */
+        .category-card[data-category="histoire"]:hover { border-color: #e67e22; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(230, 126, 34, 0.3); }
+        .category-card[data-category="geographie"]:hover { border-color: #27ae60; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(39, 174, 96, 0.3); }
+        .category-card[data-category="science"]:hover { border-color: #3498db; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(52, 152, 219, 0.3); }
+        .category-card[data-category="litterature"]:hover { border-color: #9b59b6; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(155, 89, 182, 0.3); }
+        .category-card[data-category="sport"]:hover { border-color: #e74c3c; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(231, 76, 60, 0.3); }
+        .category-card[data-category="musique"]:hover { border-color: #1abc9c; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(26, 188, 156, 0.3); }
+        .category-card[data-category="art"]:hover { border-color: #f39c12; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(243, 156, 18, 0.3); }
+        .category-card[data-category="cinema"]:hover { border-color: #e84393; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(232, 67, 147, 0.3); }
+        .category-card[data-category="gastronomie"]:hover { border-color: #fd79a8; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(253, 121, 168, 0.3); }
+        .category-card[data-category="politique"]:hover { border-color: #00cec9; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(0, 206, 201, 0.3); }
+        .category-card[data-category="philosophie"]:hover { border-color: #6c5ce7; box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 40px rgba(108, 92, 231, 0.3); }
+
+        .back-link {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .back-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .back-link a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Animation d'apparition des cartes */
+        .category-card {
+            animation: fadeInUp 0.5s ease-out both;
+        }
+
+        .category-card:nth-child(1) { animation-delay: 0.05s; }
+        .category-card:nth-child(2) { animation-delay: 0.1s; }
+        .category-card:nth-child(3) { animation-delay: 0.15s; }
+        .category-card:nth-child(4) { animation-delay: 0.2s; }
+        .category-card:nth-child(5) { animation-delay: 0.25s; }
+        .category-card:nth-child(6) { animation-delay: 0.3s; }
+        .category-card:nth-child(7) { animation-delay: 0.35s; }
+        .category-card:nth-child(8) { animation-delay: 0.4s; }
+        .category-card:nth-child(9) { animation-delay: 0.45s; }
+        .category-card:nth-child(10) { animation-delay: 0.5s; }
+        .category-card:nth-child(11) { animation-delay: 0.55s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .category-hero {
+                padding: 40px 20px 30px;
+            }
+            .category-icon {
+                font-size: 3rem;
+            }
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            .category-card {
+                padding: 20px 15px;
+            }
+            .category-card .card-icon {
+                font-size: 2.5rem;
+            }
+            .category-card h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <header>
-        <div class="h1">
-            <h1>QUIZ</h1>
-        </div>
-    </header>
+    <section class="category-hero">
+        <span class="category-icon">🎯</span>
+        <h1>Choisissez une categorie</h1>
+        <p>Testez vos connaissances dans plus de 10 domaines passionnants</p>
+    </section>
 
-    <main>
-        <div class="phrase-de-bienvenue">
-            <p>Répondez aux questions suivantes pour tester vos connaissances en culture générale.</p>
-        </div>
-
-        <div class="quiz-categories">
-            <h2>Choisissez une catégorie</h2>
-            <div class="categories-grid">
-                <a href="Histoire.html" class="category-card">
-                    <h3>Histoire</h3>
-                    <p>Testez vos connaissances historiques</p>
-                </a>
-                <a href="Géographie.html" class="category-card">
-                    <h3>Géographie</h3>
-                    <p>Explorez le monde</p>
-                </a>
-                <a href="Science.html" class="category-card">
-                    <h3>Science</h3>
-                    <p>Découvrez les sciences</p>
-                </a>
-                <a href="Littérature.html" class="category-card">
-                    <h3>Littérature</h3>
-                    <p>Plongez dans les livres</p>
-                </a>
-                <a href="Sport.html" class="category-card">
-                    <h3>Sport</h3>
-                    <p>Testez vos connaissances sportives</p>
-                </a>
-                <a href="Musique.html" class="category-card">
-                    <h3>Musique</h3>
-                    <p>Découvrez le monde de la musique</p>
-                </a>
-                <a href="Art.html" class="category-card">
-                    <h3>Art</h3>
-                    <p>Explorez l'univers de l'art</p>
-                </a>
-                <a href="Culture.html" class="category-card">
-                    <h3>Culture</h3>
-                    <p>Découvrez les richesses culturelles</p>
-                </a>
-                <a href="Cinéma.html" class="category-card">
-                    <h3>Cinéma</h3>
-                    <p>Plongez dans l'univers du cinéma</p>
-                </a>
-                <a href="Gastronomie.html" class="category-card">
-                    <h3>Gastronomie</h3>
-                    <p>Voyagez dans la gastronomie</p>
-                </a>
-                <a href="Politique.html" class="category-card">
-                    <h3>Politique</h3>
-                    <p>Testez vos connaissances politiques</p>
-                </a>
-                <a href="Philosophie.html" class="category-card">
-                    <h3>Philosophie</h3>
-                    <p>Réfléchissez avec la philosophie</p>
-                </a>
-
-            </div>
-        </div>
-
-        <div class="info-link">
-            <a href="https://www.francebleu.fr/infos/transports/pourquoi-les-routes-sont-elles-gratuites-en-bretagne-5722878"
-               title="En savoir plus sur les routes gratuites en Bretagne"
-               target="_blank"
-               rel="noopener noreferrer">
-               En savoir plus sur les routes gratuites en Bretagne
+    <main class="categories-container">
+        <div class="categories-grid">
+            <a href="Histoire.html" class="category-card" data-category="histoire">
+                <span class="card-icon">📜</span>
+                <h3>Histoire</h3>
+                <p>Voyagez a travers les epoques</p>
+                <span class="card-arrow">→</span>
             </a>
+            <a href="Géographie.html" class="category-card" data-category="geographie">
+                <span class="card-icon">🌍</span>
+                <h3>Geographie</h3>
+                <p>Explorez le monde entier</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Science.html" class="category-card" data-category="science">
+                <span class="card-icon">🔬</span>
+                <h3>Science</h3>
+                <p>Decouvrez les mysteres de l'univers</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Littérature.html" class="category-card" data-category="litterature">
+                <span class="card-icon">📚</span>
+                <h3>Litterature</h3>
+                <p>Plongez dans les grands classiques</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Sport.html" class="category-card" data-category="sport">
+                <span class="card-icon">⚽</span>
+                <h3>Sport</h3>
+                <p>Revivez les moments legendaires</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Musique.html" class="category-card" data-category="musique">
+                <span class="card-icon">🎵</span>
+                <h3>Musique</h3>
+                <p>De Mozart au rock moderne</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Art.html" class="category-card" data-category="art">
+                <span class="card-icon">🎨</span>
+                <h3>Art</h3>
+                <p>Peinture, sculpture et plus</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Cinéma.html" class="category-card" data-category="cinema">
+                <span class="card-icon">🎬</span>
+                <h3>Cinema</h3>
+                <p>Films cultes et realisateurs</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Gastronomie.html" class="category-card" data-category="gastronomie">
+                <span class="card-icon">🍽️</span>
+                <h3>Gastronomie</h3>
+                <p>Saveurs du monde entier</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Politique.html" class="category-card" data-category="politique">
+                <span class="card-icon">🏛️</span>
+                <h3>Politique</h3>
+                <p>Institutions et grands leaders</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="Philosophie.html" class="category-card" data-category="philosophie">
+                <span class="card-icon">💭</span>
+                <h3>Philosophie</h3>
+                <p>Penseurs et grandes idees</p>
+                <span class="card-arrow">→</span>
+            </a>
+        </div>
+
+        <div class="back-link">
+            <a href="Accueil.html">← Retour a l'accueil</a>
         </div>
     </main>
 
-    <footer>
-        <p>Copyright © 2024 SuperQuiz. Tous droits réservés.</p>
+    <footer class="page-footer">
+        <p>© 2024 CultureLudo - Tous droits reserves</p>
     </footer>
 </body>
 </html>

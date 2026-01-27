@@ -1538,10 +1538,13 @@ async function loadLeaderboard(type) {
             else if (rank === 2) rankDisplay = '🥈';
             else if (rank === 3) rankDisplay = '🥉';
             
+            // Gérer le cas où avatar est un objet {type, value} ou une chaîne
+            const avatarDisplay = typeof data.avatar === 'object' ? (data.avatar?.value || '👤') : (data.avatar || '👤');
+
             html += `
                 <div class="leaderboard-item ${rankClass}">
                     <div class="lb-rank">${rankDisplay}</div>
-                    <div class="lb-avatar">${data.avatar || '👤'}</div>
+                    <div class="lb-avatar">${avatarDisplay}</div>
                     <div class="lb-info">
                         <div class="lb-name">${data.pseudo || 'Joueur'}</div>
                         <div class="lb-rank-badge">${playerRank.icon} ${playerRank.name}</div>

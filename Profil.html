@@ -1366,8 +1366,8 @@
                 try {
                     const streakInfo = await StreaksSystem.getStreakInfo(currentUser.uid);
                     const flameLevel = StreaksSystem.getFlameLevel(streakInfo?.currentStreak || 0);
-                    
-                    document.getElementById('streak-flame').textContent = flameLevel;
+
+                    document.getElementById('streak-flame').textContent = flameLevel.emoji;
                     document.getElementById('streak-count').innerHTML = `${streakInfo?.currentStreak || 0} <span>jours</span>`;
                     
                     // Afficher les prochaines récompenses

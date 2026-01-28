@@ -13,7 +13,7 @@ const MULTIPLAYER_CONFIG = {
     QUICK_TIME_PER_QUESTION: 10,
     
     // Matchmaking
-    MAX_QUEUE_TIME: 30000, // 30 secondes max
+    MAX_QUEUE_TIME: 15000, // 15 secondes max avant bot
     INITIAL_ELO_RANGE: 50,
     ELO_RANGE_INCREASE: 25, // Augmente la recherche toutes les 5 secondes
     ELO_RANGE_MAX: 500,
@@ -247,10 +247,10 @@ async function startMatchmaking(mode) {
             console.log('🔎 Recherche d\'un adversaire réel...');
             await joinMatchmakingQueue();
 
-            // Timeout de 30 secondes : si pas d'adversaire trouvé, passer au bot
+            // Timeout de 15 secondes : si pas d'adversaire trouvé, passer au bot
             gameState.matchmakingTimeout = setTimeout(() => {
                 if (gameState.isSearching && !gameState.matchId) {
-                    console.log('⏰ 30s écoulées - Passage au mode simulation');
+                    console.log('⏰ 15s écoulées - Passage au mode simulation');
                     // Nettoyer la file d'attente
                     if (gameState.matchmakingRef) {
                         gameState.matchmakingRef.off();
@@ -258,7 +258,7 @@ async function startMatchmaking(mode) {
                     }
                     simulateMatchmaking();
                 }
-            }, 30000); // 30 secondes
+            }, MULTIPLAYER_CONFIG.MAX_QUEUE_TIME); // 15 secondes
 
         } catch (error) {
             console.error('❌ Erreur matchmaking:', error);
@@ -772,19 +772,19 @@ function showQuestion() {
         startQuestionTimer();
     }, 300);
     
-    // Timeout de sécurité si l'adversaire ne répond pas
-    if (window.rtdb && gameState.matchId) {
-        const safetyTimeout = (gameState.gameMode === 'duel' 
-            ? MULTIPLAYER_CONFIG.DUEL_TIME_PER_QUESTION 
+    // Timeout de sécurité si l'adversaire ne répond pas (uniquement pour vrais joueurs)
+    if (window.rtdb && gameState.matchId && !gameState.opponent?.isBot) {
+        const safetyTimeout = (gameState.gameMode === 'duel'
+            ? MULTIPLAYER_CONFIG.DUEL_TIME_PER_QUESTION
             : MULTIPLAYER_CONFIG.QUICK_TIME_PER_QUESTION) + 10;
-        
+
         gameState.safetyTimer = setTimeout(() => {
             if (gameState.hasAnswered && !gameState.opponentAnsweredCurrent) {
                 console.log('⏰ Timeout de sécurité - Adversaire n\'a pas répondu');
                 gameState.opponentAnsweredCurrent = true;
                 gameState.opponentLives--;
                 updateDuelHeader();
-                document.getElementById('opponent-answer-status').innerHTML = 
+                document.getElementById('opponent-answer-status').innerHTML =
                     `<span style="color: #e74c3c;">⏰ ${gameState.opponent.pseudo} n'a pas répondu</span>`;
                 setTimeout(() => nextQuestion(), 1500);
             }
@@ -876,15 +876,15 @@ function selectAnswer(index) {
     // Afficher le feedback (avec l'index affiché de la bonne réponse)
     showAnswerFeedback(index, isCorrect, correctDisplayIndex);
     
-    // Si jeu en temps réel, envoyer au serveur
-    if (window.rtdb && gameState.matchId) {
+    // Si jeu en temps réel contre un vrai joueur, envoyer au serveur
+    if (window.rtdb && gameState.matchId && !gameState.opponent?.isBot) {
         sendAnswerToServer(index, isCorrect, responseTime);
         // Vérifier si l'adversaire a déjà répondu
         checkBothAnswered();
     }
-    
-    // Simuler la réponse de l'adversaire (en mode simulation)
-    if (!window.rtdb) {
+
+    // Simuler la réponse de l'adversaire (si c'est un bot ou mode simulation)
+    if (!window.rtdb || gameState.opponent?.isBot) {
         simulateOpponentAnswer(question.correct);
     }
     
@@ -908,13 +908,14 @@ function handleTimeout() {
     const correctDisplayIndex = gameState.currentShuffledAnswers.findIndex(a => a.originalIndex === question.correct);
     showAnswerFeedback(-1, false, correctDisplayIndex);
     
-    // Si jeu en temps réel, envoyer le timeout au serveur
-    if (window.rtdb && gameState.matchId) {
+    // Si jeu en temps réel contre un vrai joueur, envoyer le timeout au serveur
+    if (window.rtdb && gameState.matchId && !gameState.opponent?.isBot) {
         sendAnswerToServer(-1, false, 0);
         checkBothAnswered();
     }
-    
-    if (!window.rtdb) {
+
+    // Simuler la réponse de l'adversaire (si c'est un bot ou mode simulation)
+    if (!window.rtdb || gameState.opponent?.isBot) {
         simulateOpponentAnswer(question.correct);
     }
     

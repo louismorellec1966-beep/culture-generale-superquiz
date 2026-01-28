@@ -54,6 +54,8 @@ let gameState = {
     queueTimer: null,
     matchmakingRef: null,
     matchRef: null,
+    matchmakingTimeout: null,
+    searchInterval: null,
     isSearching: false,
     hasAnswered: false,
     playerAnswers: [],
@@ -362,13 +364,15 @@ async function joinMatchmakingQueue() {
 // Chercher un adversaire compatible
 async function searchForOpponent() {
     if (!gameState.isSearching || !window.rtdb) return;
-    
+
     const myElo = gameState.playerProfile.elo;
     let eloRange = MULTIPLAYER_CONFIG.INITIAL_ELO_RANGE;
-    
-    const searchInterval = setInterval(async () => {
+
+    // Stocker l'intervalle pour pouvoir le nettoyer
+    gameState.searchInterval = setInterval(async () => {
         if (!gameState.isSearching) {
-            clearInterval(searchInterval);
+            clearInterval(gameState.searchInterval);
+            gameState.searchInterval = null;
             return;
         }
         
@@ -388,7 +392,8 @@ async function searchForOpponent() {
             const eloDiff = Math.abs(player.elo - myElo);
             if (eloDiff <= eloRange) {
                 // Adversaire trouvé !
-                clearInterval(searchInterval);
+                clearInterval(gameState.searchInterval);
+                gameState.searchInterval = null;
                 await createMatch(odexid, player);
                 return;
             }
@@ -396,16 +401,11 @@ async function searchForOpponent() {
         
         // Élargir la recherche
         eloRange = Math.min(eloRange + MULTIPLAYER_CONFIG.ELO_RANGE_INCREASE, MULTIPLAYER_CONFIG.ELO_RANGE_MAX);
-        
+
     }, 2000);
-    
-    // Timeout
-    setTimeout(() => {
-        if (gameState.isSearching) {
-            clearInterval(searchInterval);
-            handleMatchmakingTimeout();
-        }
-    }, MULTIPLAYER_CONFIG.MAX_QUEUE_TIME);
+
+    // Note: Le timeout principal est géré dans startMatchmaking() (30s puis bot)
+    // Pas de timeout ici pour éviter les doubles appels
 }
 
 // Créer un match
@@ -474,6 +474,12 @@ async function onMatchFound(matchId, opponentId) {
     gameState.isSearching = false;
     stopQueueTimer();
 
+    // Arrêter l'intervalle de recherche
+    if (gameState.searchInterval) {
+        clearInterval(gameState.searchInterval);
+        gameState.searchInterval = null;
+    }
+
     // Annuler le timeout de simulation (un vrai joueur a été trouvé)
     if (gameState.matchmakingTimeout) {
         clearTimeout(gameState.matchmakingTimeout);
@@ -502,31 +508,57 @@ async function onMatchFound(matchId, opponentId) {
     showOpponentFoundScreen();
 }
 
-// Simulation de matchmaking (pour tests)
+// Simulation de matchmaking (pour tests ou fallback)
 function simulateMatchmaking() {
-    console.log('🤖 Mode simulation du matchmaking');
-    
+    console.log('🤖 Mode simulation du matchmaking - Création d\'un bot');
+
+    // S'assurer que la recherche est active pour l'écran
+    if (!gameState.isSearching) {
+        gameState.isSearching = true;
+        showScreen('matchmaking-screen');
+        startQueueTimer();
+    }
+
+    // Liste de bots avec des noms variés
+    const botNames = [
+        { pseudo: 'QuizBot', avatar: '🤖' },
+        { pseudo: 'CultureMaster', avatar: '🧠' },
+        { pseudo: 'Le Sage', avatar: '🦉' },
+        { pseudo: 'Trivia King', avatar: '👑' },
+        { pseudo: 'Einstein Jr', avatar: '🔬' },
+        { pseudo: 'Savant Fou', avatar: '🎓' },
+        { pseudo: 'Quiz Champion', avatar: '🏆' },
+        { pseudo: 'Le Challenger', avatar: '⚡' }
+    ];
+
+    // Choisir un bot aléatoire
+    const bot = botNames[Math.floor(Math.random() * botNames.length)];
+
+    // Délai court (1-3 secondes) puisque l'utilisateur a déjà attendu
+    const delay = Math.random() * 2000 + 1000;
+
     setTimeout(() => {
-        if (!gameState.isSearching) return;
-        
-        // Simuler un adversaire
+        // Créer l'adversaire bot
         gameState.opponent = {
             odexid: 'bot_' + Date.now(),
-            pseudo: 'QuizBot',
-            avatar: '🤖',
-            elo: gameState.playerProfile.elo + Math.floor(Math.random() * 100) - 50
+            pseudo: bot.pseudo,
+            avatar: bot.avatar,
+            elo: gameState.playerProfile.elo + Math.floor(Math.random() * 100) - 50,
+            isBot: true
         };
-        
+
         gameState.isSearching = false;
         stopQueueTimer();
-        
+
+        console.log(`✅ Bot créé: ${bot.pseudo} (${gameState.opponent.elo} ELO)`);
+
         // Charger des questions
         loadQuestionsForMatch().then(questions => {
             gameState.questions = questions;
             showOpponentFoundScreen();
         });
-        
-    }, Math.random() * 3000 + 2000);
+
+    }, delay);
 }
 
 // Timer de file d'attente
@@ -555,6 +587,12 @@ function cancelMatchmaking() {
     gameState.isSearching = false;
     stopQueueTimer();
 
+    // Arrêter l'intervalle de recherche
+    if (gameState.searchInterval) {
+        clearInterval(gameState.searchInterval);
+        gameState.searchInterval = null;
+    }
+
     // Annuler le timeout de simulation
     if (gameState.matchmakingTimeout) {
         clearTimeout(gameState.matchmakingTimeout);
@@ -567,16 +605,35 @@ function cancelMatchmaking() {
         gameState.matchmakingRef.remove();
         gameState.matchmakingRef = null;
     }
-    
+
     showScreen('lobby-screen');
 }
 
-// Timeout du matchmaking
+// Timeout du matchmaking - Passer au mode bot
 function handleMatchmakingTimeout() {
-    console.log('⏱️ Timeout matchmaking');
-    
-    cancelMatchmaking();
-    alert('Aucun adversaire trouvé. Réessayez plus tard !');
+    console.log('⏱️ Timeout matchmaking - Passage au mode bot');
+
+    // Arrêter l'intervalle de recherche
+    if (gameState.searchInterval) {
+        clearInterval(gameState.searchInterval);
+        gameState.searchInterval = null;
+    }
+
+    // Nettoyer la file d'attente Firebase
+    if (gameState.matchmakingRef) {
+        gameState.matchmakingRef.off();
+        gameState.matchmakingRef.remove();
+        gameState.matchmakingRef = null;
+    }
+
+    // Annuler le timeout de simulation s'il existe (éviter double appel)
+    if (gameState.matchmakingTimeout) {
+        clearTimeout(gameState.matchmakingTimeout);
+        gameState.matchmakingTimeout = null;
+    }
+
+    // Passer en mode simulation avec bot
+    simulateMatchmaking();
 }
 
 // ========== ÉCRAN ADVERSAIRE TROUVÉ ==========

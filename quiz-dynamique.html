@@ -648,6 +648,11 @@
         let revisionQuestionIds = [];
         let revisionQuestionsData = []; // Pour stocker les données des questions en révision
 
+        // Variables pour l'affichage question par question
+        window.currentQuestionIndex = 0;
+        window.allSelectedQuestions = [];
+        window.shuffledAnswersData = [];
+
         // Initialisation
         window.addEventListener('load', () => {
             setTimeout(initQuiz, 100);
@@ -733,40 +738,28 @@
                 document.getElementById('breadcrumb').innerHTML =
                     `<a href="Quiz.html">Quiz</a> > <a href="${matiereNom}.html">${matiereNom}</a> > ${categorieNom}`;
 
-                // Questions
-                const container = document.getElementById('quiz-container');
-                container.innerHTML = '';
-
-                // Stocker les bonnes réponses pour chaque question
+                // Stocker les questions pour l'affichage une par une
+                window.allSelectedQuestions = selectedQuestions;
                 window.correctAnswersMap = [];
+                window.shuffledAnswersData = [];
+                window.currentQuestionIndex = 0;
 
+                // Préparer les réponses mélangées pour toutes les questions
                 selectedQuestions.forEach((q, index) => {
-                    // Mélanger les réponses aléatoirement
                     const shuffledAnswers = q.reponses.map((rep, i) => ({ text: rep, originalIndex: i }));
                     for (let i = shuffledAnswers.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
                     }
-                    // Trouver le nouvel index de la bonne réponse et le stocker
                     const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
                     window.correctAnswersMap[index] = newCorrectIndex;
-
-                    const questionDiv = document.createElement('div');
-                    questionDiv.className = 'question-card';
-                    questionDiv.innerHTML = `
-                        <span class="question-number">Question ${index + 1}</span>
-                        <div class="question-text">${q.question}</div>
-                        ${shuffledAnswers.map((ans, i) => `
-                            <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
-                                ${ans.text}
-                            </div>
-                        `).join('')}
-                        <div id="feedback${index}" class="reponse-feedback"></div>
-                    `;
-                    container.appendChild(questionDiv);
+                    window.shuffledAnswersData[index] = shuffledAnswers;
                 });
 
                 document.getElementById('total-questions').textContent = selectedQuestions.length;
+
+                // Afficher la première question
+                displayCurrentQuestion();
 
                 // Démarrer le timer en mode défi
                 if (mode === 'challenge') {
@@ -895,53 +888,35 @@
                 document.getElementById('breadcrumb').innerHTML =
                     `<a href="Quiz.html">Quiz</a> > <a href="revision.html">Révision</a> > Quiz de révision`;
 
-                // Afficher les questions
-                const container = document.getElementById('quiz-container');
-                container.innerHTML = '';
-
+                // Stocker les questions pour l'affichage une par une
+                window.allSelectedQuestions = shuffledQuestions;
                 window.correctAnswersMap = [];
+                window.shuffledAnswersData = [];
+                window.revisionQuestionIdsMap = [];
+                window.currentQuestionIndex = 0;
 
+                // Préparer les réponses mélangées pour toutes les questions
                 shuffledQuestions.forEach((q, index) => {
-                    // Récupérer les réponses
                     const reponses = q.reponses || [];
                     const correctIndex = q.correctIndex || 0;
 
-                    // Mélanger les réponses
                     const shuffledAnswers = reponses.map((rep, i) => ({ text: rep, originalIndex: i }));
                     for (let i = shuffledAnswers.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
                     }
 
-                    // Trouver le nouvel index de la bonne réponse
                     const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === correctIndex);
                     window.correctAnswersMap[index] = newCorrectIndex;
-
-                    // Stocker l'ID de la question pour la mise à jour
-                    if (!window.revisionQuestionIdsMap) window.revisionQuestionIdsMap = [];
+                    window.shuffledAnswersData[index] = shuffledAnswers;
                     window.revisionQuestionIdsMap[index] = q.id;
-
-                    const questionDiv = document.createElement('div');
-                    questionDiv.className = 'question-card';
-                    questionDiv.innerHTML = `
-                        <span class="question-number">Question ${index + 1}</span>
-                        <div class="question-meta" style="margin: 10px 0; font-size: 0.85em;">
-                            <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">📚 ${q.matiere || 'Général'}</span>
-                            <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">❌ ${q.missCount || 1} erreur(s)</span>
-                        </div>
-                        <div class="question-text">${q.question}</div>
-                        ${shuffledAnswers.map((ans, i) => `
-                            <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
-                                ${ans.text}
-                            </div>
-                        `).join('')}
-                        <div id="feedback${index}" class="reponse-feedback"></div>
-                    `;
-                    container.appendChild(questionDiv);
                 });
 
                 document.getElementById('total-questions').textContent = shuffledQuestions.length;
                 quizStartTime = Date.now();
+
+                // Afficher la première question
+                displayCurrentQuestionRevision();
 
             } catch (error) {
                 console.error('Erreur chargement révision:', error);
@@ -1005,6 +980,70 @@
             }
         }
 
+        // Afficher la question actuelle
+        function displayCurrentQuestion() {
+            const container = document.getElementById('quiz-container');
+            const index = window.currentQuestionIndex;
+            const q = window.allSelectedQuestions[index];
+            const shuffledAnswers = window.shuffledAnswersData[index];
+
+            container.innerHTML = `
+                <div class="question-card" style="animation: fadeInUp 0.4s ease-out;">
+                    <span class="question-number">Question ${index + 1}/${window.allSelectedQuestions.length}</span>
+                    <div class="question-text">${q.question}</div>
+                    ${shuffledAnswers.map((ans, i) => `
+                        <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
+                            ${ans.text}
+                        </div>
+                    `).join('')}
+                    <div id="feedback${index}" class="reponse-feedback"></div>
+                </div>
+            `;
+        }
+
+        // Afficher la question actuelle en mode révision
+        function displayCurrentQuestionRevision() {
+            const container = document.getElementById('quiz-container');
+            const index = window.currentQuestionIndex;
+            const q = window.allSelectedQuestions[index];
+            const shuffledAnswers = window.shuffledAnswersData[index];
+
+            container.innerHTML = `
+                <div class="question-card" style="animation: fadeInUp 0.4s ease-out;">
+                    <span class="question-number">Question ${index + 1}/${window.allSelectedQuestions.length}</span>
+                    <div class="question-meta" style="margin: 10px 0; font-size: 0.85em;">
+                        <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">📚 ${q.matiere || 'Général'}</span>
+                        <span style="background: #f8f9fa; padding: 4px 10px; border-radius: 20px;">❌ ${q.missCount || 1} erreur(s)</span>
+                    </div>
+                    <div class="question-text">${q.question}</div>
+                    ${shuffledAnswers.map((ans, i) => `
+                        <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
+                            ${ans.text}
+                        </div>
+                    `).join('')}
+                    <div id="feedback${index}" class="reponse-feedback"></div>
+                </div>
+            `;
+        }
+
+        // Passer à la question suivante
+        function nextQuestion() {
+            window.currentQuestionIndex++;
+            const totalQuestions = window.allSelectedQuestions.length;
+
+            if (window.currentQuestionIndex >= totalQuestions) {
+                stopTimer();
+                saveScore();
+            } else {
+                document.getElementById('current-score').textContent = currentScore;
+                if (isRevisionMode) {
+                    displayCurrentQuestionRevision();
+                } else {
+                    displayCurrentQuestion();
+                }
+            }
+        }
+
         function validateAnswer(qIndex, answerIndex) {
             // Vérifier si déjà répondu
             if (answeredQuestions.has(qIndex)) return;
@@ -1035,11 +1074,6 @@
                     markQuestionAsMastered(window.revisionQuestionIdsMap[qIndex]);
                     feedback.textContent = '✅ Bravo ! Question maîtrisée !';
                 }
-
-                // Afficher une fiche culture après une bonne réponse
-                setTimeout(() => {
-                    showCultureCard(qIndex);
-                }, 1000);
             } else {
                 feedback.className = 'reponse-feedback incorrect';
                 const correctOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${correctAnswer}"]`);
@@ -1063,12 +1097,10 @@
                 opt.style.cursor = 'not-allowed';
             });
 
-            // Quiz terminé ?
-            const totalQuestions = parseInt(document.getElementById('total-questions').textContent);
-            if (answeredQuestions.size === totalQuestions) {
-                stopTimer();
-                setTimeout(saveScore, 500);
-            }
+            // Passer automatiquement à la question suivante
+            setTimeout(() => {
+                nextQuestion();
+            }, isCorrect ? 1000 : 1500);
         }
 
         // Afficher une fiche culture après une bonne réponse

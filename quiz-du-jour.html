@@ -797,19 +797,18 @@
             timerInterval = setInterval(updateTimer, 100);
         }
 
-        // Afficher les questions
-        function displayQuestions() {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
+        // Index de la question actuelle
+        window.currentQuestionIndex = 0;
 
-            // Stocker les mappings des réponses mélangées et les bonnes réponses
+        // Préparer les données des questions
+        function prepareQuestions() {
             window.shuffledAnswersMap = [];
             window.correctAnswersMap = [];
             window.answeredQuestions = new Set();
             window.dailyScore = 0;
+            window.currentQuestionIndex = 0;
 
             dailyQuizData.questions.forEach((q, index) => {
-                // Utiliser reponses (ou answers pour compatibilité)
                 const answers = q.reponses || q.answers;
                 if (!answers || !Array.isArray(answers)) {
                     console.error(`Question ${index + 1}: pas de réponses trouvées`, q);
@@ -821,14 +820,21 @@
                     const j = Math.floor(Math.random() * (i + 1));
                     [shuffledAnswers[i], shuffledAnswers[j]] = [shuffledAnswers[j], shuffledAnswers[i]];
                 }
-                // Stocker le mapping et la bonne réponse
                 window.shuffledAnswersMap[index] = shuffledAnswers;
                 window.correctAnswersMap[index] = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
-                
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'question-card';
-                questionDiv.innerHTML = `
-                    <div class="question-number">Question ${index + 1}/10</div>
+            });
+        }
+
+        // Afficher une seule question
+        function displayCurrentQuestion() {
+            const container = document.getElementById('questions-container');
+            const index = window.currentQuestionIndex;
+            const q = dailyQuizData.questions[index];
+            const shuffledAnswers = window.shuffledAnswersMap[index];
+
+            container.innerHTML = `
+                <div class="question-card" style="animation: fadeInUp 0.4s ease-out;">
+                    <div class="question-number">Question ${index + 1}/${dailyQuizData.questions.length}</div>
                     <div class="question-text">${q.question}</div>
                     ${shuffledAnswers.map((ans, i) => `
                         <div class="answer-option" onclick="validateAnswer(${index}, ${i})" data-qindex="${index}" data-aindex="${i}">
@@ -836,9 +842,25 @@
                         </div>
                     `).join('')}
                     <div id="feedback${index}" class="question-feedback" style="display: none;"></div>
-                `;
-                container.appendChild(questionDiv);
-            });
+                </div>
+            `;
+        }
+
+        // Afficher les questions (appelle la préparation puis affiche la première)
+        function displayQuestions() {
+            prepareQuestions();
+            displayCurrentQuestion();
+        }
+
+        // Passer à la question suivante
+        function nextQuestion() {
+            window.currentQuestionIndex++;
+
+            if (window.currentQuestionIndex >= dailyQuizData.questions.length) {
+                finishQuiz();
+            } else {
+                displayCurrentQuestion();
+            }
         }
 
         // Valider une réponse au clic
@@ -846,21 +868,21 @@
             // Vérifier si déjà répondu
             if (window.answeredQuestions.has(qIndex)) return;
             window.answeredQuestions.add(qIndex);
-            
+
             const selectedOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${answerIndex}"]`);
-            
+
             // Mettre à jour le style
             document.querySelectorAll(`.answer-option[data-qindex="${qIndex}"]`).forEach(opt => {
                 opt.classList.remove('selected');
                 opt.classList.add('disabled');
             });
             selectedOption.classList.add('selected');
-            
+
             // Vérifier la réponse
             const correctIndex = window.correctAnswersMap[qIndex];
             const isCorrect = answerIndex === correctIndex;
             const feedback = document.getElementById(`feedback${qIndex}`);
-            
+
             if (isCorrect) {
                 window.dailyScore++;
                 selectedOption.classList.add('correct-answer');
@@ -875,14 +897,14 @@
                 feedback.className = 'question-feedback incorrect';
                 feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctText;
             }
-            
+
             feedback.style.display = 'block';
             userAnswers[qIndex] = answerIndex;
-            
-            // Vérifier si toutes les questions sont répondues
-            if (window.answeredQuestions.size === dailyQuizData.questions.length) {
-                setTimeout(() => finishQuiz(), 1000);
-            }
+
+            // Passer automatiquement à la question suivante après un délai
+            setTimeout(() => {
+                nextQuestion();
+            }, isCorrect ? 1000 : 1500);
         }
         
         // Terminer le quiz automatiquement

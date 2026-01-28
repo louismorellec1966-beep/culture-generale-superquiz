@@ -118,6 +118,7 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
+            color: #2c3e50;
         }
 
         .tab:hover {
@@ -158,6 +159,8 @@
             border-radius: 8px;
             font-size: 1em;
             transition: border-color 0.3s;
+            color: #2c3e50;
+            background: white;
         }
 
         .form-group input:focus,
@@ -245,6 +248,8 @@
             border: 2px solid #ecf0f1;
             border-radius: 8px;
             font-size: 0.95em;
+            color: #2c3e50;
+            background: white;
         }
 
         .questions-count {
@@ -369,12 +374,14 @@
             background: white;
             border-radius: 6px;
             font-size: 0.95em;
+            color: #2c3e50;
         }
 
         .answer-display.correct {
             background: #d4edda;
             border: 2px solid #28a745;
             font-weight: bold;
+            color: #155724;
         }
 
         .question-tags {
@@ -478,6 +485,10 @@
             margin-bottom: 20px;
         }
 
+        .modal-header h2 {
+            color: #2c3e50;
+        }
+
         .modal-close {
             background: none;
             border: none;
@@ -489,7 +500,7 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #7f8c8d;
+            color: #495057;
         }
 
         /* Bulk Import */
@@ -816,7 +827,7 @@
 
             <div id="duplicates-actions" style="display: none; margin-top: 20px; padding-top: 20px; border-top: 2px solid #ecf0f1;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span id="duplicates-selected-count">0 doublon(s) sélectionné(s)</span>
+                    <span id="duplicates-selected-count" style="color: #2c3e50; font-weight: bold;">0 doublon(s) sélectionné(s)</span>
                     <div style="display: flex; gap: 10px;">
                         <button onclick="selectAllDuplicates()" class="btn btn-secondary btn-small">Tout sélectionner</button>
                         <button onclick="deleteDuplicates()" class="btn btn-danger" id="btn-delete-duplicates" disabled>🗑️ Supprimer les doublons sélectionnés</button>
@@ -1856,8 +1867,8 @@
                     content.innerHTML = `
                         <div class="alert alert-success" style="text-align: center; padding: 40px;">
                             <span style="font-size: 3em;">✅</span>
-                            <h3 style="margin-top: 15px;">Aucun doublon trouvé !</h3>
-                            <p style="color: #7f8c8d; margin-top: 10px;">${questions.length} questions analysées - toutes uniques.</p>
+                            <h3 style="margin-top: 15px; color: #155724;">Aucun doublon trouvé !</h3>
+                            <p style="color: #155724; margin-top: 10px;">${questions.length} questions analysées - toutes uniques.</p>
                         </div>
                     `;
                     return;
@@ -1895,7 +1906,7 @@
                                 <div style="font-weight: bold; margin-bottom: 10px; color: #2c3e50;">
                                     Groupe ${gIndex + 1} - ${group.questions.length} exemplaires
                                 </div>
-                                <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+                                <div style="background: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; color: #2c3e50;">
                                     <strong>Question :</strong> ${group.questions[0].question}
                                 </div>
                                 ${group.questions.map((q, i) => `
@@ -1910,9 +1921,9 @@
                                                    style="width: 18px; height: 18px; margin-right: 10px; cursor: pointer;">
                                         `}
                                         <div style="flex: 1; font-size: 0.9em;">
-                                            <span style="color: #7f8c8d;">ID: ${q.id.substring(0, 8)}...</span>
-                                            <span style="margin-left: 10px;">📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'}</span>
-                                            <span style="margin-left: 10px;">${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || '')}</span>
+                                            <span style="color: #495057;">ID: ${q.id.substring(0, 8)}...</span>
+                                            <span style="margin-left: 10px; color: #2c3e50;">📁 ${q.matiere || 'N/A'} / ${q.categorie || 'N/A'}</span>
+                                            <span style="margin-left: 10px; color: #2c3e50;">${getDifficultyEmoji(q.difficulty)} ${capitalizeFirst(q.difficulty || '')}</span>
                                         </div>
                                     </div>
                                 `).join('')}

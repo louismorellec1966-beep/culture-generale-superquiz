@@ -1,21 +1,52 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <link rel="icon" type="image/png" sizes="32x32" href="Images/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="Images/favicon-16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="Images/logo-192.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CultureLudo - Le quiz de culture générale fun et addictif. Testez vos connaissances, défiez vos amis et grimpez dans le classement !">
     <title>CultureLudo - Quiz de Culture Générale</title>
-    
-    <!-- CSS complet -->
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="Images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="Images/favicon-16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="Images/logo-192.png">
+
+    <!-- Preconnect pour performance -->
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="https://www.gstatic.com">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cultureludo.com/">
+    <meta property="og:title" content="CultureLudo - Quiz de Culture Générale">
+    <meta property="og:description" content="Le quiz de culture générale fun et addictif. Testez vos connaissances, défiez vos amis et grimpez dans le classement !">
+    <meta property="og:image" content="Images/logo-512.png">
+    <meta property="og:locale" content="fr_FR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://cultureludo.com/">
+    <meta name="twitter:title" content="CultureLudo - Quiz de Culture Générale">
+    <meta name="twitter:description" content="Le quiz de culture générale fun et addictif. Testez vos connaissances, défiez vos amis et grimpez dans le classement !">
+    <meta name="twitter:image" content="Images/logo-512.png">
+
+    <!-- SEO supplémentaire -->
+    <meta name="keywords" content="quiz, culture générale, jeu, éducation, apprentissage, trivia, questions">
+    <meta name="author" content="CultureLudo">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cultureludo.com/">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="css/style.css">
-    
+
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
-    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-G3YEKJLDRT"></script>
     <script>
@@ -24,505 +55,12 @@
         gtag('js', new Date());
         gtag('config', 'G-G3YEKJLDRT');
     </script>
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            color: #fff;
-            padding-top: 70px;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 60px 20px 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 50%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.5; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 20px;
-            text-shadow: 0 0 40px rgba(102, 126, 234, 0.5);
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .hero-subtitle {
-            font-size: 1.4rem;
-            color: #a0aec0;
-            margin-bottom: 30px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-        }
-
-        .hero-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 40px 0;
-            flex-wrap: wrap;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #00d9ff, #00ff88);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            color: #718096;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Section Quiz du Jour */
-        .daily-quiz-section {
-            max-width: 900px;
-            margin: 0 auto 40px;
-            padding: 0 20px;
-        }
-
-        .daily-quiz-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
-            animation: fadeInUp 0.8s ease-out 0.6s both;
-        }
-
-        .daily-quiz-card::before {
-            content: '📅';
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            font-size: 120px;
-            opacity: 0.1;
-        }
-
-        .daily-badge {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .daily-quiz-card h2 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        .daily-theme {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            margin-bottom: 25px;
-        }
-
-        .btn-play {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            color: #667eea;
-            padding: 15px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        .btn-play:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-
-        /* Grille des modes de jeu */
-        .game-modes {
-            max-width: 1200px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2rem;
-            margin-bottom: 40px;
-            color: #fff;
-        }
-
-        .modes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-        }
-
-        .mode-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            text-decoration: none;
-            color: white;
-            display: block;
-        }
-
-        .mode-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(102, 126, 234, 0.5);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        .mode-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .mode-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-        }
-
-        .mode-card p {
-            color: #a0aec0;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
-        .mode-card.featured {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
-            border-color: rgba(102, 126, 234, 0.5);
-        }
-
-        /* Catégories */
-        .categories-section {
-            max-width: 1200px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
-        }
-
-        .categories-scroll {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 10px 0 20px;
-            scrollbar-width: thin;
-            scrollbar-color: #667eea transparent;
-        }
-
-        .category-chip {
-            flex-shrink: 0;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
-            padding: 12px 25px;
-            border-radius: 50px;
-            text-decoration: none;
-            color: white;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .category-chip:hover {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: transparent;
-            transform: scale(1.05);
-        }
-
-        /* Section utilisateur */
-        .user-section {
-            max-width: 800px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
-        }
-
-        .user-card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .user-card h2 {
-            margin-bottom: 15px;
-            font-size: 1.8rem;
-        }
-
-        .user-card p {
-            color: #a0aec0;
-            margin-bottom: 25px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 14px 35px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 12px 35px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.5);
-        }
-
-        /* Features */
-        .features-section {
-            max-width: 1000px;
-            margin: 0 auto 60px;
-            padding: 0 20px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-        }
-
-        .feature-item {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .feature-item h4 {
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-
-        .feature-item p {
-            color: #718096;
-            font-size: 0.9rem;
-        }
-
-        /* Footer */
-        .home-footer {
-            text-align: center;
-            padding: 40px 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            color: #718096;
-        }
-
-        .home-footer a {
-            color: #a0aec0;
-            text-decoration: none;
-            margin: 0 15px;
-        }
-
-        .home-footer a:hover {
-            color: #667eea;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 1.1rem; }
-            .hero-stats { gap: 25px; }
-            .stat-number { font-size: 2rem; }
-            .daily-quiz-card { padding: 30px 20px; }
-            .daily-quiz-card h2 { font-size: 1.5rem; }
-            .section-title { font-size: 1.5rem; }
-        }
-
-        @media (max-width: 480px) {
-            .hero h1 { font-size: 2rem; }
-            .hero-stats { flex-direction: column; gap: 20px; }
-            .btn-group { flex-direction: column; }
-        }
-
-        /* Bannière Beta Test */
-        .beta-banner {
-            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
-            padding: 12px 20px;
-            position: fixed;
-            top: 65px;
-            left: 0;
-            right: 0;
-            z-index: 999;
-            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
-            animation: slideDown 0.5s ease-out;
-        }
-
-        .beta-banner.hidden {
-            display: none;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .beta-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .beta-badge {
-            background: rgba(0,0,0,0.2);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            animation: pulse 2s infinite;
-        }
-
-        .beta-text {
-            font-size: 0.95rem;
-            color: white;
-        }
-
-        .beta-text strong {
-            color: #fff;
-        }
-
-        .beta-link {
-            color: white;
-            text-decoration: underline;
-            font-weight: bold;
-            margin-left: 8px;
-            transition: opacity 0.3s;
-        }
-
-        .beta-link:hover {
-            opacity: 0.8;
-        }
-
-        .beta-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            line-height: 1;
-            transition: all 0.3s;
-            margin-left: 10px;
-        }
-
-        .beta-close:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-        }
-
-        /* Ajuster le padding du body quand la bannière est visible */
-        body.beta-visible {
-            padding-top: 120px;
-        }
-
-        @media (max-width: 768px) {
-            .beta-banner {
-                top: 0;
-                padding: 10px 15px;
-            }
-            .beta-content {
-                gap: 10px;
-            }
-            .beta-text {
-                font-size: 0.85rem;
-                text-align: center;
-            }
-            body.beta-visible {
-                padding-top: 140px;
-            }
-        }
-    </style>
 </head>
 
-<body>
+<body class="home-page">
+    <!-- Skip link pour accessibilité -->
+    <a href="#main-content" class="skip-link">Aller au contenu principal</a>
+
     <!-- Bannière Beta Test -->
     <div class="beta-banner">
         <div class="beta-content">
@@ -536,7 +74,8 @@
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <main id="main-content">
+    <section class="hero" role="banner">
         <div class="hero-content">
             <h1>🧠 CultureLudi</h1>
             <p class="hero-subtitle">Devenez incollable en culture générale !</p>
@@ -572,8 +111,8 @@
     </section>
 
     <!-- Modes de jeu -->
-    <section class="game-modes">
-        <h2 class="section-title">Choisissez votre mode de jeu</h2>
+    <section class="game-modes" aria-labelledby="modes-title">
+        <h2 class="section-title" id="modes-title">Choisissez votre mode de jeu</h2>
         <div class="modes-grid">
             <a href="Quiz.html" class="mode-card featured">
                 <span class="mode-icon">🎮</span>
@@ -614,8 +153,8 @@
     </section>
 
     <!-- Catégories -->
-    <section class="categories-section">
-        <h2 class="section-title">Explorez les catégories</h2>
+    <section class="categories-section" aria-labelledby="categories-title">
+        <h2 class="section-title" id="categories-title">Explorez les catégories</h2>
         <div class="categories-scroll">
             <a href="Histoire.html" class="category-chip">📜 Histoire</a>
             <a href="Géographie.html" class="category-chip">🌍 Géographie</a>
@@ -669,15 +208,17 @@
         </div>
     </section>
 
+    </main>
+
     <!-- Footer -->
-    <footer class="home-footer">
-        <p>
+    <footer class="home-footer" role="contentinfo">
+        <nav aria-label="Liens du pied de page">
             <a href="avis.html">Avis & Bugs</a>
             <a href="Contact.html">Contact</a>
             <a href="Mentions-Legales.html">Mentions légales</a>
             <a href="Politique-Confidentialite.html">Confidentialité</a>
-        </p>
-        <p style="margin-top: 15px;">© 2024 CultureLudo - Tous droits réservés</p>
+        </nav>
+        <p style="margin-top: 15px;" id="copyright"></p>
     </footer>
 
     <!-- Scripts Firebase (chargés une seule fois) -->
@@ -839,6 +380,12 @@
 
         // Gestion du menu mobile
         document.addEventListener('DOMContentLoaded', function() {
+            // Copyright dynamique
+            const copyrightEl = document.getElementById('copyright');
+            if (copyrightEl) {
+                copyrightEl.textContent = `© ${new Date().getFullYear()} CultureLudo - Tous droits réservés`;
+            }
+
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
             const mobileMenuClose = document.getElementById('mobile-menu-close');

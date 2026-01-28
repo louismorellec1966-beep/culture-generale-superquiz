@@ -1,4 +1,19 @@
+# robots.txt pour CultureLudo
+# https://cultureludo.com
+
 User-agent: *
 Allow: /
 
+# Pages a ne pas indexer
+Disallow: /admin-questions.html
+Disallow: /404.html
+
+# Fichiers et dossiers
+Disallow: /firebase-config.js
+Disallow: /*.json$
+
+# Sitemap
 Sitemap: https://cultureludo.com/sitemap.xml
+
+# Delai entre les requetes (en secondes)
+Crawl-delay: 1

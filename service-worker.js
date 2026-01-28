@@ -1,16 +1,30 @@
-// ========== SERVICE WORKER - SUPERQUIZ PWA ==========
+// ========== SERVICE WORKER - CULTURELUDO PWA ==========
+// Version 4 - Améliorations offline et performance
 
-const CACHE_NAME = 'superquiz-cache-v3';
-const STATIC_CACHE = 'superquiz-static-v3';
-const DYNAMIC_CACHE = 'superquiz-dynamic-v3';
-const QUESTIONS_CACHE = 'superquiz-questions-v1';
+const CACHE_VERSION = 'v4';
+const STATIC_CACHE = `cultureludo-static-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `cultureludo-dynamic-${CACHE_VERSION}`;
+const QUESTIONS_CACHE = `cultureludo-questions-${CACHE_VERSION}`;
+const IMAGES_CACHE = `cultureludo-images-${CACHE_VERSION}`;
 
-// Ressources statiques à mettre en cache
-const urlsToCache = [
+// Ressources statiques essentielles (toujours en cache)
+const CORE_ASSETS = [
     '/',
     '/Accueil.html',
     '/Quiz.html',
+    '/quiz-du-jour.html',
     '/quiz-dynamique.html',
+    '/404.html',
+    '/css/style.css',
+    '/css/multiplayer.css',
+    '/js/script.js',
+    '/js/menu.js',
+    '/firebase-config.js',
+    '/manifest.json'
+];
+
+// Pages principales à pré-cacher
+const PAGE_ASSETS = [
     '/Profil.html',
     '/Classement.html',
     '/revision.html',
@@ -18,29 +32,45 @@ const urlsToCache = [
     '/clubs.html',
     '/parametres.html',
     '/mode-survie.html',
+    '/multiplayer.html',
     '/Auth.html',
-    '/404.html',
-    '/CSS/style.css',
-    '/CSS/multiplayer.css',
-    '/js/script.js',
-    '/js/menu.js',
+    '/Social.html',
+    '/quiz-perso.html',
+    '/avis.html'
+];
+
+// Scripts JS à pré-cacher
+const JS_ASSETS = [
     '/js/daily-rewards.js',
     '/js/notifications.js',
     '/js/profile-system.js',
     '/js/quiz-loader.js',
-    '/js/auth-menu.js',
     '/js/social-system.js',
     '/js/streaks-system.js',
     '/js/titles-system.js',
     '/js/seasons-system.js',
     '/js/themes-system.js',
-    '/js/betting-system.js',
     '/js/tournaments-system.js',
     '/js/clubs-system.js',
-    '/js/culture-cards-system.js',
-    '/firebase-config.js',
-    '/questions.json',
-    '/manifest.json'
+    '/js/multiplayer.js',
+    '/js/custom-quiz-system.js',
+    '/js/security.js'
+];
+
+// Images essentielles
+const IMAGE_ASSETS = [
+    '/Images/logo-192.png',
+    '/Images/logo-512.png',
+    '/Images/favicon-32.png',
+    '/Images/favicon-16.png'
+];
+
+// Toutes les ressources à cacher
+const urlsToCache = [
+    ...CORE_ASSETS,
+    ...PAGE_ASSETS,
+    ...JS_ASSETS,
+    ...IMAGE_ASSETS
 ];
 
 // Pages de catégories
@@ -60,20 +90,46 @@ const categoryPages = [
 
 // Installation du Service Worker
 self.addEventListener('install', event => {
-    console.log('Service Worker: Installation v3...');
+    console.log(`Service Worker: Installation ${CACHE_VERSION}...`);
     event.waitUntil(
         Promise.all([
+            // Cache des ressources essentielles (bloquant)
             caches.open(STATIC_CACHE).then(cache => {
-                console.log('Service Worker: Mise en cache des fichiers statiques');
-                return cache.addAll(urlsToCache).catch(err => {
-                    console.log('Erreur cache statique (non bloquant):', err);
-                });
+                console.log('Service Worker: Cache des fichiers essentiels');
+                return cache.addAll(CORE_ASSETS);
             }),
-            caches.open(STATIC_CACHE).then(cache => {
-                console.log('Service Worker: Mise en cache des pages catégories');
-                return cache.addAll(categoryPages).catch(err => {
-                    console.log('Erreur cache catégories (non bloquant):', err);
-                });
+            // Cache des autres ressources (non bloquant)
+            caches.open(STATIC_CACHE).then(async cache => {
+                console.log('Service Worker: Cache des ressources secondaires');
+                for (const url of [...PAGE_ASSETS, ...JS_ASSETS]) {
+                    try {
+                        await cache.add(url);
+                    } catch (err) {
+                        console.log(`Cache skip: ${url}`);
+                    }
+                }
+            }),
+            // Cache des pages catégories
+            caches.open(STATIC_CACHE).then(async cache => {
+                console.log('Service Worker: Cache des catégories');
+                for (const url of categoryPages) {
+                    try {
+                        await cache.add(url);
+                    } catch (err) {
+                        console.log(`Cache skip: ${url}`);
+                    }
+                }
+            }),
+            // Cache des images
+            caches.open(IMAGES_CACHE).then(async cache => {
+                console.log('Service Worker: Cache des images');
+                for (const url of IMAGE_ASSETS) {
+                    try {
+                        await cache.add(url);
+                    } catch (err) {
+                        console.log(`Cache skip: ${url}`);
+                    }
+                }
             })
         ])
     );
@@ -82,17 +138,21 @@ self.addEventListener('install', event => {
 
 // Activation du Service Worker
 self.addEventListener('activate', event => {
-    console.log('Service Worker: Activation v3...');
+    console.log(`Service Worker: Activation ${CACHE_VERSION}...`);
+    const currentCaches = [STATIC_CACHE, DYNAMIC_CACHE, QUESTIONS_CACHE, IMAGES_CACHE];
+
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cache => {
-                    if (![STATIC_CACHE, DYNAMIC_CACHE, QUESTIONS_CACHE].includes(cache)) {
+                    if (!currentCaches.includes(cache)) {
                         console.log('Service Worker: Suppression ancien cache', cache);
                         return caches.delete(cache);
                     }
                 })
             );
+        }).then(() => {
+            console.log('Service Worker: Prêt à servir les requêtes');
         })
     );
     self.clients.claim();
@@ -101,7 +161,12 @@ self.addEventListener('activate', event => {
 // Interception des requêtes
 self.addEventListener('fetch', event => {
     const url = new URL(event.request.url);
-    
+
+    // Ignorer les requêtes non-GET
+    if (event.request.method !== 'GET') {
+        return;
+    }
+
     // Ignorer les requêtes externes (Firebase, Google Analytics, etc.)
     const externalDomains = [
         'firebaseio.com',
@@ -111,28 +176,35 @@ self.addEventListener('fetch', event => {
         'google-analytics.com',
         'firebasedatabase.app',
         'identitytoolkit.googleapis.com',
-        'firestore.googleapis.com'
+        'firestore.googleapis.com',
+        'cdn.jsdelivr.net'
     ];
-    
+
     if (externalDomains.some(domain => url.hostname.includes(domain))) {
         return; // Laisser passer sans intercepter
     }
 
-    // Stratégie pour les questions (Cache First)
+    // Stratégie pour les questions (Cache First avec refresh)
     if (url.pathname.includes('questions.json')) {
         event.respondWith(cacheFirstThenNetwork(event.request, QUESTIONS_CACHE));
         return;
     }
 
-    // Stratégie pour les fichiers statiques (Cache First)
+    // Stratégie pour les images (Cache First)
+    if (isImageResource(url.pathname)) {
+        event.respondWith(cacheFirstThenNetwork(event.request, IMAGES_CACHE));
+        return;
+    }
+
+    // Stratégie pour les fichiers statiques CSS/JS (Cache First)
     if (isStaticResource(url.pathname)) {
         event.respondWith(cacheFirstThenNetwork(event.request, STATIC_CACHE));
         return;
     }
 
-    // Stratégie pour les pages HTML (Network First avec fallback)
+    // Stratégie pour les pages HTML (Stale While Revalidate)
     if (url.pathname.endsWith('.html') || url.pathname === '/' || !url.pathname.includes('.')) {
-        event.respondWith(networkFirstWithFallback(event.request));
+        event.respondWith(staleWhileRevalidate(event.request));
         return;
     }
 
@@ -140,10 +212,16 @@ self.addEventListener('fetch', event => {
     event.respondWith(networkFirstStrategy(event.request));
 });
 
-// Vérifier si c'est une ressource statique
+// Vérifier si c'est une ressource statique (CSS/JS)
 function isStaticResource(pathname) {
-    const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.woff', '.woff2'];
+    const staticExtensions = ['.css', '.js', '.woff', '.woff2', '.ttf', '.eot'];
     return staticExtensions.some(ext => pathname.endsWith(ext));
+}
+
+// Vérifier si c'est une image
+function isImageResource(pathname) {
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico', '.webp', '.avif'];
+    return imageExtensions.some(ext => pathname.endsWith(ext));
 }
 
 // Stratégie Cache First puis Network
@@ -176,6 +254,38 @@ async function networkFirstWithFallback(request) {
             headers: { 'Content-Type': 'text/html' }
         });
     }
+}
+
+// Stratégie Stale While Revalidate (retourne le cache immédiatement, met à jour en arrière-plan)
+async function staleWhileRevalidate(request) {
+    const cache = await caches.open(DYNAMIC_CACHE);
+    const cachedResponse = await caches.match(request);
+
+    // Lancer la mise à jour en arrière-plan
+    const fetchPromise = fetch(request).then(networkResponse => {
+        if (networkResponse && networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+        }
+        return networkResponse;
+    }).catch(err => {
+        console.log('Service Worker: Erreur réseau, utilisation du cache');
+        return null;
+    });
+
+    // Retourner le cache s'il existe, sinon attendre le réseau
+    if (cachedResponse) {
+        return cachedResponse;
+    }
+
+    const networkResponse = await fetchPromise;
+    if (networkResponse) {
+        return networkResponse;
+    }
+
+    // Fallback vers la page offline
+    return new Response(getOfflinePage(), {
+        headers: { 'Content-Type': 'text/html' }
+    });
 }
 
 // Stratégie Network First standard

@@ -201,8 +201,9 @@ function updatePlayerDisplay() {
     const winrate = totalGames > 0 ? Math.round((stats.wins / totalGames) * 100) : 0;
     
     // Lobby
+    const avatarDisplay = typeof profile.avatar === 'object' ? (profile.avatar?.value || '👤') : (profile.avatar || '👤');
     document.getElementById('player-name').textContent = profile.pseudo || 'Joueur';
-    document.getElementById('player-avatar').textContent = profile.avatar || '👤';
+    document.getElementById('player-avatar').textContent = avatarDisplay;
     document.getElementById('player-elo').textContent = profile.elo;
     document.getElementById('player-rank').innerHTML = `
         <span class="rank-icon">${rank.icon}</span>
@@ -214,7 +215,7 @@ function updatePlayerDisplay() {
     
     // Matchmaking
     document.getElementById('mm-player-name').textContent = profile.pseudo || 'Vous';
-    document.getElementById('mm-player-avatar').textContent = profile.avatar || '👤';
+    document.getElementById('mm-player-avatar').textContent = avatarDisplay;
     document.getElementById('mm-player-elo').textContent = `${profile.elo} ELO`;
 }
 

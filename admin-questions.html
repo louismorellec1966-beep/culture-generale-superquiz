@@ -626,6 +626,12 @@
                     <input type="text" id="tags" placeholder="histoire, france, guerre...">
                 </div>
 
+                <div class="form-group">
+                    <label>📚 Lien ressource (optionnel)</label>
+                    <input type="url" id="ressource-url" placeholder="https://fr.wikipedia.org/wiki/...">
+                    <input type="text" id="ressource-titre" placeholder="Titre du lien (ex: En savoir plus sur Wikipédia)" style="margin-top: 10px;">
+                </div>
+
                 <button type="submit" class="btn btn-primary">➕ Ajouter la Question</button>
             </form>
         </div>
@@ -653,9 +659,14 @@
     "question": "En quelle année a débuté la Première Guerre mondiale ?",
     "reponses": ["1914", "1915", "1916", "1918"],
     "correct": 0,
-    "tags": ["guerre", "histoire"]
+    "tags": ["guerre", "histoire"],
+    "ressource": {
+      "url": "https://fr.wikipedia.org/wiki/Première_Guerre_mondiale",
+      "titre": "En savoir plus sur Wikipédia"
+    }
   }
 ]</pre>
+                <p style="margin-top: 10px; color: #7f8c8d;">📚 Le champ "ressource" est optionnel.</p>
             </div>
         </div>
 
@@ -801,6 +812,12 @@
                 <div class="form-group">
                     <label>🏷️ Tags</label>
                     <input type="text" id="edit-tags">
+                </div>
+
+                <div class="form-group">
+                    <label>📚 Lien ressource (optionnel)</label>
+                    <input type="url" id="edit-ressource-url" placeholder="https://...">
+                    <input type="text" id="edit-ressource-titre" placeholder="Titre du lien" style="margin-top: 10px;">
                 </div>
 
                 <div style="display: flex; gap: 10px;">
@@ -1123,6 +1140,9 @@
             const messageDiv = document.getElementById('message-add');
             messageDiv.innerHTML = '';
 
+            const ressourceUrl = document.getElementById('ressource-url').value.trim();
+            const ressourceTitre = document.getElementById('ressource-titre').value.trim();
+
             const question = {
                 matiere: document.getElementById('add-matiere').value,
                 categorie: document.getElementById('add-categorie').value,
@@ -1138,6 +1158,14 @@
                 tags: document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t),
                 addedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+
+            // Ajouter la ressource si elle existe
+            if (ressourceUrl) {
+                question.ressource = {
+                    url: ressourceUrl,
+                    titre: ressourceTitre || 'En savoir plus'
+                };
+            }
 
             try {
                 await db.collection('questionBank').add(question);
@@ -1266,7 +1294,15 @@
                         tags: q.tags || [],
                         addedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
-                    
+
+                    // Ajouter la ressource si elle existe
+                    if (q.ressource && q.ressource.url) {
+                        questionData.ressource = {
+                            url: q.ressource.url,
+                            titre: q.ressource.titre || 'En savoir plus'
+                        };
+                    }
+
                     await db.collection('questionBank').add(questionData);
                     imported++;
                 }
@@ -1435,6 +1471,8 @@
                 document.getElementById('edit-reponse3').value = question.reponses?.[3] || '';
                 document.getElementById('edit-correct').value = question.correct ?? 0;
                 document.getElementById('edit-tags').value = (question.tags || []).join(', ');
+                document.getElementById('edit-ressource-url').value = question.ressource?.url || '';
+                document.getElementById('edit-ressource-titre').value = question.ressource?.titre || '';
             });
 
             // Afficher le modal
@@ -1452,6 +1490,9 @@
             const messageDiv = document.getElementById('message-edit');
             const id = document.getElementById('edit-id').value;
 
+            const editRessourceUrl = document.getElementById('edit-ressource-url').value.trim();
+            const editRessourceTitre = document.getElementById('edit-ressource-titre').value.trim();
+
             const updatedQuestion = {
                 matiere: document.getElementById('edit-matiere').value,
                 categorie: document.getElementById('edit-categorie').value,
@@ -1467,6 +1508,16 @@
                 tags: document.getElementById('edit-tags').value.split(',').map(t => t.trim()).filter(t => t),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+
+            // Ajouter ou supprimer la ressource
+            if (editRessourceUrl) {
+                updatedQuestion.ressource = {
+                    url: editRessourceUrl,
+                    titre: editRessourceTitre || 'En savoir plus'
+                };
+            } else {
+                updatedQuestion.ressource = firebase.firestore.FieldValue.delete();
+            }
 
             try {
                 await db.collection('questionBank').doc(id).update(updatedQuestion);

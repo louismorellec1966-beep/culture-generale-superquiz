@@ -652,6 +652,7 @@
         window.currentQuestionIndex = 0;
         window.allSelectedQuestions = [];
         window.shuffledAnswersData = [];
+        window.questionsRessources = []; // Stocker les ressources pour chaque question
 
         // Initialisation
         window.addEventListener('load', () => {
@@ -742,6 +743,7 @@
                 window.allSelectedQuestions = selectedQuestions;
                 window.correctAnswersMap = [];
                 window.shuffledAnswersData = [];
+                window.questionsRessources = [];
                 window.currentQuestionIndex = 0;
 
                 // Préparer les réponses mélangées pour toutes les questions
@@ -754,6 +756,7 @@
                     const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === q.correct);
                     window.correctAnswersMap[index] = newCorrectIndex;
                     window.shuffledAnswersData[index] = shuffledAnswers;
+                    window.questionsRessources[index] = q.ressource || null; // Stocker la ressource
                 });
 
                 document.getElementById('total-questions').textContent = selectedQuestions.length;
@@ -892,6 +895,7 @@
                 window.allSelectedQuestions = shuffledQuestions;
                 window.correctAnswersMap = [];
                 window.shuffledAnswersData = [];
+                window.questionsRessources = [];
                 window.revisionQuestionIdsMap = [];
                 window.currentQuestionIndex = 0;
 
@@ -909,6 +913,7 @@
                     const newCorrectIndex = shuffledAnswers.findIndex(a => a.originalIndex === correctIndex);
                     window.correctAnswersMap[index] = newCorrectIndex;
                     window.shuffledAnswersData[index] = shuffledAnswers;
+                    window.questionsRessources[index] = q.ressource || null; // Stocker la ressource
                     window.revisionQuestionIdsMap[index] = q.id;
                 });
 
@@ -1062,22 +1067,28 @@
             const correctAnswer = window.correctAnswersMap[qIndex];
             const isCorrect = answerIndex === correctAnswer;
 
+            // Récupérer la ressource si elle existe
+            const ressource = window.questionsRessources ? window.questionsRessources[qIndex] : null;
+            const ressourceLink = ressource && ressource.url
+                ? `<br><a href="${ressource.url}" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline; margin-top: 8px; display: inline-block;">📚 ${ressource.titre || 'En savoir plus'} →</a>`
+                : '';
+
             if (isCorrect) {
                 currentScore++;
                 document.getElementById('current-score').textContent = currentScore;
                 feedback.className = 'reponse-feedback correct';
-                feedback.textContent = '✅ Bravo ! Bonne réponse !';
+                feedback.innerHTML = '✅ Bravo ! Bonne réponse !' + ressourceLink;
                 selectedOption.classList.add('correct-answer');
 
                 // En mode révision, marquer comme maîtrisé
                 if (isRevisionMode && window.revisionQuestionIdsMap && window.revisionQuestionIdsMap[qIndex]) {
                     markQuestionAsMastered(window.revisionQuestionIdsMap[qIndex]);
-                    feedback.textContent = '✅ Bravo ! Question maîtrisée !';
+                    feedback.innerHTML = '✅ Bravo ! Question maîtrisée !' + ressourceLink;
                 }
             } else {
                 feedback.className = 'reponse-feedback incorrect';
                 const correctOption = document.querySelector(`.answer-option[data-qindex="${qIndex}"][data-aindex="${correctAnswer}"]`);
-                feedback.textContent = '❌ Incorrect. La bonne réponse était : ' + correctOption.textContent.trim();
+                feedback.innerHTML = '❌ Incorrect. La bonne réponse était : ' + correctOption.textContent.trim() + ressourceLink;
                 selectedOption.classList.add('wrong-answer');
                 // Montrer la bonne réponse
                 correctOption.classList.add('correct-answer');

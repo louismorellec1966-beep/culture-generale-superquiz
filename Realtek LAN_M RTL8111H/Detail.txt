@@ -1,0 +1,13 @@
+[INFORMATION]
+Projects=Amalthea_ADU;Europa_ADU;Thebe_ADU;Ganymede_ADU;Callisto_ADU;Iris_TL;Jade_TL;Jameson_TL;Jasmine_TL;Lilac_TL;Lily_TL;Tuba_TL;Kavalan_TL;Camellia_TL;
+OSs=Windows Next All X64;Windows 10 All X64;
+WHQL=Y,
+ProviderFullName=Realtek
+SelectedDriverType=Use Inf
+Installer=%RELATIVE_PATH%\Install.cmd
+Parameters=
+InfFiles=%RELATIVE_PATH%\rt640x64.inf;
+DriverUtilityInstaller=
+DriverUtilityParameters=
+UWPSourceFolder=
+UWPInstaller=

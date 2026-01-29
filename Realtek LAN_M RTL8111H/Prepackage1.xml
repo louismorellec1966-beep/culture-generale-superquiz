@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModuleInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <ModulePN>MOD01?????00??????</ModulePN>
+  <Creator PN="01" Name="Acer-HQ1" />
+  <Type PN="" Name="Drivers" />
+  <Module PN="" Name="Realtek LAN_M RTL8111H" Alias="" GUID="" Serial="RTL8111H" Provider="Realtek" Class="LAN_M" />
+  <WOS PN="61" Sku="W10 All" CPU="X64" />
+  <Lang>All language</Lang>
+  <ModuleVersion>v10.053.1001.2021</ModuleVersion>
+  <DriverVersion>v10.053.1001.2021</DriverVersion>
+  <OptionVersion>Install.cmd</OptionVersion>
+  <ProjectCodeName>NULL</ProjectCodeName>
+  <OdmName>NBCOM</OdmName>
+  <ModuleTimeout>0</ModuleTimeout>
+  <InstallPreiod>UserAlaunch</InstallPreiod>
+  <Reboot>False</Reboot>
+  <Delete>False</Delete>
+  <ReinstallProcessList>
+    <Process Country="" OS-Language="" OS-Sku="" Check="" Timeout="0" RetCode="-" Params="" Exec="%RELATIVE_PATH%\Install.cmd" Order="00" Period="" />
+  </ReinstallProcessList>
+  <AutoRun>True</AutoRun>
+  <InstallPath />
+  <Description />
+  <ProcessList>
+    <Process Country="" OS-Language="" OS-Sku="" Check="False" Timeout="10" RetCode="-" Params="" Exec="%RELATIVE_PATH%\Install.cmd" Order="00" Period="" />
+  </ProcessList>
+  <RegItemList />
+  <ModuleProperty>RCD,STCD,RSCD</ModuleProperty>
+  <HWIDs>PCI\VEN_10EC&amp;DEV_8168</HWIDs>
+  <AutoCheckHWID>True</AutoCheckHWID>
+  <CheckRemove>True</CheckRemove>
+  <MVPKernelVersion>2.0.7.3</MVPKernelVersion>
+  <MVPUIVersion>2.0.8.4</MVPUIVersion>
+  <LOB>Notebook</LOB>
+</ModuleInfo>

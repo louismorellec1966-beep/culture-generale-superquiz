@@ -240,11 +240,23 @@ async function logoutFromMenu(event) {
     }
 }
 
+// Charger dynamiquement le système de recherche
+function loadSearchSystem() {
+    const script = document.createElement('script');
+    script.src = 'js/search-system.js';
+    script.async = true;
+    document.body.appendChild(script);
+}
+
 // Initialiser le menu quand le DOM est prêt
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMenu);
+    document.addEventListener('DOMContentLoaded', () => {
+        initMenu();
+        loadSearchSystem();
+    });
 } else {
     initMenu();
+    loadSearchSystem();
 }
 
 console.log('✅ Menu dynamique chargé');

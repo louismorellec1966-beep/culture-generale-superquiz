@@ -645,8 +645,41 @@
                 if (quizDoc.exists) {
                     dailyQuizData = quizDoc.data();
                 } else {
-                    // Créer un nouveau quiz pour aujourd'hui
-                    dailyQuizData = await generateDailyQuiz(date);
+                    // Quiz non existant - le créer si l'utilisateur est connecté
+                    if (currentUser) {
+                        dailyQuizData = await generateDailyQuiz(date);
+                        if (!dailyQuizData) {
+                            // Échec de génération
+                            document.getElementById('loading-screen').style.display = 'none';
+                            document.getElementById('ready-screen').innerHTML = `
+                                <h2>Erreur de génération</h2>
+                                <p style="margin: 20px 0; font-size: 1.1em; color: #e74c3c;">
+                                    Impossible de générer le quiz.<br>
+                                    Vérifiez la console pour plus de détails.
+                                </p>
+                                <button class="start-btn" onclick="location.reload()">
+                                    Réessayer
+                                </button>
+                            `;
+                            document.getElementById('ready-screen').style.display = 'block';
+                            return;
+                        }
+                    } else {
+                        // Utilisateur non connecté et quiz non existant
+                        document.getElementById('loading-screen').style.display = 'none';
+                        document.getElementById('ready-screen').innerHTML = `
+                            <h2>Quiz en attente</h2>
+                            <p style="margin: 20px 0; font-size: 1.1em; color: #7f8c8d;">
+                                Le Quiz du Jour n'est pas encore disponible.<br>
+                                Connectez-vous pour le lancer !
+                            </p>
+                            <button class="start-btn" onclick="window.location.href='Auth.html'">
+                                Se Connecter
+                            </button>
+                        `;
+                        document.getElementById('ready-screen').style.display = 'block';
+                        return;
+                    }
                 }
 
                 // Afficher le thème

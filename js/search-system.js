@@ -20,50 +20,94 @@ const searchData = {
 
     // Sous-catégories (par catégorie principale)
     subcategories: [
-        // Histoire
-        { name: 'Antiquité', emoji: '🏛️', url: 'mode-selection.html?matiere=histoire&categorie=antiquite', parent: 'Histoire', keywords: ['antiquité', 'rome', 'grèce', 'égypte', 'ancien'] },
-        { name: 'Moyen Âge', emoji: '🏰', url: 'mode-selection.html?matiere=histoire&categorie=moyenage', parent: 'Histoire', keywords: ['moyen âge', 'médiéval', 'chevaliers', 'châteaux'] },
-        { name: 'Histoire de l\'Art', emoji: '🖼️', url: 'mode-selection.html?matiere=histoire&categorie=art', parent: 'Histoire', keywords: ['art', 'peinture', 'sculpture', 'architecture'] },
-        { name: 'Guerres Mondiales', emoji: '⚔️', url: 'mode-selection.html?matiere=histoire&categorie=guerres', parent: 'Histoire', keywords: ['guerre', 'guerres mondiales', 'wwi', 'wwii', 'conflits'] },
-        { name: 'Histoire de France', emoji: '🇫🇷', url: 'mode-selection.html?matiere=histoire&categorie=france', parent: 'Histoire', keywords: ['france', 'révolution', 'empire', 'république'] },
-        { name: 'Histoire Contemporaine', emoji: '📰', url: 'mode-selection.html?matiere=histoire&categorie=contemporaine', parent: 'Histoire', keywords: ['contemporain', 'moderne', '20ème siècle', '21ème siècle'] },
-        { name: 'Préhistoire', emoji: '🦴', url: 'mode-selection.html?matiere=histoire&categorie=prehistoire', parent: 'Histoire', keywords: ['préhistoire', 'dinosaures', 'hommes préhistoriques', 'cavernes'] },
+        // Histoire (7 sous-catégories)
+        { name: 'Antiquité', emoji: '🏛️', url: 'mode-selection.html?matiere=histoire&categorie=antiquite', parent: 'Histoire', keywords: ['antiquité', 'rome', 'grèce', 'égypte', 'ancien', 'romains', 'grecs'] },
+        { name: 'Moyen Âge', emoji: '🏰', url: 'mode-selection.html?matiere=histoire&categorie=moyenage', parent: 'Histoire', keywords: ['moyen âge', 'médiéval', 'chevaliers', 'châteaux', 'féodal'] },
+        { name: 'Histoire de l\'Art', emoji: '🖼️', url: 'mode-selection.html?matiere=histoire&categorie=art', parent: 'Histoire', keywords: ['art', 'artistique', 'mouvements', 'courants'] },
+        { name: 'Guerres Mondiales', emoji: '⚔️', url: 'mode-selection.html?matiere=histoire&categorie=guerres', parent: 'Histoire', keywords: ['guerre', 'guerres mondiales', 'wwi', 'wwii', 'conflits', 'batailles'] },
+        { name: 'Histoire de France', emoji: '🇫🇷', url: 'mode-selection.html?matiere=histoire&categorie=france', parent: 'Histoire', keywords: ['france', 'révolution', 'empire', 'république', 'napoléon', 'rois'] },
+        { name: 'Histoire Contemporaine', emoji: '📰', url: 'mode-selection.html?matiere=histoire&categorie=contemporaine', parent: 'Histoire', keywords: ['contemporain', 'moderne', '20ème siècle', '21ème siècle', 'récent'] },
+        { name: 'Préhistoire', emoji: '🦴', url: 'mode-selection.html?matiere=histoire&categorie=prehistoire', parent: 'Histoire', keywords: ['préhistoire', 'dinosaures', 'hommes préhistoriques', 'cavernes', 'néolithique'] },
 
-        // Géographie
-        { name: 'Europe', emoji: '🇪🇺', url: 'mode-selection.html?matiere=geographie&categorie=europe', parent: 'Géographie', keywords: ['europe', 'européen', 'ue', 'union européenne'] },
-        { name: 'Afrique', emoji: '🌍', url: 'mode-selection.html?matiere=geographie&categorie=afrique', parent: 'Géographie', keywords: ['afrique', 'africain'] },
-        { name: 'Asie', emoji: '🌏', url: 'mode-selection.html?matiere=geographie&categorie=asie', parent: 'Géographie', keywords: ['asie', 'asiatique'] },
-        { name: 'Amériques', emoji: '🌎', url: 'mode-selection.html?matiere=geographie&categorie=ameriques', parent: 'Géographie', keywords: ['amérique', 'américain', 'usa', 'états-unis'] },
-        { name: 'Océanie', emoji: '🏝️', url: 'mode-selection.html?matiere=geographie&categorie=oceanie', parent: 'Géographie', keywords: ['océanie', 'australie', 'pacifique'] },
-        { name: 'Capitales', emoji: '🏙️', url: 'mode-selection.html?matiere=geographie&categorie=capitales', parent: 'Géographie', keywords: ['capitales', 'villes', 'métropoles'] },
-        { name: 'Drapeaux', emoji: '🚩', url: 'mode-selection.html?matiere=geographie&categorie=drapeaux', parent: 'Géographie', keywords: ['drapeaux', 'emblèmes', 'symboles'] },
+        // Géographie (6 sous-catégories)
+        { name: 'Capitales du Monde', emoji: '🏛️', url: 'mode-selection.html?matiere=geographie&categorie=capitales', parent: 'Géographie', keywords: ['capitales', 'villes', 'métropoles', 'capitale'] },
+        { name: 'Géographie de France', emoji: '🇫🇷', url: 'mode-selection.html?matiere=geographie&categorie=france', parent: 'Géographie', keywords: ['france', 'régions', 'départements', 'villes françaises'] },
+        { name: 'Europe', emoji: '🇪🇺', url: 'mode-selection.html?matiere=geographie&categorie=europe', parent: 'Géographie', keywords: ['europe', 'européen', 'ue', 'union européenne', 'pays européens'] },
+        { name: 'Continents & Océans', emoji: '🌏', url: 'mode-selection.html?matiere=geographie&categorie=continents', parent: 'Géographie', keywords: ['continents', 'océans', 'mers', 'terres', 'mondial'] },
+        { name: 'Géographie Physique', emoji: '🏔️', url: 'mode-selection.html?matiere=geographie&categorie=nature', parent: 'Géographie', keywords: ['montagnes', 'fleuves', 'rivières', 'climat', 'nature', 'relief'] },
+        { name: 'Géographie Culturelle', emoji: '🎭', url: 'mode-selection.html?matiere=geographie&categorie=culture', parent: 'Géographie', keywords: ['cultures', 'populations', 'traditions', 'peuples'] },
 
-        // Science
-        { name: 'Physique', emoji: '⚛️', url: 'mode-selection.html?matiere=science&categorie=physique', parent: 'Science', keywords: ['physique', 'atomes', 'énergie', 'mécanique'] },
-        { name: 'Chimie', emoji: '🧪', url: 'mode-selection.html?matiere=science&categorie=chimie', parent: 'Science', keywords: ['chimie', 'molécules', 'éléments', 'réactions'] },
-        { name: 'Biologie', emoji: '🧬', url: 'mode-selection.html?matiere=science&categorie=biologie', parent: 'Science', keywords: ['biologie', 'vivant', 'cellules', 'adn'] },
-        { name: 'Astronomie', emoji: '🔭', url: 'mode-selection.html?matiere=science&categorie=astronomie', parent: 'Science', keywords: ['astronomie', 'espace', 'planètes', 'étoiles', 'univers'] },
-        { name: 'Mathématiques', emoji: '🔢', url: 'mode-selection.html?matiere=science&categorie=mathematiques', parent: 'Science', keywords: ['mathématiques', 'maths', 'calcul', 'géométrie'] },
+        // Science (6 sous-catégories)
+        { name: 'Physique', emoji: '⚛️', url: 'mode-selection.html?matiere=science&categorie=physique', parent: 'Science', keywords: ['physique', 'atomes', 'énergie', 'mécanique', 'forces', 'newton'] },
+        { name: 'Chimie', emoji: '🧪', url: 'mode-selection.html?matiere=science&categorie=chimie', parent: 'Science', keywords: ['chimie', 'molécules', 'éléments', 'réactions', 'tableau périodique'] },
+        { name: 'Biologie', emoji: '🧬', url: 'mode-selection.html?matiere=science&categorie=biologie', parent: 'Science', keywords: ['biologie', 'vivant', 'cellules', 'adn', 'génétique', 'animaux', 'plantes'] },
+        { name: 'Astronomie', emoji: '🔭', url: 'mode-selection.html?matiere=science&categorie=astronomie', parent: 'Science', keywords: ['astronomie', 'espace', 'planètes', 'étoiles', 'univers', 'galaxies', 'nasa'] },
+        { name: 'Mathématiques', emoji: '🔢', url: 'mode-selection.html?matiere=science&categorie=mathematiques', parent: 'Science', keywords: ['mathématiques', 'maths', 'calcul', 'géométrie', 'algèbre', 'nombres'] },
+        { name: 'Technologie', emoji: '💻', url: 'mode-selection.html?matiere=science&categorie=technologie', parent: 'Science', keywords: ['technologie', 'tech', 'informatique', 'inventions', 'innovations'] },
 
-        // Littérature
-        { name: 'Classiques', emoji: '📖', url: 'mode-selection.html?matiere=litterature&categorie=classiques', parent: 'Littérature', keywords: ['classiques', 'classique', 'grands auteurs'] },
-        { name: 'Poésie', emoji: '✨', url: 'mode-selection.html?matiere=litterature&categorie=poesie', parent: 'Littérature', keywords: ['poésie', 'poèmes', 'vers', 'rimes'] },
-        { name: 'Théâtre', emoji: '🎭', url: 'mode-selection.html?matiere=litterature&categorie=theatre', parent: 'Littérature', keywords: ['théâtre', 'pièces', 'molière', 'comédie', 'tragédie'] },
+        // Littérature (6 sous-catégories)
+        { name: 'Classiques', emoji: '📖', url: 'mode-selection.html?matiere=litterature&categorie=classiques', parent: 'Littérature', keywords: ['classiques', 'classique', 'grands auteurs', 'chefs-d\'oeuvre'] },
+        { name: 'Poésie', emoji: '✨', url: 'mode-selection.html?matiere=litterature&categorie=poesie', parent: 'Littérature', keywords: ['poésie', 'poèmes', 'vers', 'rimes', 'poètes'] },
+        { name: 'Théâtre', emoji: '🎭', url: 'mode-selection.html?matiere=litterature&categorie=theatre', parent: 'Littérature', keywords: ['théâtre', 'pièces', 'molière', 'comédie', 'tragédie', 'dramaturgie'] },
+        { name: 'Romans', emoji: '📕', url: 'mode-selection.html?matiere=litterature&categorie=romans', parent: 'Littérature', keywords: ['romans', 'roman', 'fiction', 'récit', 'narratif'] },
+        { name: 'Littérature Mondiale', emoji: '🌍', url: 'mode-selection.html?matiere=litterature&categorie=mondiale', parent: 'Littérature', keywords: ['mondiale', 'international', 'étrangère', 'world'] },
+        { name: 'Littérature Contemporaine', emoji: '📚', url: 'mode-selection.html?matiere=litterature&categorie=contemporaine', parent: 'Littérature', keywords: ['contemporaine', 'moderne', 'actuelle', 'récente'] },
 
-        // Sport
-        { name: 'Football', emoji: '⚽', url: 'mode-selection.html?matiere=sport&categorie=football', parent: 'Sport', keywords: ['football', 'foot', 'ballon rond', 'coupe du monde'] },
-        { name: 'Tennis', emoji: '🎾', url: 'mode-selection.html?matiere=sport&categorie=tennis', parent: 'Sport', keywords: ['tennis', 'raquette', 'roland garros', 'wimbledon'] },
-        { name: 'Jeux Olympiques', emoji: '🏅', url: 'mode-selection.html?matiere=sport&categorie=jo', parent: 'Sport', keywords: ['olympiques', 'jo', 'jeux', 'médailles'] },
+        // Sport (6 sous-catégories)
+        { name: 'Football', emoji: '⚽', url: 'mode-selection.html?matiere=sport&categorie=football', parent: 'Sport', keywords: ['football', 'foot', 'ballon rond', 'coupe du monde', 'ligue', 'fifa'] },
+        { name: 'Basketball', emoji: '🏀', url: 'mode-selection.html?matiere=sport&categorie=basketball', parent: 'Sport', keywords: ['basketball', 'basket', 'nba', 'panier'] },
+        { name: 'Tennis', emoji: '🎾', url: 'mode-selection.html?matiere=sport&categorie=tennis', parent: 'Sport', keywords: ['tennis', 'raquette', 'roland garros', 'wimbledon', 'atp'] },
+        { name: 'Athlétisme', emoji: '🏃', url: 'mode-selection.html?matiere=sport&categorie=athletisme', parent: 'Sport', keywords: ['athlétisme', 'course', 'sprint', 'marathon', 'saut'] },
+        { name: 'Natation', emoji: '🏊', url: 'mode-selection.html?matiere=sport&categorie=natation', parent: 'Sport', keywords: ['natation', 'nager', 'piscine', 'crawl', 'brasse'] },
+        { name: 'Jeux Olympiques', emoji: '🏅', url: 'mode-selection.html?matiere=sport&categorie=jeux-olympiques', parent: 'Sport', keywords: ['olympiques', 'jo', 'jeux', 'médailles', 'olympics'] },
 
-        // Musique
-        { name: 'Rock', emoji: '🎸', url: 'mode-selection.html?matiere=musique&categorie=rock', parent: 'Musique', keywords: ['rock', 'guitare', 'metal'] },
-        { name: 'Pop', emoji: '🎤', url: 'mode-selection.html?matiere=musique&categorie=pop', parent: 'Musique', keywords: ['pop', 'populaire', 'hits'] },
-        { name: 'Classique', emoji: '🎻', url: 'mode-selection.html?matiere=musique&categorie=classique', parent: 'Musique', keywords: ['classique', 'orchestres', 'symphonie', 'opéra'] },
+        // Musique (6 sous-catégories)
+        { name: 'Musique Classique', emoji: '🎻', url: 'mode-selection.html?matiere=musique&categorie=classique', parent: 'Musique', keywords: ['classique', 'orchestres', 'symphonie', 'opéra', 'mozart', 'beethoven'] },
+        { name: 'Rock', emoji: '🎸', url: 'mode-selection.html?matiere=musique&categorie=rock', parent: 'Musique', keywords: ['rock', 'guitare', 'metal', 'hard rock', 'groupe'] },
+        { name: 'Jazz', emoji: '🎷', url: 'mode-selection.html?matiere=musique&categorie=jazz', parent: 'Musique', keywords: ['jazz', 'blues', 'swing', 'saxophone', 'improvisation'] },
+        { name: 'Rap & Hip-Hop', emoji: '🎤', url: 'mode-selection.html?matiere=musique&categorie=rap', parent: 'Musique', keywords: ['rap', 'hip-hop', 'hip hop', 'rappeur', 'mc', 'flow'] },
+        { name: 'Musiques du Monde', emoji: '🌍', url: 'mode-selection.html?matiere=musique&categorie=monde', parent: 'Musique', keywords: ['monde', 'world', 'ethnique', 'traditionnel', 'folklore'] },
+        { name: 'Théorie Musicale', emoji: '🎼', url: 'mode-selection.html?matiere=musique&categorie=theorie', parent: 'Musique', keywords: ['théorie', 'solfège', 'notes', 'accords', 'gammes'] },
 
-        // Cinéma
-        { name: 'Films Cultes', emoji: '🎬', url: 'mode-selection.html?matiere=cinema&categorie=cultes', parent: 'Cinéma', keywords: ['cultes', 'classiques', 'incontournables'] },
-        { name: 'Réalisateurs', emoji: '🎥', url: 'mode-selection.html?matiere=cinema&categorie=realisateurs', parent: 'Cinéma', keywords: ['réalisateurs', 'metteurs en scène', 'directors'] },
-        { name: 'Acteurs', emoji: '🌟', url: 'mode-selection.html?matiere=cinema&categorie=acteurs', parent: 'Cinéma', keywords: ['acteurs', 'actrices', 'stars', 'célébrités'] }
+        // Art (6 sous-catégories)
+        { name: 'Peinture', emoji: '🖌️', url: 'mode-selection.html?matiere=art&categorie=peinture', parent: 'Art', keywords: ['peinture', 'peintres', 'tableaux', 'toile', 'huile', 'aquarelle', 'impressionnisme'] },
+        { name: 'Sculpture', emoji: '🗿', url: 'mode-selection.html?matiere=art&categorie=sculpture', parent: 'Art', keywords: ['sculpture', 'sculpteurs', 'statues', 'bronze', 'marbre'] },
+        { name: 'Architecture', emoji: '🏛️', url: 'mode-selection.html?matiere=art&categorie=architecture', parent: 'Art', keywords: ['architecture', 'monuments', 'bâtiments', 'architectes', 'style'] },
+        { name: 'Art Moderne', emoji: '🖼️', url: 'mode-selection.html?matiere=art&categorie=moderne', parent: 'Art', keywords: ['moderne', 'contemporain', 'abstrait', 'avant-garde', 'xxe siècle'] },
+        { name: 'Photographie', emoji: '📷', url: 'mode-selection.html?matiere=art&categorie=photo', parent: 'Art', keywords: ['photographie', 'photo', 'photographes', 'clichés', 'images'] },
+        { name: 'Histoire de l\'Art', emoji: '📜', url: 'mode-selection.html?matiere=art&categorie=histoire', parent: 'Art', keywords: ['histoire', 'époques', 'mouvements', 'courants', 'renaissance', 'baroque'] },
+
+        // Cinéma (6 sous-catégories)
+        { name: 'Cinéma Français', emoji: '🇫🇷', url: 'mode-selection.html?matiere=cinema&categorie=francais', parent: 'Cinéma', keywords: ['français', 'france', 'cinéma français', 'nouvelle vague'] },
+        { name: 'Cinéma International', emoji: '🌍', url: 'mode-selection.html?matiere=cinema&categorie=international', parent: 'Cinéma', keywords: ['international', 'hollywood', 'étranger', 'world cinema'] },
+        { name: 'Acteurs & Actrices', emoji: '🌟', url: 'mode-selection.html?matiere=cinema&categorie=acteurs', parent: 'Cinéma', keywords: ['acteurs', 'actrices', 'stars', 'célébrités', 'comédiens'] },
+        { name: 'Réalisateurs', emoji: '🎥', url: 'mode-selection.html?matiere=cinema&categorie=realisateurs', parent: 'Cinéma', keywords: ['réalisateurs', 'metteurs en scène', 'directors', 'cinéastes'] },
+        { name: 'Oscars & Récompenses', emoji: '🏆', url: 'mode-selection.html?matiere=cinema&categorie=oscars', parent: 'Cinéma', keywords: ['oscars', 'césar', 'récompenses', 'prix', 'palmarès', 'festival'] },
+        { name: 'Films Cultes', emoji: '🎬', url: 'mode-selection.html?matiere=cinema&categorie=films-cultes', parent: 'Cinéma', keywords: ['cultes', 'classiques', 'incontournables', 'chef-d\'oeuvre', 'mythiques'] },
+
+        // Gastronomie (6 sous-catégories)
+        { name: 'Cuisine Française', emoji: '🇫🇷', url: 'mode-selection.html?matiere=gastronomie&categorie=francaise', parent: 'Gastronomie', keywords: ['française', 'france', 'traditionnelle', 'terroir'] },
+        { name: 'Cuisine Mondiale', emoji: '🌍', url: 'mode-selection.html?matiere=gastronomie&categorie=mondiale', parent: 'Gastronomie', keywords: ['mondiale', 'international', 'étrangère', 'world'] },
+        { name: 'Chefs Cuisiniers', emoji: '👨‍🍳', url: 'mode-selection.html?matiere=gastronomie&categorie=chefs', parent: 'Gastronomie', keywords: ['chefs', 'cuisiniers', 'étoilés', 'bocuse', 'top chef'] },
+        { name: 'Fromages', emoji: '🧀', url: 'mode-selection.html?matiere=gastronomie&categorie=fromages', parent: 'Gastronomie', keywords: ['fromages', 'fromage', 'lait', 'affinage'] },
+        { name: 'Vins & Boissons', emoji: '🍷', url: 'mode-selection.html?matiere=gastronomie&categorie=boissons', parent: 'Gastronomie', keywords: ['vins', 'vin', 'boissons', 'alcool', 'vignobles', 'champagne'] },
+        { name: 'Desserts & Pâtisserie', emoji: '🍰', url: 'mode-selection.html?matiere=gastronomie&categorie=desserts', parent: 'Gastronomie', keywords: ['desserts', 'pâtisserie', 'gâteaux', 'sucreries', 'chocolat'] },
+
+        // Politique (6 sous-catégories)
+        { name: 'Partis Politiques', emoji: '🗳️', url: 'mode-selection.html?matiere=politique&categorie=partis', parent: 'Politique', keywords: ['partis', 'parti', 'gauche', 'droite', 'élections'] },
+        { name: 'Présidents', emoji: '🏛️', url: 'mode-selection.html?matiere=politique&categorie=presidents', parent: 'Politique', keywords: ['présidents', 'président', 'chef d\'état', 'élysée'] },
+        { name: 'Institutions', emoji: '⚖️', url: 'mode-selection.html?matiere=politique&categorie=institutions', parent: 'Politique', keywords: ['institutions', 'assemblée', 'sénat', 'constitution', 'lois'] },
+        { name: 'Idéologies', emoji: '💡', url: 'mode-selection.html?matiere=politique&categorie=ideologies', parent: 'Politique', keywords: ['idéologies', 'socialisme', 'libéralisme', 'communisme', 'démocratie'] },
+        { name: 'Histoire Politique', emoji: '📜', url: 'mode-selection.html?matiere=politique&categorie=histoire', parent: 'Politique', keywords: ['histoire', 'révolutions', 'régimes', 'république'] },
+        { name: 'Actualité Politique', emoji: '📰', url: 'mode-selection.html?matiere=politique&categorie=actualite', parent: 'Politique', keywords: ['actualité', 'actuel', 'récent', 'news', 'aujourd\'hui'] },
+
+        // Philosophie (6 sous-catégories)
+        { name: 'Philosophie Antique', emoji: '🏛️', url: 'mode-selection.html?matiere=philosophie&categorie=antiquite', parent: 'Philosophie', keywords: ['antique', 'grecque', 'socrate', 'platon', 'aristote'] },
+        { name: 'Philosophie Moderne', emoji: '📖', url: 'mode-selection.html?matiere=philosophie&categorie=moderne', parent: 'Philosophie', keywords: ['moderne', 'descartes', 'kant', 'lumières', 'raison'] },
+        { name: 'Philosophie Contemporaine', emoji: '💭', url: 'mode-selection.html?matiere=philosophie&categorie=contemporaine', parent: 'Philosophie', keywords: ['contemporaine', 'sartre', 'existentialisme', 'nietzsche'] },
+        { name: 'Éthique', emoji: '⚖️', url: 'mode-selection.html?matiere=philosophie&categorie=ethique', parent: 'Philosophie', keywords: ['éthique', 'morale', 'bien', 'mal', 'valeurs'] },
+        { name: 'Philosophie Politique', emoji: '🏛️', url: 'mode-selection.html?matiere=philosophie&categorie=politique', parent: 'Philosophie', keywords: ['politique', 'état', 'société', 'pouvoir', 'contrat social'] },
+        { name: 'Concepts Philosophiques', emoji: '🧠', url: 'mode-selection.html?matiere=philosophie&categorie=concepts', parent: 'Philosophie', keywords: ['concepts', 'idées', 'notions', 'pensée', 'réflexion'] }
     ],
 
     // Pages du menu

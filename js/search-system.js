@@ -22,9 +22,17 @@ const searchData = {
     subcategories: [
         // Histoire (7 sous-catégories)
         { name: 'Antiquité', emoji: '🏛️', url: 'mode-selection.html?matiere=histoire&categorie=antiquite', parent: 'Histoire', keywords: ['antiquité', 'rome', 'grèce', 'égypte', 'ancien', 'romains', 'grecs'] },
+        // Sous-sous-catégories de l'Antiquité
+        { name: 'Grèce Antique', emoji: '🏺', url: 'mode-selection.html?matiere=histoire&categorie=antiquite-grece', parent: 'Antiquité', keywords: ['grèce', 'grecs', 'athènes', 'sparte', 'alexandre', 'mythologie grecque', 'olympe'] },
+        { name: 'Rome Antique', emoji: '🦅', url: 'mode-selection.html?matiere=histoire&categorie=antiquite-rome', parent: 'Antiquité', keywords: ['rome', 'romains', 'césar', 'empire romain', 'gladiateurs', 'sénat', 'légions'] },
+        { name: 'Égypte Antique', emoji: '🔺', url: 'mode-selection.html?matiere=histoire&categorie=antiquite-egypte', parent: 'Antiquité', keywords: ['égypte', 'pharaons', 'pyramides', 'nil', 'cléopâtre', 'hiéroglyphes', 'momies'] },
         { name: 'Moyen Âge', emoji: '🏰', url: 'mode-selection.html?matiere=histoire&categorie=moyenage', parent: 'Histoire', keywords: ['moyen âge', 'médiéval', 'chevaliers', 'châteaux', 'féodal'] },
         { name: 'Histoire de l\'Art', emoji: '🖼️', url: 'mode-selection.html?matiere=histoire&categorie=art', parent: 'Histoire', keywords: ['art', 'artistique', 'mouvements', 'courants'] },
         { name: 'Guerres Mondiales', emoji: '⚔️', url: 'mode-selection.html?matiere=histoire&categorie=guerres', parent: 'Histoire', keywords: ['guerre', 'guerres mondiales', 'wwi', 'wwii', 'conflits', 'batailles'] },
+        // Sous-sous-catégories de Guerres Mondiales
+        { name: 'Première Guerre Mondiale', emoji: '🎖️', url: 'mode-selection.html?matiere=histoire&categorie=guerres-ww1', parent: 'Guerres Mondiales', keywords: ['première guerre', 'ww1', '1914', '1918', 'tranchées', 'verdun', 'poilus'] },
+        { name: 'Seconde Guerre Mondiale', emoji: '✈️', url: 'mode-selection.html?matiere=histoire&categorie=guerres-ww2', parent: 'Guerres Mondiales', keywords: ['seconde guerre', 'ww2', '1939', '1945', 'débarquement', 'résistance', 'nazis'] },
+        { name: 'Guerre Froide', emoji: '❄️', url: 'mode-selection.html?matiere=histoire&categorie=guerres-froide', parent: 'Guerres Mondiales', keywords: ['guerre froide', 'urss', 'usa', 'mur de berlin', 'soviétique', 'communisme'] },
         { name: 'Histoire de France', emoji: '🇫🇷', url: 'mode-selection.html?matiere=histoire&categorie=france', parent: 'Histoire', keywords: ['france', 'révolution', 'empire', 'république', 'napoléon', 'rois'] },
         { name: 'Histoire Contemporaine', emoji: '📰', url: 'mode-selection.html?matiere=histoire&categorie=contemporaine', parent: 'Histoire', keywords: ['contemporain', 'moderne', '20ème siècle', '21ème siècle', 'récent'] },
         { name: 'Préhistoire', emoji: '🦴', url: 'mode-selection.html?matiere=histoire&categorie=prehistoire', parent: 'Histoire', keywords: ['préhistoire', 'dinosaures', 'hommes préhistoriques', 'cavernes', 'néolithique'] },
@@ -42,6 +50,10 @@ const searchData = {
         { name: 'Chimie', emoji: '🧪', url: 'mode-selection.html?matiere=science&categorie=chimie', parent: 'Science', keywords: ['chimie', 'molécules', 'éléments', 'réactions', 'tableau périodique'] },
         { name: 'Biologie', emoji: '🧬', url: 'mode-selection.html?matiere=science&categorie=biologie', parent: 'Science', keywords: ['biologie', 'vivant', 'cellules', 'adn', 'génétique', 'animaux', 'plantes'] },
         { name: 'Astronomie', emoji: '🔭', url: 'mode-selection.html?matiere=science&categorie=astronomie', parent: 'Science', keywords: ['astronomie', 'espace', 'planètes', 'étoiles', 'univers', 'galaxies', 'nasa'] },
+        // Sous-sous-catégories d'Astronomie
+        { name: 'Système Solaire', emoji: '☀️', url: 'mode-selection.html?matiere=science&categorie=astronomie-solaire', parent: 'Astronomie', keywords: ['système solaire', 'planètes', 'soleil', 'lune', 'mars', 'jupiter', 'saturne'] },
+        { name: 'Exploration Spatiale', emoji: '🚀', url: 'mode-selection.html?matiere=science&categorie=astronomie-exploration', parent: 'Astronomie', keywords: ['exploration', 'nasa', 'esa', 'apollo', 'iss', 'fusées', 'astronautes', 'spacex'] },
+        { name: 'Étoiles & Galaxies', emoji: '🌌', url: 'mode-selection.html?matiere=science&categorie=astronomie-galaxies', parent: 'Astronomie', keywords: ['étoiles', 'galaxies', 'voie lactée', 'trous noirs', 'nébuleuses', 'supernovas'] },
         { name: 'Mathématiques', emoji: '🔢', url: 'mode-selection.html?matiere=science&categorie=mathematiques', parent: 'Science', keywords: ['mathématiques', 'maths', 'calcul', 'géométrie', 'algèbre', 'nombres'] },
         { name: 'Technologie', emoji: '💻', url: 'mode-selection.html?matiere=science&categorie=technologie', parent: 'Science', keywords: ['technologie', 'tech', 'informatique', 'inventions', 'innovations'] },
 
@@ -49,6 +61,9 @@ const searchData = {
         { name: 'Classiques', emoji: '📖', url: 'mode-selection.html?matiere=litterature&categorie=classiques', parent: 'Littérature', keywords: ['classiques', 'classique', 'grands auteurs', 'chefs-d\'oeuvre'] },
         { name: 'Poésie', emoji: '✨', url: 'mode-selection.html?matiere=litterature&categorie=poesie', parent: 'Littérature', keywords: ['poésie', 'poèmes', 'vers', 'rimes', 'poètes'] },
         { name: 'Théâtre', emoji: '🎭', url: 'mode-selection.html?matiere=litterature&categorie=theatre', parent: 'Littérature', keywords: ['théâtre', 'pièces', 'molière', 'comédie', 'tragédie', 'dramaturgie'] },
+        // Sous-sous-catégories de Théâtre
+        { name: 'Théâtre Classique', emoji: '🎭', url: 'mode-selection.html?matiere=litterature&categorie=theatre-classique', parent: 'Théâtre', keywords: ['classique', 'molière', 'racine', 'corneille', '17e siècle', 'comédie', 'tragédie'] },
+        { name: 'Théâtre Contemporain', emoji: '🎪', url: 'mode-selection.html?matiere=litterature&categorie=theatre-contemporain', parent: 'Théâtre', keywords: ['contemporain', 'moderne', 'ionesco', 'beckett', 'absurde', '20e siècle'] },
         { name: 'Romans', emoji: '📕', url: 'mode-selection.html?matiere=litterature&categorie=romans', parent: 'Littérature', keywords: ['romans', 'roman', 'fiction', 'récit', 'narratif'] },
         { name: 'Littérature Mondiale', emoji: '🌍', url: 'mode-selection.html?matiere=litterature&categorie=mondiale', parent: 'Littérature', keywords: ['mondiale', 'international', 'étrangère', 'world'] },
         { name: 'Littérature Contemporaine', emoji: '📚', url: 'mode-selection.html?matiere=litterature&categorie=contemporaine', parent: 'Littérature', keywords: ['contemporaine', 'moderne', 'actuelle', 'récente'] },
@@ -61,7 +76,14 @@ const searchData = {
         { name: 'Ligue 1', emoji: '🇫🇷', url: 'mode-selection.html?matiere=sport&categorie=football-ligue1', parent: 'Football', keywords: ['ligue 1', 'france', 'psg', 'om', 'championnat français'] },
         { name: 'Légendes du Football', emoji: '👑', url: 'mode-selection.html?matiere=sport&categorie=football-legendes', parent: 'Football', keywords: ['légendes', 'pelé', 'maradona', 'zidane', 'messi', 'ronaldo', 'platini'] },
         { name: 'Basketball', emoji: '🏀', url: 'mode-selection.html?matiere=sport&categorie=basketball', parent: 'Sport', keywords: ['basketball', 'basket', 'nba', 'panier'] },
+        // Sous-sous-catégories de Basketball
+        { name: 'NBA', emoji: '🇺🇸', url: 'mode-selection.html?matiere=sport&categorie=basketball-nba', parent: 'Basketball', keywords: ['nba', 'lakers', 'bulls', 'celtics', 'finals', 'mvp', 'all-star'] },
+        { name: 'Euroleague', emoji: '🇪🇺', url: 'mode-selection.html?matiere=sport&categorie=basketball-euro', parent: 'Basketball', keywords: ['euroleague', 'europe', 'basket européen', 'real madrid', 'barcelone'] },
+        { name: 'Légendes du Basketball', emoji: '👑', url: 'mode-selection.html?matiere=sport&categorie=basketball-legendes', parent: 'Basketball', keywords: ['légendes', 'jordan', 'lebron', 'kobe', 'magic', 'bird', 'shaq'] },
         { name: 'Tennis', emoji: '🎾', url: 'mode-selection.html?matiere=sport&categorie=tennis', parent: 'Sport', keywords: ['tennis', 'raquette', 'roland garros', 'wimbledon', 'atp'] },
+        // Sous-sous-catégories de Tennis
+        { name: 'Grand Chelem', emoji: '🏆', url: 'mode-selection.html?matiere=sport&categorie=tennis-grandchelem', parent: 'Tennis', keywords: ['grand chelem', 'roland garros', 'wimbledon', 'us open', 'australian open'] },
+        { name: 'Légendes du Tennis', emoji: '👑', url: 'mode-selection.html?matiere=sport&categorie=tennis-legendes', parent: 'Tennis', keywords: ['légendes', 'federer', 'nadal', 'djokovic', 'borg', 'sampras', 'agassi'] },
         { name: 'Athlétisme', emoji: '🏃', url: 'mode-selection.html?matiere=sport&categorie=athletisme', parent: 'Sport', keywords: ['athlétisme', 'course', 'sprint', 'marathon', 'saut'] },
         { name: 'Natation', emoji: '🏊', url: 'mode-selection.html?matiere=sport&categorie=natation', parent: 'Sport', keywords: ['natation', 'nager', 'piscine', 'crawl', 'brasse'] },
         { name: 'Jeux Olympiques', emoji: '🏅', url: 'mode-selection.html?matiere=sport&categorie=jeux-olympiques', parent: 'Sport', keywords: ['olympiques', 'jo', 'jeux', 'médailles', 'olympics'] },
@@ -74,6 +96,10 @@ const searchData = {
         { name: 'Opéra', emoji: '🎭', url: 'mode-selection.html?matiere=musique&categorie=classique-opera', parent: 'Musique Classique', keywords: ['opéra', 'verdi', 'wagner', 'puccini', 'bizet', 'aria', 'ténor', 'soprano'] },
         { name: 'Compositeurs Célèbres', emoji: '🎼', url: 'mode-selection.html?matiere=musique&categorie=classique-compositeurs', parent: 'Musique Classique', keywords: ['compositeurs', 'mozart', 'beethoven', 'bach', 'haydn', 'schubert'] },
         { name: 'Rock', emoji: '🎸', url: 'mode-selection.html?matiere=musique&categorie=rock', parent: 'Musique', keywords: ['rock', 'guitare', 'metal', 'hard rock', 'groupe'] },
+        // Sous-sous-catégories de Rock
+        { name: 'Rock Classique', emoji: '🎸', url: 'mode-selection.html?matiere=musique&categorie=rock-classique', parent: 'Rock', keywords: ['rock classique', 'beatles', 'rolling stones', 'led zeppelin', 'pink floyd', '60s', '70s'] },
+        { name: 'Metal', emoji: '🤘', url: 'mode-selection.html?matiere=musique&categorie=rock-metal', parent: 'Rock', keywords: ['metal', 'heavy metal', 'metallica', 'iron maiden', 'black sabbath', 'thrash'] },
+        { name: 'Rock Alternatif', emoji: '🎵', url: 'mode-selection.html?matiere=musique&categorie=rock-alternatif', parent: 'Rock', keywords: ['alternatif', 'grunge', 'indie', 'nirvana', 'radiohead', '90s'] },
         { name: 'Jazz', emoji: '🎷', url: 'mode-selection.html?matiere=musique&categorie=jazz', parent: 'Musique', keywords: ['jazz', 'blues', 'swing', 'saxophone', 'improvisation'] },
         { name: 'Rap & Hip-Hop', emoji: '🎤', url: 'mode-selection.html?matiere=musique&categorie=rap', parent: 'Musique', keywords: ['rap', 'hip-hop', 'hip hop', 'rappeur', 'mc', 'flow'] },
         { name: 'Musiques du Monde', emoji: '🌍', url: 'mode-selection.html?matiere=musique&categorie=monde', parent: 'Musique', keywords: ['monde', 'world', 'ethnique', 'traditionnel', 'folklore'] },

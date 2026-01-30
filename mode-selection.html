@@ -470,6 +470,18 @@
 
         // Données des sous-sous-catégories (synchronisées avec search-system.js)
         const subSubcategories = {
+            'histoire': {
+                'antiquite': [
+                    { name: 'Grèce Antique', emoji: '🏺', categorie: 'antiquite-grece' },
+                    { name: 'Rome Antique', emoji: '🦅', categorie: 'antiquite-rome' },
+                    { name: 'Égypte Antique', emoji: '🔺', categorie: 'antiquite-egypte' }
+                ],
+                'guerres': [
+                    { name: 'Première Guerre Mondiale', emoji: '🎖️', categorie: 'guerres-ww1' },
+                    { name: 'Seconde Guerre Mondiale', emoji: '✈️', categorie: 'guerres-ww2' },
+                    { name: 'Guerre Froide', emoji: '❄️', categorie: 'guerres-froide' }
+                ]
+            },
             'art': {
                 'peinture': [
                     { name: 'Peinture Renaissance', emoji: '🎨', categorie: 'peinture-renaissance' },
@@ -485,6 +497,15 @@
                     { name: 'Ligue des Champions', emoji: '⭐', categorie: 'football-ucl' },
                     { name: 'Ligue 1', emoji: '🇫🇷', categorie: 'football-ligue1' },
                     { name: 'Légendes du Football', emoji: '👑', categorie: 'football-legendes' }
+                ],
+                'basketball': [
+                    { name: 'NBA', emoji: '🇺🇸', categorie: 'basketball-nba' },
+                    { name: 'Euroleague', emoji: '🇪🇺', categorie: 'basketball-euro' },
+                    { name: 'Légendes du Basketball', emoji: '👑', categorie: 'basketball-legendes' }
+                ],
+                'tennis': [
+                    { name: 'Grand Chelem', emoji: '🏆', categorie: 'tennis-grandchelem' },
+                    { name: 'Légendes du Tennis', emoji: '👑', categorie: 'tennis-legendes' }
                 ]
             },
             'musique': {
@@ -493,6 +514,24 @@
                     { name: 'Musique Romantique', emoji: '💜', categorie: 'classique-romantique' },
                     { name: 'Opéra', emoji: '🎭', categorie: 'classique-opera' },
                     { name: 'Compositeurs Célèbres', emoji: '🎼', categorie: 'classique-compositeurs' }
+                ],
+                'rock': [
+                    { name: 'Rock Classique', emoji: '🎸', categorie: 'rock-classique' },
+                    { name: 'Metal', emoji: '🤘', categorie: 'rock-metal' },
+                    { name: 'Rock Alternatif', emoji: '🎵', categorie: 'rock-alternatif' }
+                ]
+            },
+            'litterature': {
+                'theatre': [
+                    { name: 'Théâtre Classique', emoji: '🎭', categorie: 'theatre-classique' },
+                    { name: 'Théâtre Contemporain', emoji: '🎪', categorie: 'theatre-contemporain' }
+                ]
+            },
+            'science': {
+                'astronomie': [
+                    { name: 'Système Solaire', emoji: '☀️', categorie: 'astronomie-solaire' },
+                    { name: 'Exploration Spatiale', emoji: '🚀', categorie: 'astronomie-exploration' },
+                    { name: 'Étoiles & Galaxies', emoji: '🌌', categorie: 'astronomie-galaxies' }
                 ]
             },
             'cinema': {

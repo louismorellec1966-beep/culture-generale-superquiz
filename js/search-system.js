@@ -53,40 +53,64 @@ const searchData = {
         { name: 'Littérature Mondiale', emoji: '🌍', url: 'mode-selection.html?matiere=litterature&categorie=mondiale', parent: 'Littérature', keywords: ['mondiale', 'international', 'étrangère', 'world'] },
         { name: 'Littérature Contemporaine', emoji: '📚', url: 'mode-selection.html?matiere=litterature&categorie=contemporaine', parent: 'Littérature', keywords: ['contemporaine', 'moderne', 'actuelle', 'récente'] },
 
-        // Sport (6 sous-catégories)
+        // Sport (6 sous-catégories + sous-sous-catégories)
         { name: 'Football', emoji: '⚽', url: 'mode-selection.html?matiere=sport&categorie=football', parent: 'Sport', keywords: ['football', 'foot', 'ballon rond', 'coupe du monde', 'ligue', 'fifa'] },
+        // Sous-sous-catégories de Football
+        { name: 'Coupe du Monde', emoji: '🏆', url: 'mode-selection.html?matiere=sport&categorie=football-cdm', parent: 'Football', keywords: ['coupe du monde', 'mondial', 'world cup', 'fifa', 'nations'] },
+        { name: 'Ligue des Champions', emoji: '⭐', url: 'mode-selection.html?matiere=sport&categorie=football-ucl', parent: 'Football', keywords: ['ligue des champions', 'champions league', 'ucl', 'europe', 'clubs'] },
+        { name: 'Ligue 1', emoji: '🇫🇷', url: 'mode-selection.html?matiere=sport&categorie=football-ligue1', parent: 'Football', keywords: ['ligue 1', 'france', 'psg', 'om', 'championnat français'] },
+        { name: 'Légendes du Football', emoji: '👑', url: 'mode-selection.html?matiere=sport&categorie=football-legendes', parent: 'Football', keywords: ['légendes', 'pelé', 'maradona', 'zidane', 'messi', 'ronaldo', 'platini'] },
         { name: 'Basketball', emoji: '🏀', url: 'mode-selection.html?matiere=sport&categorie=basketball', parent: 'Sport', keywords: ['basketball', 'basket', 'nba', 'panier'] },
         { name: 'Tennis', emoji: '🎾', url: 'mode-selection.html?matiere=sport&categorie=tennis', parent: 'Sport', keywords: ['tennis', 'raquette', 'roland garros', 'wimbledon', 'atp'] },
         { name: 'Athlétisme', emoji: '🏃', url: 'mode-selection.html?matiere=sport&categorie=athletisme', parent: 'Sport', keywords: ['athlétisme', 'course', 'sprint', 'marathon', 'saut'] },
         { name: 'Natation', emoji: '🏊', url: 'mode-selection.html?matiere=sport&categorie=natation', parent: 'Sport', keywords: ['natation', 'nager', 'piscine', 'crawl', 'brasse'] },
         { name: 'Jeux Olympiques', emoji: '🏅', url: 'mode-selection.html?matiere=sport&categorie=jeux-olympiques', parent: 'Sport', keywords: ['olympiques', 'jo', 'jeux', 'médailles', 'olympics'] },
 
-        // Musique (6 sous-catégories)
+        // Musique (6 sous-catégories + sous-sous-catégories)
         { name: 'Musique Classique', emoji: '🎻', url: 'mode-selection.html?matiere=musique&categorie=classique', parent: 'Musique', keywords: ['classique', 'orchestres', 'symphonie', 'opéra', 'mozart', 'beethoven'] },
+        // Sous-sous-catégories de Musique Classique
+        { name: 'Musique Baroque', emoji: '🎹', url: 'mode-selection.html?matiere=musique&categorie=classique-baroque', parent: 'Musique Classique', keywords: ['baroque', 'bach', 'vivaldi', 'haendel', '17e siècle', '18e siècle', 'clavecin'] },
+        { name: 'Musique Romantique', emoji: '💜', url: 'mode-selection.html?matiere=musique&categorie=classique-romantique', parent: 'Musique Classique', keywords: ['romantique', 'chopin', 'liszt', 'schumann', 'brahms', 'tchaïkovski', '19e siècle'] },
+        { name: 'Opéra', emoji: '🎭', url: 'mode-selection.html?matiere=musique&categorie=classique-opera', parent: 'Musique Classique', keywords: ['opéra', 'verdi', 'wagner', 'puccini', 'bizet', 'aria', 'ténor', 'soprano'] },
+        { name: 'Compositeurs Célèbres', emoji: '🎼', url: 'mode-selection.html?matiere=musique&categorie=classique-compositeurs', parent: 'Musique Classique', keywords: ['compositeurs', 'mozart', 'beethoven', 'bach', 'haydn', 'schubert'] },
         { name: 'Rock', emoji: '🎸', url: 'mode-selection.html?matiere=musique&categorie=rock', parent: 'Musique', keywords: ['rock', 'guitare', 'metal', 'hard rock', 'groupe'] },
         { name: 'Jazz', emoji: '🎷', url: 'mode-selection.html?matiere=musique&categorie=jazz', parent: 'Musique', keywords: ['jazz', 'blues', 'swing', 'saxophone', 'improvisation'] },
         { name: 'Rap & Hip-Hop', emoji: '🎤', url: 'mode-selection.html?matiere=musique&categorie=rap', parent: 'Musique', keywords: ['rap', 'hip-hop', 'hip hop', 'rappeur', 'mc', 'flow'] },
         { name: 'Musiques du Monde', emoji: '🌍', url: 'mode-selection.html?matiere=musique&categorie=monde', parent: 'Musique', keywords: ['monde', 'world', 'ethnique', 'traditionnel', 'folklore'] },
         { name: 'Théorie Musicale', emoji: '🎼', url: 'mode-selection.html?matiere=musique&categorie=theorie', parent: 'Musique', keywords: ['théorie', 'solfège', 'notes', 'accords', 'gammes'] },
 
-        // Art (6 sous-catégories)
-        { name: 'Peinture', emoji: '🖌️', url: 'mode-selection.html?matiere=art&categorie=peinture', parent: 'Art', keywords: ['peinture', 'peintres', 'tableaux', 'toile', 'huile', 'aquarelle', 'impressionnisme'] },
+        // Art (6 sous-catégories + sous-sous-catégories)
+        { name: 'Peinture', emoji: '🖌️', url: 'mode-selection.html?matiere=art&categorie=peinture', parent: 'Art', keywords: ['peinture', 'peintres', 'tableaux', 'toile', 'huile', 'aquarelle'] },
+        // Sous-sous-catégories de Peinture
+        { name: 'Peinture Renaissance', emoji: '🎨', url: 'mode-selection.html?matiere=art&categorie=peinture-renaissance', parent: 'Peinture', keywords: ['renaissance', 'léonard de vinci', 'michel-ange', 'raphaël', 'botticelli', '15e siècle', '16e siècle', 'italie'] },
+        { name: 'Peinture Baroque', emoji: '🖼️', url: 'mode-selection.html?matiere=art&categorie=peinture-baroque', parent: 'Peinture', keywords: ['baroque', 'caravage', 'rubens', 'rembrandt', 'vermeer', '17e siècle', 'clair-obscur'] },
+        { name: 'Peinture Impressionniste', emoji: '🌸', url: 'mode-selection.html?matiere=art&categorie=peinture-impressionnisme', parent: 'Peinture', keywords: ['impressionnisme', 'monet', 'renoir', 'degas', 'manet', 'cézanne', 'lumière', '19e siècle'] },
+        { name: 'Peinture Romantique', emoji: '🌅', url: 'mode-selection.html?matiere=art&categorie=peinture-romantisme', parent: 'Peinture', keywords: ['romantisme', 'delacroix', 'géricault', 'turner', 'friedrich', 'émotion', '19e siècle'] },
+        { name: 'Peinture Classique', emoji: '🏛️', url: 'mode-selection.html?matiere=art&categorie=peinture-classique', parent: 'Peinture', keywords: ['classicisme', 'poussin', 'david', 'ingres', 'académisme', '17e siècle', '18e siècle'] },
         { name: 'Sculpture', emoji: '🗿', url: 'mode-selection.html?matiere=art&categorie=sculpture', parent: 'Art', keywords: ['sculpture', 'sculpteurs', 'statues', 'bronze', 'marbre'] },
         { name: 'Architecture', emoji: '🏛️', url: 'mode-selection.html?matiere=art&categorie=architecture', parent: 'Art', keywords: ['architecture', 'monuments', 'bâtiments', 'architectes', 'style'] },
         { name: 'Art Moderne', emoji: '🖼️', url: 'mode-selection.html?matiere=art&categorie=moderne', parent: 'Art', keywords: ['moderne', 'contemporain', 'abstrait', 'avant-garde', 'xxe siècle'] },
         { name: 'Photographie', emoji: '📷', url: 'mode-selection.html?matiere=art&categorie=photo', parent: 'Art', keywords: ['photographie', 'photo', 'photographes', 'clichés', 'images'] },
         { name: 'Histoire de l\'Art', emoji: '📜', url: 'mode-selection.html?matiere=art&categorie=histoire', parent: 'Art', keywords: ['histoire', 'époques', 'mouvements', 'courants', 'renaissance', 'baroque'] },
 
-        // Cinéma (6 sous-catégories)
+        // Cinéma (6 sous-catégories + sous-sous-catégories)
         { name: 'Cinéma Français', emoji: '🇫🇷', url: 'mode-selection.html?matiere=cinema&categorie=francais', parent: 'Cinéma', keywords: ['français', 'france', 'cinéma français', 'nouvelle vague'] },
+        // Sous-sous-catégories de Cinéma Français
+        { name: 'Nouvelle Vague', emoji: '🌊', url: 'mode-selection.html?matiere=cinema&categorie=francais-nouvellevague', parent: 'Cinéma Français', keywords: ['nouvelle vague', 'godard', 'truffaut', 'chabrol', 'rohmer', '1960'] },
+        { name: 'Comédie Française', emoji: '😂', url: 'mode-selection.html?matiere=cinema&categorie=francais-comedie', parent: 'Cinéma Français', keywords: ['comédie', 'de funès', 'bourvil', 'coluche', 'depardieu', 'rire'] },
+        { name: 'Cinéma d\'Auteur', emoji: '🎬', url: 'mode-selection.html?matiere=cinema&categorie=francais-auteur', parent: 'Cinéma Français', keywords: ['auteur', 'art et essai', 'festival', 'cannes', 'audiard', 'dolan'] },
         { name: 'Cinéma International', emoji: '🌍', url: 'mode-selection.html?matiere=cinema&categorie=international', parent: 'Cinéma', keywords: ['international', 'hollywood', 'étranger', 'world cinema'] },
         { name: 'Acteurs & Actrices', emoji: '🌟', url: 'mode-selection.html?matiere=cinema&categorie=acteurs', parent: 'Cinéma', keywords: ['acteurs', 'actrices', 'stars', 'célébrités', 'comédiens'] },
         { name: 'Réalisateurs', emoji: '🎥', url: 'mode-selection.html?matiere=cinema&categorie=realisateurs', parent: 'Cinéma', keywords: ['réalisateurs', 'metteurs en scène', 'directors', 'cinéastes'] },
         { name: 'Oscars & Récompenses', emoji: '🏆', url: 'mode-selection.html?matiere=cinema&categorie=oscars', parent: 'Cinéma', keywords: ['oscars', 'césar', 'récompenses', 'prix', 'palmarès', 'festival'] },
         { name: 'Films Cultes', emoji: '🎬', url: 'mode-selection.html?matiere=cinema&categorie=films-cultes', parent: 'Cinéma', keywords: ['cultes', 'classiques', 'incontournables', 'chef-d\'oeuvre', 'mythiques'] },
 
-        // Gastronomie (6 sous-catégories)
+        // Gastronomie (6 sous-catégories + sous-sous-catégories)
         { name: 'Cuisine Française', emoji: '🇫🇷', url: 'mode-selection.html?matiere=gastronomie&categorie=francaise', parent: 'Gastronomie', keywords: ['française', 'france', 'traditionnelle', 'terroir'] },
+        // Sous-sous-catégories de Cuisine Française
+        { name: 'Cuisine Régionale', emoji: '🗺️', url: 'mode-selection.html?matiere=gastronomie&categorie=francaise-regionale', parent: 'Cuisine Française', keywords: ['régionale', 'bretagne', 'alsace', 'provence', 'lyon', 'terroir'] },
+        { name: 'Haute Gastronomie', emoji: '⭐', url: 'mode-selection.html?matiere=gastronomie&categorie=francaise-haute', parent: 'Cuisine Française', keywords: ['haute gastronomie', 'étoilé', 'michelin', 'bocuse', 'escoffier', 'luxe'] },
+        { name: 'Pâtisserie Française', emoji: '🥐', url: 'mode-selection.html?matiere=gastronomie&categorie=francaise-patisserie', parent: 'Cuisine Française', keywords: ['pâtisserie', 'croissant', 'macaron', 'éclair', 'tarte', 'hermé'] },
         { name: 'Cuisine Mondiale', emoji: '🌍', url: 'mode-selection.html?matiere=gastronomie&categorie=mondiale', parent: 'Gastronomie', keywords: ['mondiale', 'international', 'étrangère', 'world'] },
         { name: 'Chefs Cuisiniers', emoji: '👨‍🍳', url: 'mode-selection.html?matiere=gastronomie&categorie=chefs', parent: 'Gastronomie', keywords: ['chefs', 'cuisiniers', 'étoilés', 'bocuse', 'top chef'] },
         { name: 'Fromages', emoji: '🧀', url: 'mode-selection.html?matiere=gastronomie&categorie=fromages', parent: 'Gastronomie', keywords: ['fromages', 'fromage', 'lait', 'affinage'] },

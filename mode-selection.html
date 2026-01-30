@@ -293,6 +293,70 @@
                 max-width: 250px;
             }
         }
+
+        /* Styles pour la sélection de sous-sous-catégories */
+        .subcategory-selection {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .subcategory-selection h3 {
+            margin: 0 0 20px 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+        }
+
+        .subcategory-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .subcategory-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 20px 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .subcategory-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .subcategory-card .emoji {
+            font-size: 2em;
+        }
+
+        .subcategory-card .name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .subcategory-hint {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .subcategory-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
@@ -305,6 +369,15 @@
 
             <div class="quiz-info" id="quiz-info">
                 <h2>Chargement...</h2>
+            </div>
+
+            <!-- Sélection de sous-sous-catégorie (si disponible) -->
+            <div class="subcategory-selection" id="subcategory-selection" style="display: none;">
+                <h3>📂 Choisir une spécialité</h3>
+                <div class="subcategory-options" id="subcategory-options">
+                    <!-- Les sous-sous-catégories seront injectées ici -->
+                </div>
+                <p class="subcategory-hint">Ou choisissez un mode ci-dessous pour toute la catégorie</p>
             </div>
 
             <!-- Sélection de difficulté -->
@@ -391,9 +464,73 @@
         const urlParams = new URLSearchParams(window.location.search);
         const matiere = urlParams.get('matiere');
         const categorie = urlParams.get('categorie');
-        
+
         // Difficulté sélectionnée (par défaut : toutes)
         let selectedDifficulty = 'all';
+
+        // Données des sous-sous-catégories (synchronisées avec search-system.js)
+        const subSubcategories = {
+            'art': {
+                'peinture': [
+                    { name: 'Peinture Renaissance', emoji: '🎨', categorie: 'peinture-renaissance' },
+                    { name: 'Peinture Baroque', emoji: '🖼️', categorie: 'peinture-baroque' },
+                    { name: 'Peinture Impressionniste', emoji: '🌸', categorie: 'peinture-impressionnisme' },
+                    { name: 'Peinture Romantique', emoji: '🌅', categorie: 'peinture-romantisme' },
+                    { name: 'Peinture Classique', emoji: '🏛️', categorie: 'peinture-classique' }
+                ]
+            },
+            'sport': {
+                'football': [
+                    { name: 'Coupe du Monde', emoji: '🏆', categorie: 'football-cdm' },
+                    { name: 'Ligue des Champions', emoji: '⭐', categorie: 'football-ucl' },
+                    { name: 'Ligue 1', emoji: '🇫🇷', categorie: 'football-ligue1' },
+                    { name: 'Légendes du Football', emoji: '👑', categorie: 'football-legendes' }
+                ]
+            },
+            'musique': {
+                'classique': [
+                    { name: 'Musique Baroque', emoji: '🎹', categorie: 'classique-baroque' },
+                    { name: 'Musique Romantique', emoji: '💜', categorie: 'classique-romantique' },
+                    { name: 'Opéra', emoji: '🎭', categorie: 'classique-opera' },
+                    { name: 'Compositeurs Célèbres', emoji: '🎼', categorie: 'classique-compositeurs' }
+                ]
+            },
+            'cinema': {
+                'francais': [
+                    { name: 'Nouvelle Vague', emoji: '🌊', categorie: 'francais-nouvellevague' },
+                    { name: 'Comédie Française', emoji: '😂', categorie: 'francais-comedie' },
+                    { name: 'Cinéma d\'Auteur', emoji: '🎬', categorie: 'francais-auteur' }
+                ]
+            },
+            'gastronomie': {
+                'francaise': [
+                    { name: 'Cuisine Régionale', emoji: '🗺️', categorie: 'francaise-regionale' },
+                    { name: 'Haute Gastronomie', emoji: '⭐', categorie: 'francaise-haute' },
+                    { name: 'Pâtisserie Française', emoji: '🥐', categorie: 'francaise-patisserie' }
+                ]
+            }
+        };
+
+        // Fonction pour afficher les sous-sous-catégories
+        function displaySubSubcategories() {
+            const container = document.getElementById('subcategory-selection');
+            const optionsContainer = document.getElementById('subcategory-options');
+
+            // Vérifier si des sous-sous-catégories existent pour cette matière/catégorie
+            const subSubs = subSubcategories[matiere]?.[categorie];
+
+            if (subSubs && subSubs.length > 0) {
+                container.style.display = 'block';
+                optionsContainer.innerHTML = subSubs.map(sub => `
+                    <a href="mode-selection.html?matiere=${matiere}&categorie=${sub.categorie}" class="subcategory-card">
+                        <span class="emoji">${sub.emoji}</span>
+                        <span class="name">${sub.name}</span>
+                    </a>
+                `).join('');
+            } else {
+                container.style.display = 'none';
+            }
+        }
 
         // Fonction pour sélectionner la difficulté
         function selectDifficulty(difficulty) {
@@ -503,6 +640,7 @@
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
             displayQuizInfo();
+            displaySubSubcategories();
             
             // Gestion du menu d'authentification
             const nav = document.querySelector('.menu');

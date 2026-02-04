@@ -442,6 +442,7 @@ label {
     margin-left: 5px;
     cursor: pointer;
     transition: color var(--transition-speed) ease;
+    color: #333;
 }
 
 label:hover {
